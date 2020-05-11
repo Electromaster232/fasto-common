@@ -27,64 +27,24 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#pragma once
-
-#include <string>
-#include <vector>
+#include <common/uri/url_constants.h>
 
 namespace common {
 namespace uri {
 
-extern const char uri_separator;
-extern const char uri_separator_string[];
+const char kDataScheme[] = "data";
+const char kFileScheme[] = "file";
+const char kDevScheme[] = "dev";
+const char kFtpScheme[] = "ftp";
+const char kHttpScheme[] = "http";
+const char kHttpsScheme[] = "https";
+const char kTelScheme[] = "tel";
+const char kWsScheme[] = "ws";
+const char kWssScheme[] = "wss";
 
-struct QueryParams {
-  std::string key;
-  std::string value;
-};
+const char kStandardSchemeSeparator[] = "://";
 
-class Upath {
- public:
-  Upath();
-  explicit Upath(const std::string& url_sp);
-  static Upath MakeRoot();
-
-  bool IsValid() const;
-  bool IsRoot() const;
-
-  std::string GetPath() const;  // hpath + filename = path
-  void SetPath(const std::string& path);
-
-  std::string GetQuery() const;
-  std::vector<QueryParams> GetQueryParams() const;
-
-  std::string GetMime() const;  // mime
-  size_t GetLevels() const;
-  std::string GetHpathLevel(size_t lv) const;  // directories
-  std::string GetHpath() const;                // directories
-  std::string GetFileName() const;             // filename
-  std::string GetUpath() const;                // path + query
-  bool Equals(const Upath& path) const;
-
- private:
-  void Parse(const std::string& url_s);
-  void Parse(const char* url_s, size_t len);
-
-  std::string path_;
-  std::string query_;
-};
-
-inline bool operator==(const Upath& left, const Upath& right) {
-  return left.Equals(right);
-}
-
-inline bool operator!=(const Upath& left, const Upath& right) {
-  return !(left == right);
-}
-
-namespace detail {
-const char* get_mime_type(const char* name);
-}
+const size_t kMaxURLChars = 2 * 1024 * 1024;
 
 }  // namespace uri
 }  // namespace common

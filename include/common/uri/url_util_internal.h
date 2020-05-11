@@ -31,83 +31,15 @@
 
 #include <string>
 
-#include <common/macros.h>
-
-#include <common/uri/upath.h>
+#include <common/uri/url_parse.h>
 
 namespace common {
 namespace uri {
 
-class Url {
- public:
-  enum scheme {
-    unknown = 0,  // defualt value
-    http = 1,
-    https = 2,
-    ftp = 3,
-    file = 4,
-    ws = 5,
-    wss = 6,
-    udp = 7,
-    tcp = 8,
-    rtmp = 9,
-    dev = 10,
-    rtsp = 11,
-    srt = 12,
-    num_schemes
-  };
-  enum {
-    host_size = 64,
-  };
-
-  Url();
-  explicit Url(const std::string& url_s);
-
-  bool IsValid() const;
-
-  scheme GetScheme() const;
-  std::string GetProtocol() const;
-
-  const std::string& GetHost() const;
-  void SetHost(const std::string& host);
-
-  Upath GetPath() const;
-  void SetPath(const Upath& path);
-
-  std::string GetUrl() const;    // IsValid == true
-  std::string GetHroot() const;  // IsValid == true
-  std::string GetHpath() const;  // IsValid == true
-  bool Equals(const Url& uri) const;
-
- private:
-  void Parse(const std::string& url_s);
-
-  scheme scheme_;
-  std::string host_;
-  Upath path_;
-};
-
-inline bool operator==(const Url& left, const Url& right) {
-  return left.Equals(right);
-}
-
-inline bool operator!=(const Url& left, const Url& right) {
-  return !(left == right);
-}
-
-namespace detail {
-bool get_schemes(const char* url_s, size_t len, Url::scheme* prot);
-/* Returns a url-encoded version of str */
-/* IMPORTANT: be sure to free() the returned string after use */
-char* uri_encode(const char* str, size_t len);
-
-/* Returns a url-decoded version of str */
-/* IMPORTANT: be sure to free() the returned string after use */
-char* uri_decode(const char* str, size_t len);
-}  // namespace detail
+// Given a string and a range inside the string, compares it to the given
+// lower-case |compare_to| buffer.
+bool CompareSchemeComponent(const char* spec, const Component& component, const char* compare_to);
+bool CompareSchemeComponent(const char16* spec, const Component& component, const char* compare_to);
 
 }  // namespace uri
-
-std::string ConvertToString(const uri::Url& from);
-bool ConvertFromString(const std::string& from, uri::Url* out) WARN_UNUSED_RESULT;
 }  // namespace common

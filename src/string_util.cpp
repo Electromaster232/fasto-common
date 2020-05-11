@@ -67,7 +67,41 @@ bool CompareParameter(const ReplacementOffset& elem1, const ReplacementOffset& e
   return elem1.parameter < elem2.parameter;
 }
 
+template <typename StringType>
+StringType ToLowerASCIIImpl(BasicStringPiece<StringType> str) {
+  StringType ret;
+  ret.reserve(str.size());
+  for (size_t i = 0; i < str.size(); i++)
+    ret.push_back(ToLowerASCII(str[i]));
+  return ret;
+}
+
+template <typename StringType>
+StringType ToUpperASCIIImpl(BasicStringPiece<StringType> str) {
+  StringType ret;
+  ret.reserve(str.size());
+  for (size_t i = 0; i < str.size(); i++)
+    ret.push_back(ToUpperASCII(str[i]));
+  return ret;
+}
+
 }  // namespace
+
+std::string ToLowerASCII(StringPiece str) {
+  return ToLowerASCIIImpl<std::string>(str);
+}
+
+string16 ToLowerASCII(StringPiece16 str) {
+  return ToLowerASCIIImpl<string16>(str);
+}
+
+std::string ToUpperASCII(StringPiece str) {
+  return ToUpperASCIIImpl<std::string>(str);
+}
+
+string16 ToUpperASCII(StringPiece16 str) {
+  return ToUpperASCIIImpl<string16>(str);
+}
 
 // Overloaded function to append one string onto the end of another. Having a
 // separate overload for |source| as both string and StringPiece allows for more
@@ -200,6 +234,23 @@ bool TrimString(const string16& input, const StringPiece16& trim_chars, string16
 
 bool TrimString(const std::string& input, const StringPiece& trim_chars, std::string* output) {
   return TrimStringT(input, trim_chars.as_string(), TRIM_ALL, output) != TRIM_NONE;
+}
+
+template <typename Str>
+BasicStringPiece<Str> TrimStringPieceT(BasicStringPiece<Str> input,
+                                       BasicStringPiece<Str> trim_chars,
+                                       TrimPositions positions) {
+  size_t begin = (positions & TRIM_LEADING) ? input.find_first_not_of(trim_chars) : 0;
+  size_t end = (positions & TRIM_TRAILING) ? input.find_last_not_of(trim_chars) + 1 : input.size();
+  return input.substr(begin, end - begin);
+}
+
+StringPiece16 TrimString(StringPiece16 input, StringPiece16 trim_chars, TrimPositions positions) {
+  return TrimStringPieceT(input, trim_chars, positions);
+}
+
+StringPiece TrimString(StringPiece input, StringPiece trim_chars, TrimPositions positions) {
+  return TrimStringPieceT(input, trim_chars, positions);
 }
 
 void TruncateUTF8ToByteSize(const std::string& input, const size_t byte_size, std::string* output) {
@@ -343,44 +394,24 @@ bool IsStringUTF8(const std::string& str) {
   return true;
 }
 
-template <typename Iter>
-static inline bool DoLowerCaseEqualsASCII(Iter a_begin, Iter a_end, const char* b) {
-  for (Iter it = a_begin; it != a_end; ++it, ++b) {
-    if (!*b || ToLowerASCII(*it) != *b) {
+template <typename Str>
+static inline bool DoLowerCaseEqualsASCII(BasicStringPiece<Str> str, StringPiece lowercase_ascii) {
+  if (str.size() != lowercase_ascii.size())
+    return false;
+  for (size_t i = 0; i < str.size(); i++) {
+    if (ToLowerASCII(str[i]) != lowercase_ascii[i])
       return false;
-    }
   }
-  return *b == 0;
+  return true;
 }
 
-// Front-ends for LowerCaseEqualsASCII.
-bool LowerCaseEqualsASCII(const std::string& a, const char* b) {
-  return DoLowerCaseEqualsASCII(a.begin(), a.end(), b);
+bool LowerCaseEqualsASCII(StringPiece str, StringPiece lowercase_ascii) {
+  return DoLowerCaseEqualsASCII<std::string>(str, lowercase_ascii);
 }
 
-bool LowerCaseEqualsASCII(const string16& a, const char* b) {
-  return DoLowerCaseEqualsASCII(a.begin(), a.end(), b);
+bool LowerCaseEqualsASCII(StringPiece16 str, StringPiece lowercase_ascii) {
+  return DoLowerCaseEqualsASCII<string16>(str, lowercase_ascii);
 }
-
-bool LowerCaseEqualsASCII(std::string::const_iterator a_begin, std::string::const_iterator a_end, const char* b) {
-  return DoLowerCaseEqualsASCII(a_begin, a_end, b);
-}
-
-bool LowerCaseEqualsASCII(string16::const_iterator a_begin, string16::const_iterator a_end, const char* b) {
-  return DoLowerCaseEqualsASCII(a_begin, a_end, b);
-}
-
-// TODO(port): Resolve wchar_t/iterator issues that require OS_ANDROID here.
-#if !defined(OS_ANDROID)
-bool LowerCaseEqualsASCII(const char* a_begin, const char* a_end, const char* b) {
-  return DoLowerCaseEqualsASCII(a_begin, a_end, b);
-}
-
-bool LowerCaseEqualsASCII(const char16* a_begin, const char16* a_end, const char* b) {
-  return DoLowerCaseEqualsASCII(a_begin, a_end, b);
-}
-
-#endif  // !defined(OS_ANDROID)
 
 bool EqualsASCII(const string16& a, const StringPiece& b) {
   if (a.length() != b.length()) {

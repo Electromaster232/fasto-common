@@ -66,17 +66,17 @@ bool GetHttpHostAndPort(const std::string& host, HostAndPort* out) {
   return true;
 }
 
-bool GetPostServerFromUrl(const uri::Url& url, HostAndPort* out) {
-  if (!url.IsValid() || !out) {
+bool GetPostServerFromUrl(const uri::GURL& url, HostAndPort* out) {
+  if (!url.is_valid() || !out) {
     return false;
   }
 
-  const std::string host_str = url.GetHost();
+  const std::string host_str = url.HostNoBrackets();
   return GetHttpHostAndPort(host_str, out);
 }
 }  // namespace
 
-Error IHttpClient::PostFile(const uri::Upath& path, const file_system::ascii_file_string_path& file_path) {
+Error IHttpClient::PostFile(const url_t& path, const file_system::ascii_file_string_path& file_path) {
   file_system::File file;
   ErrnoError errn = file.Open(file_path, file_system::File::FLAG_OPEN | file_system::File::FLAG_READ);
   if (errn) {
@@ -117,7 +117,7 @@ Error IHttpClient::PostFile(const uri::Upath& path, const file_system::ascii_fil
   return Error();
 }
 
-Error IHttpClient::Get(const uri::Upath& path) {
+Error IHttpClient::Get(const url_t& path) {
   const HostAndPort hs = GetHost();
   http::HttpHeader header("Host", ConvertToString(hs));
   http::HttpHeader user("User-Agent", USER_AGENT_VALUE);
@@ -128,7 +128,7 @@ Error IHttpClient::Get(const uri::Upath& path) {
   return SendRequest(*req);
 }
 
-Error IHttpClient::Head(const uri::Upath& path) {
+Error IHttpClient::Head(const url_t& path) {
   const HostAndPort hs = GetHost();
   http::HttpHeader header("Host", ConvertToString(hs));
   http::HttpHeader user("User-Agent", USER_AGENT_VALUE);
@@ -261,7 +261,7 @@ HostAndPort HttpClient::GetHost() const {
   return sock->GetHost();
 }
 
-Error PostHttpFile(const file_system::ascii_file_string_path& file_path, const uri::Url& url) {
+Error PostHttpFile(const file_system::ascii_file_string_path& file_path, const uri::GURL& url) {
   HostAndPort http_server_address;
   if (!GetPostServerFromUrl(url, &http_server_address)) {
     return make_error_inval();
@@ -273,7 +273,7 @@ Error PostHttpFile(const file_system::ascii_file_string_path& file_path, const u
     return make_error_from_errno(errn);
   }
 
-  const auto path = url.GetPath();
+  const auto path = url.PathForRequest();
   Error err = cl.PostFile(path, file_path);
   if (err) {
     cl.Disconnect();
