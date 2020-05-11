@@ -32,7 +32,6 @@
 #include <stddef.h>
 
 #include <iosfwd>
-#include <memory>
 #include <string>
 
 #include <common/uri/url_canon_stdstring.h>
@@ -345,14 +344,6 @@ class GURL {
   // may be called from any thread.
   static const GURL& EmptyGURL();
 
-  // Returns the inner URL of a nested URL (currently only non-null for
-  // filesystem URLs).
-  //
-  // TODO(mmenke): inner_url().spec() currently returns the same value as
-  // caling spec() on the GURL itself. This should be fixed.
-  // See https://crbug.com/619596
-  const GURL* inner_url() const { return inner_url_.get(); }
-
  private:
   // Variant of the string parsing constructor that allows the caller to elect
   // retain trailing whitespace, if any, on the passed URL spec, but only if
@@ -389,9 +380,6 @@ class GURL {
 
   // Identified components of the canonical spec.
   uri::Parsed parsed_;
-
-  // Used for nested schemes [currently only filesystem:].
-  std::unique_ptr<GURL> inner_url_;
 };
 
 std::ostream& operator<<(std::ostream& out, const GURL& url);

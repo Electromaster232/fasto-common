@@ -46,17 +46,10 @@ namespace uri {
 GURL::GURL() : is_valid_(false) {}
 
 GURL::GURL(const GURL& other) : spec_(other.spec_), is_valid_(other.is_valid_), parsed_(other.parsed_) {
-  if (other.inner_url_)
-    inner_url_.reset(new GURL(*other.inner_url_));
-  // Valid filesystem urls should always have an inner_url_.
-  DCHECK(!is_valid_ || inner_url_);
+  DCHECK(!is_valid_);
 }
 
-GURL::GURL(GURL&& other) noexcept
-    : spec_(std::move(other.spec_)),
-      is_valid_(other.is_valid_),
-      parsed_(other.parsed_),
-      inner_url_(std::move(other.inner_url_)) {
+GURL::GURL(GURL&& other) noexcept : spec_(std::move(other.spec_)), is_valid_(other.is_valid_), parsed_(other.parsed_) {
   other.is_valid_ = false;
   other.parsed_ = Parsed();
 }
@@ -103,13 +96,6 @@ GURL& GURL::operator=(const GURL& other) {
   is_valid_ = other.is_valid_;
   parsed_ = other.parsed_;
 
-  if (!other.inner_url_)
-    inner_url_.reset();
-  else if (inner_url_)
-    *inner_url_ = *other.inner_url_;
-  else
-    inner_url_.reset(new GURL(*other.inner_url_));
-
   return *this;
 }
 
@@ -117,7 +103,6 @@ GURL& GURL::operator=(GURL&& other) noexcept {
   spec_ = std::move(other.spec_);
   is_valid_ = other.is_valid_;
   parsed_ = other.parsed_;
-  inner_url_ = std::move(other.inner_url_);
 
   other.is_valid_ = false;
   other.parsed_ = Parsed();
@@ -395,7 +380,6 @@ void GURL::Swap(GURL* other) {
   spec_.swap(other->spec_);
   std::swap(is_valid_, other->is_valid_);
   std::swap(parsed_, other->parsed_);
-  inner_url_.swap(other->inner_url_);
 }
 
 std::ostream& operator<<(std::ostream& out, const GURL& url) {
