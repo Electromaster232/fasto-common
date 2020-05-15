@@ -218,6 +218,8 @@ class GURL {
 
   bool SchemeIsDev() const { return SchemeIs(uri::kDevScheme); }
 
+  bool SchemeIsUdp() const { return SchemeIs(uri::kUdpScheme); }
+
   // Returns true if the scheme indicates a network connection that uses TLS or
   // some other cryptographic protocol (e.g. QUIC) for security.
   //

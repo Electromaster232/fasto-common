@@ -63,6 +63,7 @@ struct SchemeRegistry {
       // canonicalization.
       {kFileScheme, SCHEME_WITH_HOST},
       {kDevScheme, SCHEME_WITH_HOST},
+      {kUdpScheme, SCHEME_WITH_HOST},
       {kFtpScheme, SCHEME_WITH_HOST_PORT_AND_USER_INFORMATION},
       {kWssScheme, SCHEME_WITH_HOST_PORT_AND_USER_INFORMATION},  // WebSocket secure.
       {kWsScheme, SCHEME_WITH_HOST_PORT_AND_USER_INFORMATION},   // WebSocket.
@@ -250,6 +251,10 @@ bool DoCanonicalize(const CHAR* spec,
     // Dev URLs are special.
     ParseDevURL(spec, spec_len, &parsed_input);
     success = CanonicalizeDevURL(spec, spec_len, parsed_input, charset_converter, output, output_parsed);
+  } else if (DoCompareSchemeComponent(spec, scheme, uri::kUdpScheme)) {
+    // Udp URLs are special.
+    ParseUdpURL(spec, spec_len, &parsed_input);
+    success = CanonicalizeUdpURL(spec, spec_len, parsed_input, charset_converter, output, output_parsed);
   } else if (DoIsStandard(spec, scheme, &scheme_type)) {
     // All "normal" URLs.
     ParseStandardURL(spec, spec_len, &parsed_input);

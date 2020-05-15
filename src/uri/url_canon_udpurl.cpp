@@ -111,35 +111,26 @@ bool DoCanonicalizeDevURL(const URLComponentSource<CHAR>& source,
                           CharsetConverter* query_converter,
                           CanonOutput* output,
                           Parsed* new_parsed) {
-  // Things we don't set in dev: URLs.
+  // Things we don't set in udp: URLs.
   new_parsed->username = Component();
   new_parsed->password = Component();
-  new_parsed->port = Component();
+  new_parsed->query = Component();
 
   // Scheme (known, so we don't bother running it through the more
   // complicated scheme canonicalizer).
   new_parsed->scheme.begin = output->length();
-  output->Append("dev://", 6);
+  output->Append("udp://", 6);
   new_parsed->scheme.len = 3;
 
-  // Append the host. For many dev URLs, this will be empty. For UNC, this
-  // will be present.
-  // TODO(brettw) This doesn't do any checking for host name validity. We
-  // should probably handle validity checking of UNC hosts differently than
-  // for regular IP hosts.
   bool success = CanonicalizeHost(source.host, parsed.host, output, &new_parsed->host);
-  success &= DoDevCanonicalizePath<CHAR, UCHAR>(source.path, parsed.path, output, &new_parsed->path);
-  CanonicalizeQuery(source.query, parsed.query, query_converter, output, &new_parsed->query);
-
-  // Ignore failure for refs since the URL can probably still be loaded.
-  CanonicalizeRef(source.ref, parsed.ref, output, &new_parsed->ref);
-
+  int default_port = DefaultPortForScheme(&output->data()[new_parsed->scheme.begin], new_parsed->scheme.len);
+  success &= CanonicalizePort(source.port, parsed.port, default_port, output, &new_parsed->port);
   return success;
 }
 
 }  // namespace
 
-bool CanonicalizeDevURL(const char* spec,
+bool CanonicalizeUdpURL(const char* spec,
                         int spec_len,
                         const Parsed& parsed,
                         CharsetConverter* query_converter,
@@ -149,7 +140,7 @@ bool CanonicalizeDevURL(const char* spec,
                                                    new_parsed);
 }
 
-bool CanonicalizeDevURL(const char16* spec,
+bool CanonicalizeUdpURL(const char16* spec,
                         int spec_len,
                         const Parsed& parsed,
                         CharsetConverter* query_converter,

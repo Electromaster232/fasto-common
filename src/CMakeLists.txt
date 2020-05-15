@@ -129,8 +129,10 @@ SET(URI_SOURCES
   ${CMAKE_SOURCE_DIR}/src/uri/url_canon_etc.cpp
   ${CMAKE_SOURCE_DIR}/src/uri/url_parse_file.cpp
   ${CMAKE_SOURCE_DIR}/src/uri/url_parse_dev.cpp
+  ${CMAKE_SOURCE_DIR}/src/uri/url_parse_udp.cpp
   ${CMAKE_SOURCE_DIR}/src/uri/url_canon_fileurl.cpp
   ${CMAKE_SOURCE_DIR}/src/uri/url_canon_devurl.cpp
+  ${CMAKE_SOURCE_DIR}/src/uri/url_canon_udpurl.cpp
   ${CMAKE_SOURCE_DIR}/src/uri/url_canon_pathurl.cpp
   ${CMAKE_SOURCE_DIR}/src/uri/url_canon_path.cpp
   ${CMAKE_SOURCE_DIR}/src/uri/url_canon_relative.cpp

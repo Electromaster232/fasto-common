@@ -34,6 +34,7 @@
 #define HTTP_PATH "/home/index.html"
 #define FILE_PATH "/home/sasha/1.mp4"
 #define DEV_VIDEO_PATH "/dev/video3"
+#define UDP_LINK "udp://239.0.3.3:3003"
 
 TEST(Url, IsValid) {
   common::uri::GURL path;
@@ -66,4 +67,10 @@ TEST(Url, IsValid) {
 
   common::uri::GURL http_path(HTTP_PATH);
   ASSERT_FALSE(http_path.is_valid());
+
+  common::uri::GURL udp(UDP_LINK);
+  ASSERT_TRUE(udp.is_valid());
+  ASSERT_TRUE(udp.SchemeIsUdp());
+  ASSERT_EQ(udp.host(), "239.0.3.3");
+  ASSERT_EQ(udp.port(), "3003");
 }

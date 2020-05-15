@@ -597,6 +597,21 @@ bool CanonicalizeDevURL(const char16* spec,
                         CanonOutput* output,
                         Parsed* new_parsed);
 
+// Use for dev URLs.
+bool CanonicalizeUdpURL(const char* spec,
+                        int spec_len,
+                        const Parsed& parsed,
+                        CharsetConverter* query_converter,
+                        CanonOutput* output,
+                        Parsed* new_parsed);
+
+bool CanonicalizeUdpURL(const char16* spec,
+                        int spec_len,
+                        const Parsed& parsed,
+                        CharsetConverter* query_converter,
+                        CanonOutput* output,
+                        Parsed* new_parsed);
+
 // Use for path URLs such as javascript. This does not modify the path in any
 // way, for example, by escaping it.
 
