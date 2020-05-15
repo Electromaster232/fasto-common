@@ -81,6 +81,13 @@ TEST(file_system_path, filename) {
   ASSERT_TRUE(home_dir.IsValid());
   ASSERT_EQ(home_dir.GetPath(), common::file_system::stable_dir_path(home));
   ASSERT_EQ(home_dir.GetFolderName(), common::file_system::get_file_or_dir_name(home));
+
+  common::file_system::ascii_file_string_path mp4("~/The.Willoughbys.2020.HDRip.XviD.AC3-EVO.mp4");
+  ASSERT_TRUE(mp4.IsValid());
+  ASSERT_EQ(mp4.GetDirectory(), common::file_system::stable_dir_path(home));
+  ASSERT_EQ(mp4.GetFileName(), "The.Willoughbys.2020.HDRip.XviD.AC3-EVO.mp4");
+  ASSERT_EQ(mp4.GetExtension(), "mp4");
+  ASSERT_EQ(mp4.GetBaseFileName(), "The.Willoughbys.2020.HDRip.XviD.AC3-EVO");
 }
 
 TEST(file_system_path, make_node) {

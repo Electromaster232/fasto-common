@@ -105,7 +105,7 @@ class FileStringPath : public StringPath<CharT, Traits> {
 
   value_type GetBaseFileName() const {  // without extension
     const value_type file_name = GetFileName();
-    size_t pos = file_name.find_first_of('.');
+    size_t pos = file_name.find_last_of('.');
     if (pos != std::basic_string<CharT, Traits>::npos) {
       return file_name.substr(0, pos);
     }

@@ -219,7 +219,7 @@ inline std::basic_string<CharT, Traits> get_file_extension(std::basic_string<Cha
     return std::basic_string<CharT, Traits>();
   }
 
-  size_t pos = path.find_first_of('.');
+  size_t pos = path.find_last_of('.');
   if (pos != std::basic_string<CharT, Traits>::npos) {
     return path.substr(pos + 1);
   }
