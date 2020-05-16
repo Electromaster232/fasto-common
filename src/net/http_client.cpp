@@ -40,6 +40,8 @@
 
 #define USER_AGENT_VALUE PROJECT_COMPANYNAME "/" PROJECT_NAME "/" PROJECT_VERSION
 
+#undef SetPort
+
 namespace common {
 namespace net {
 
