@@ -39,7 +39,7 @@ namespace uri {
 namespace {
 
 template <typename CHAR, typename UCHAR>
-bool DoCanonicalizeUdpURL(const URLComponentSource<CHAR>& source,
+bool DoCanonicalizeTcpURL(const URLComponentSource<CHAR>& source,
                           const Parsed& parsed,
                           CharsetConverter* query_converter,
                           CanonOutput* output,
@@ -52,7 +52,7 @@ bool DoCanonicalizeUdpURL(const URLComponentSource<CHAR>& source,
   // Scheme (known, so we don't bother running it through the more
   // complicated scheme canonicalizer).
   new_parsed->scheme.begin = output->length();
-  output->Append("udp://", 6);
+  output->Append("tcp://", 6);
   new_parsed->scheme.len = 3;
 
   bool success = CanonicalizeHost(source.host, parsed.host, output, &new_parsed->host);
@@ -63,23 +63,23 @@ bool DoCanonicalizeUdpURL(const URLComponentSource<CHAR>& source,
 
 }  // namespace
 
-bool CanonicalizeUdpURL(const char* spec,
+bool CanonicalizeTcpURL(const char* spec,
                         int spec_len,
                         const Parsed& parsed,
                         CharsetConverter* query_converter,
                         CanonOutput* output,
                         Parsed* new_parsed) {
-  return DoCanonicalizeUdpURL<char, unsigned char>(URLComponentSource<char>(spec), parsed, query_converter, output,
+  return DoCanonicalizeTcpURL<char, unsigned char>(URLComponentSource<char>(spec), parsed, query_converter, output,
                                                    new_parsed);
 }
 
-bool CanonicalizeUdpURL(const char16* spec,
+bool CanonicalizeTcpURL(const char16* spec,
                         int spec_len,
                         const Parsed& parsed,
                         CharsetConverter* query_converter,
                         CanonOutput* output,
                         Parsed* new_parsed) {
-  return DoCanonicalizeUdpURL<char16, char16>(URLComponentSource<char16>(spec), parsed, query_converter, output,
+  return DoCanonicalizeTcpURL<char16, char16>(URLComponentSource<char16>(spec), parsed, query_converter, output,
                                               new_parsed);
 }
 

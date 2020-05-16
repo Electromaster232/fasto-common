@@ -270,6 +270,10 @@ void ParseUdpURL(const char* url, int url_len, Parsed* parsed);
 
 void ParseUdpURL(const char16* url, int url_len, Parsed* parsed);
 
+void ParseTcpURL(const char* url, int url_len, Parsed* parsed);
+
+void ParseTcpURL(const char16* url, int url_len, Parsed* parsed);
+
 // Helper functions -----------------------------------------------------------
 
 // Locates the scheme according to the URL  parser's rules. This function is

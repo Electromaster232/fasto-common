@@ -597,7 +597,7 @@ bool CanonicalizeDevURL(const char16* spec,
                         CanonOutput* output,
                         Parsed* new_parsed);
 
-// Use for dev URLs.
+// Use for udp URLs.
 bool CanonicalizeUdpURL(const char* spec,
                         int spec_len,
                         const Parsed& parsed,
@@ -606,6 +606,21 @@ bool CanonicalizeUdpURL(const char* spec,
                         Parsed* new_parsed);
 
 bool CanonicalizeUdpURL(const char16* spec,
+                        int spec_len,
+                        const Parsed& parsed,
+                        CharsetConverter* query_converter,
+                        CanonOutput* output,
+                        Parsed* new_parsed);
+
+// Use for tcp URLs.
+bool CanonicalizeTcpURL(const char* spec,
+                        int spec_len,
+                        const Parsed& parsed,
+                        CharsetConverter* query_converter,
+                        CanonOutput* output,
+                        Parsed* new_parsed);
+
+bool CanonicalizeTcpURL(const char16* spec,
                         int spec_len,
                         const Parsed& parsed,
                         CharsetConverter* query_converter,
