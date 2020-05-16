@@ -43,16 +43,14 @@ namespace {
 // Converts one of the character types that represent a numerical base to the
 // corresponding base.
 int BaseForType(SharedCharTypes type) {
-  switch (type) {
-    case CHAR_HEX:
-      return 16;
-    case CHAR_DEC:
-      return 10;
-    case CHAR_OCT:
-      return 8;
-    default:
-      return 0;
+  if (type == CHAR_HEX) {
+    return 16;
+  } else if (type == CHAR_DEC) {
+    return 10;
+  } else if (type == CHAR_OCT) {
+    return 8;
   }
+  return 0;
 }
 
 template <typename CHAR, typename UCHAR>

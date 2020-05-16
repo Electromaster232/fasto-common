@@ -28,8 +28,6 @@
 */
 
 #include <common/uri/url_file.h>
-#include <common/uri/url_parse.h>
-#include <common/uri/url_parse_internal.h>
 
 // Interesting IE file:isms...
 //

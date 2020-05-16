@@ -28,7 +28,6 @@
 */
 
 #pragma once
-// ICU integration functions.
 
 #include <common/uri/url_canon.h>
 

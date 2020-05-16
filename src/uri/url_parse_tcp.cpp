@@ -27,8 +27,6 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <common/uri/url_file.h>
-#include <common/uri/url_parse.h>
 #include <common/uri/url_parse_internal.h>
 
 namespace common {

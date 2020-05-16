@@ -27,11 +27,7 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <common/string_util.h>
-#include <common/uri/url_canon.h>
 #include <common/uri/url_canon_internal.h>
-#include <common/uri/url_file.h>
-#include <common/uri/url_parse_internal.h>
 
 namespace common {
 namespace uri {
@@ -145,6 +141,7 @@ bool CanonicalizeFileURL(const char* spec,
                          CharsetConverter* query_converter,
                          CanonOutput* output,
                          Parsed* new_parsed) {
+  UNUSED(spec_len);
   return DoCanonicalizeFileURL<char, unsigned char>(URLComponentSource<char>(spec), parsed, query_converter, output,
                                                     new_parsed);
 }
@@ -155,6 +152,7 @@ bool CanonicalizeFileURL(const char16* spec,
                          CharsetConverter* query_converter,
                          CanonOutput* output,
                          Parsed* new_parsed) {
+  UNUSED(spec_len);
   return DoCanonicalizeFileURL<char16, char16>(URLComponentSource<char16>(spec), parsed, query_converter, output,
                                                new_parsed);
 }

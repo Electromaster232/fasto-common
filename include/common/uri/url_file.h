@@ -29,7 +29,6 @@
 
 #pragma once
 
-#include <common/string_util.h>
 #include <common/uri/url_parse_internal.h>
 
 namespace common {

@@ -64,7 +64,7 @@ class ServerWebHandler : public common::libev::IoLoopObserver {
     ASSERT_FALSE(errn);
 
     common::libev::websocket::WebSocketClient* cl = new common::libev::websocket::WebSocketClient(sserver, sc);
-    cl->SetBlocking(false);
+    ignore_result(cl->SetBlocking(false));
     sserver->RegisterClient(cl);
     errn = cl->StartHandshake(ws_url);
     ASSERT_FALSE(errn);
@@ -97,9 +97,11 @@ class ServerWebHandler : public common::libev::IoLoopObserver {
     UNUSED(server);
     UNUSED(child);
   }
+
   void ChildStatusChanged(common::libev::IoChild* child, int status, int signal) override {
     UNUSED(child);
     UNUSED(status);
+    UNUSED(signal);
   }
 
   void DataReceived(common::libev::IoClient* client) override {
@@ -107,7 +109,7 @@ class ServerWebHandler : public common::libev::IoLoopObserver {
     size_t nread = 0;
     common::ErrnoError errn = client->Read(buff, BUF_SIZE, &nread);
     if ((errn && errn->GetErrorCode() != EAGAIN) || nread == 0) {
-      client->Close();
+      ignore_result(client->Close());
       delete client;
       return;
     }

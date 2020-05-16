@@ -35,7 +35,6 @@
 
 #include <common/string_piece.h>
 #include <common/uri/url_canon.h>
-#include <common/uri/url_parse.h>
 
 namespace common {
 namespace uri {

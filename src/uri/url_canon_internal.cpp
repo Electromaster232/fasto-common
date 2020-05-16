@@ -465,6 +465,7 @@ void SetupOverrideComponents(const char* base,
                              const Replacements<char>& repl,
                              URLComponentSource<char>* source,
                              Parsed* parsed) {
+  UNUSED(base);
   // Get the source and parsed structures of the things we are replacing.
   const URLComponentSource<char>& repl_source = repl.sources();
   const Parsed& repl_parsed = repl.components();
@@ -489,6 +490,7 @@ bool SetupUTF16OverrideComponents(const char* base,
                                   CanonOutput* utf8_buffer,
                                   URLComponentSource<char>* source,
                                   Parsed* parsed) {
+  UNUSED(base);
   bool success = true;
 
   // Get the source and parsed structures of the things we are replacing.

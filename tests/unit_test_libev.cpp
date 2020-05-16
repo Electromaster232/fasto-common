@@ -88,6 +88,7 @@ class ServerHandler : public common::libev::IoLoopObserver {
   void ChildStatusChanged(common::libev::IoChild* child, int status, int signal) override {
     UNUSED(child);
     UNUSED(status);
+    UNUSED(signal);
   }
 
   void DataReceived(common::libev::IoClient* client) override { UNUSED(client); }
@@ -189,6 +190,7 @@ class ServerWebHandler : public common::libev::IoLoopObserver {
   void ChildStatusChanged(common::libev::IoChild* child, int status, int signal) override {
     UNUSED(child);
     UNUSED(status);
+    UNUSED(signal);
   }
 
   void DataReceived(common::libev::IoClient* client) override {

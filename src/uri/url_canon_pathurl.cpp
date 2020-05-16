@@ -27,7 +27,6 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <common/uri/url_canon.h>
 #include <common/uri/url_canon_internal.h>
 
 namespace common {
@@ -99,6 +98,7 @@ bool CanonicalizePathURL(const char* spec,
                          const Parsed& parsed,
                          CanonOutput* output,
                          Parsed* new_parsed) {
+  UNUSED(spec_len);
   return DoCanonicalizePathURL<char, unsigned char>(URLComponentSource<char>(spec), parsed, output, new_parsed);
 }
 
@@ -107,6 +107,7 @@ bool CanonicalizePathURL(const char16* spec,
                          const Parsed& parsed,
                          CanonOutput* output,
                          Parsed* new_parsed) {
+  UNUSED(spec_len);
   return DoCanonicalizePathURL<char16, char16>(URLComponentSource<char16>(spec), parsed, output, new_parsed);
 }
 

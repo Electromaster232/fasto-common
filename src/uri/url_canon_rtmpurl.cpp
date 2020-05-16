@@ -40,6 +40,8 @@ bool DoCanonicalizeRtmpURL(const URLComponentSource<CHAR>& source,
                            CharsetConverter* query_converter,
                            CanonOutput* output,
                            Parsed* new_parsed) {
+  UNUSED(query_converter);
+
   // Things we don't set in udp: URLs.
   new_parsed->username = Component();
   new_parsed->password = Component();
@@ -78,6 +80,7 @@ bool CanonicalizeRtmpURL(const char* spec,
                          CharsetConverter* query_converter,
                          CanonOutput* output,
                          Parsed* new_parsed) {
+  UNUSED(spec_len);
   return DoCanonicalizeRtmpURL<char, unsigned char>(URLComponentSource<char>(spec), parsed, query_converter, output,
                                                     new_parsed);
 }
@@ -88,6 +91,7 @@ bool CanonicalizeRtmpURL(const char16* spec,
                          CharsetConverter* query_converter,
                          CanonOutput* output,
                          Parsed* new_parsed) {
+  UNUSED(spec_len);
   return DoCanonicalizeRtmpURL<char16, char16>(URLComponentSource<char16>(spec), parsed, query_converter, output,
                                                new_parsed);
 }

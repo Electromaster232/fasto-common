@@ -32,7 +32,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <common/string16.h>
 #include <common/uri/url_canon.h>
 
 namespace common {
@@ -294,6 +293,7 @@ inline bool AppendUTF8EscapedChar(const char* str, int* begin, int length, Canon
 // through it will point to the next character to be considered. On failure,
 // |*begin| will be unchanged.
 inline bool Is8BitChar(char c) {
+  UNUSED(c);
   return true;  // this case is specialized to avoid a warning
 }
 inline bool Is8BitChar(char16 c) {

@@ -27,11 +27,7 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <common/string_util.h>
 #include <common/uri/url_canon.h>
-#include <common/uri/url_canon_internal.h>
-#include <common/uri/url_file.h>
-#include <common/uri/url_parse_internal.h>
 
 namespace common {
 namespace uri {
@@ -44,6 +40,7 @@ bool DoCanonicalizeUdpURL(const URLComponentSource<CHAR>& source,
                           CharsetConverter* query_converter,
                           CanonOutput* output,
                           Parsed* new_parsed) {
+  UNUSED(query_converter);
   // Things we don't set in udp: URLs.
   new_parsed->username = Component();
   new_parsed->password = Component();
@@ -69,6 +66,7 @@ bool CanonicalizeUdpURL(const char* spec,
                         CharsetConverter* query_converter,
                         CanonOutput* output,
                         Parsed* new_parsed) {
+  UNUSED(spec_len);
   return DoCanonicalizeUdpURL<char, unsigned char>(URLComponentSource<char>(spec), parsed, query_converter, output,
                                                    new_parsed);
 }
@@ -79,6 +77,7 @@ bool CanonicalizeUdpURL(const char16* spec,
                         CharsetConverter* query_converter,
                         CanonOutput* output,
                         Parsed* new_parsed) {
+  UNUSED(spec_len);
   return DoCanonicalizeUdpURL<char16, char16>(URLComponentSource<char16>(spec), parsed, query_converter, output,
                                               new_parsed);
 }

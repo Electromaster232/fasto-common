@@ -29,7 +29,6 @@
 
 #include <limits.h>
 
-#include <common/uri/url_canon.h>
 #include <common/uri/url_canon_internal.h>
 #include <common/uri/url_parse_internal.h>
 

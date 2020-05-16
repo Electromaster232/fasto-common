@@ -34,7 +34,6 @@
 #include <vector>
 
 #include <common/string_util.h>
-#include <common/uri/url_canon.h>
 #include <common/uri/url_canon_internal.h>
 #include <common/uri/url_constants.h>
 #include <common/uri/url_parse_internal.h>

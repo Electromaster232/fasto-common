@@ -27,7 +27,6 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <common/uri/url_canon.h>
 #include <common/uri/url_canon_internal.h>
 
 // Query canonicalization in IE

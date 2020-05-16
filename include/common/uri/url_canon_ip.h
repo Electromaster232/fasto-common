@@ -31,7 +31,6 @@
 
 #include <string>
 
-#include <common/string_piece.h>
 #include <common/uri/url_canon.h>
 
 namespace common {

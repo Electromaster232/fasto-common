@@ -104,6 +104,7 @@ bool CanonicalizeRtspURL(const char* spec,
                          CharsetConverter* query_converter,
                          CanonOutput* output,
                          Parsed* new_parsed) {
+  UNUSED(spec_len);
   return DoCanonicalizeRtspURL<char, unsigned char>(URLComponentSource<char>(spec), parsed, query_converter, output,
                                                     new_parsed);
 }
@@ -114,6 +115,7 @@ bool CanonicalizeRtspURL(const char16* spec,
                          CharsetConverter* query_converter,
                          CanonOutput* output,
                          Parsed* new_parsed) {
+  UNUSED(spec_len);
   return DoCanonicalizeRtspURL<char16, char16>(URLComponentSource<char16>(spec), parsed, query_converter, output,
                                                new_parsed);
 }

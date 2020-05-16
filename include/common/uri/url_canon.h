@@ -32,7 +32,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <common/string16.h>
 #include <common/uri/url_parse.h>
 
 namespace common {

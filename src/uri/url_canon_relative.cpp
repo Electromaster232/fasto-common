@@ -30,10 +30,7 @@
 #include <algorithm>
 
 #include <common/string_util.h>
-#include <common/uri/url_canon.h>
 #include <common/uri/url_canon_internal.h>
-#include <common/uri/url_constants.h>
-#include <common/uri/url_file.h>
 #include <common/uri/url_parse_internal.h>
 #include <common/uri/url_util.h>
 #include <common/uri/url_util_internal.h>
@@ -313,6 +310,7 @@ bool DoResolveRelativePath(const char* base_url,
                            CharsetConverter* query_converter,
                            CanonOutput* output,
                            Parsed* out_parsed) {
+  UNUSED(base_is_file);
   bool success = true;
 
   // We know the authority section didn't change, copy it to the output. We

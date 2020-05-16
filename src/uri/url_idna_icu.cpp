@@ -33,6 +33,9 @@ namespace common {
 namespace uri {
 
 bool IDNToASCII(const char16* src, int src_len, CanonOutputW* output) {
+  UNUSED(src);
+  UNUSED(src_len);
+  UNUSED(output);
   return false;
 }
 
