@@ -63,8 +63,9 @@ struct SchemeRegistry {
       // canonicalization.
       {kFileScheme, SCHEME_WITH_HOST},
       {kDevScheme, SCHEME_WITH_HOST},
-      {kUdpScheme, SCHEME_WITH_HOST},
-      {kTcpScheme, SCHEME_WITH_HOST},
+      {kUdpScheme, SCHEME_WITH_HOST_AND_PORT},
+      {kTcpScheme, SCHEME_WITH_HOST_AND_PORT},
+      {kRtmpScheme, SCHEME_WITH_HOST_AND_PORT},
       {kFtpScheme, SCHEME_WITH_HOST_PORT_AND_USER_INFORMATION},
       {kWssScheme, SCHEME_WITH_HOST_PORT_AND_USER_INFORMATION},  // WebSocket secure.
       {kWsScheme, SCHEME_WITH_HOST_PORT_AND_USER_INFORMATION},   // WebSocket.
@@ -257,9 +258,13 @@ bool DoCanonicalize(const CHAR* spec,
     ParseUdpURL(spec, spec_len, &parsed_input);
     success = CanonicalizeUdpURL(spec, spec_len, parsed_input, charset_converter, output, output_parsed);
   } else if (DoCompareSchemeComponent(spec, scheme, uri::kTcpScheme)) {
-    // Udp URLs are special.
+    // Tcp URLs are special.
     ParseTcpURL(spec, spec_len, &parsed_input);
     success = CanonicalizeTcpURL(spec, spec_len, parsed_input, charset_converter, output, output_parsed);
+  } else if (DoCompareSchemeComponent(spec, scheme, uri::kRtmpScheme)) {
+    // Rtmp URLs are special.
+    ParseRtmpURL(spec, spec_len, &parsed_input);
+    success = CanonicalizeRtmpURL(spec, spec_len, parsed_input, charset_converter, output, output_parsed);
   } else if (DoIsStandard(spec, scheme, &scheme_type)) {
     // All "normal" URLs.
     ParseStandardURL(spec, spec_len, &parsed_input);

@@ -65,14 +65,9 @@ void DoParseTcpURL(const CHAR* spec, int spec_len, Parsed* parsed) {
     int num_slashes = CountConsecutiveSlashes(spec, after_scheme, spec_len);
     int after_slashes = after_scheme + num_slashes;
 
-    for (int i = after_slashes; i < spec_len; i++) {
-      if (spec[i] == ':') {
-        parsed->host = MakeRange(after_slashes, i);
-        int col_pos = i + 1;
-        parsed->port = MakeRange(col_pos, spec_len);
-        return;
-      }
-    }
+    Component username;
+    Component password;
+    ParseAuthority(spec, MakeRange(after_slashes, spec_len), &username, &password, &parsed->host, &parsed->port);
   }
 }
 

@@ -222,6 +222,8 @@ class GURL {
 
   bool SchemeIsTcp() const { return SchemeIs(uri::kTcpScheme); }
 
+  bool SchemeIsRtmp() const { return SchemeIs(uri::kRtmpScheme); }
+
   // Returns true if the scheme indicates a network connection that uses TLS or
   // some other cryptographic protocol (e.g. QUIC) for security.
   //

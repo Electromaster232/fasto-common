@@ -36,21 +36,46 @@
 #define DEV_VIDEO_PATH "/dev/video3"
 #define UDP_LINK "udp://239.0.3.3:3003"
 #define TCP_LINK "tcp://google.com:2121"
+#define RTMP_LINK "rtmp://192.168.1.105:5423/live"
+#define RTMP_LINK_DEFAULT "rtmp://a.rtmp.youtube.com/live2"
+
+#define HTTP_COMMON_LINK "http://www.permadi.com/index.html"
+#define HTTP_PORT_LINK "http://111.119.160.90:81/fastocloud/hls/2/5ebeba5ba2ffe6cd5d4488d3/0/master.m3u8"
+#define HTTP_LONG_LINK "http://www.permadi.com/tutorial/urlEncoding/index.html"
+#define HTTPS_LINK "https://github.com/fastogt/fastotvlite_mobile"
+#define HTTP_QUERY_LINK "http://www.permadi.com/tutorial/urlEncoding/example.html?var=This+is+a+simple+%26+short+test"
 
 TEST(Url, IsValid) {
-  common::uri::GURL path;
-  ASSERT_FALSE(path.is_valid());
+  common::uri::GURL invalid;
+  ASSERT_FALSE(invalid.is_valid());
 
-  common::uri::GURL path2("http://www.permadi.com/index.html");
-  ASSERT_TRUE(path2.is_valid());
+  common::uri::GURL http_common(HTTP_COMMON_LINK);
+  ASSERT_TRUE(http_common.is_valid());
+  ASSERT_TRUE(http_common.SchemeIsHTTPOrHTTPS());
+  ASSERT_EQ(http_common.EffectiveIntPort(), 80);
+  ASSERT_EQ(http_common.spec(), HTTP_COMMON_LINK);
 
-  common::uri::GURL path3("http://www.permadi.com/tutorial/urlEncoding/index.html");
-  ASSERT_TRUE(path3.is_valid());
+  common::uri::GURL http_port(HTTP_PORT_LINK);
+  ASSERT_TRUE(http_port.is_valid());
+  ASSERT_TRUE(http_port.SchemeIsHTTPOrHTTPS());
+  ASSERT_EQ(http_port.port(), "81");
+  ASSERT_EQ(http_port.IntPort(), 81);
+  ASSERT_EQ(http_port.spec(), HTTP_PORT_LINK);
 
-  common::uri::GURL path4(
-      "http://www.permadi.com/tutorial/urlEncoding/example.html?var=This+is+a+simple+%26+short+test");
-  ASSERT_TRUE(path4.is_valid());
-  ASSERT_TRUE(path4.SchemeIsHTTPOrHTTPS());
+  common::uri::GURL http_long(HTTP_LONG_LINK);
+  ASSERT_TRUE(http_long.is_valid());
+  ASSERT_TRUE(http_long.SchemeIsHTTPOrHTTPS());
+  ASSERT_EQ(http_long.spec(), HTTP_LONG_LINK);
+
+  common::uri::GURL https(HTTPS_LINK);
+  ASSERT_TRUE(https.is_valid());
+  ASSERT_TRUE(https.SchemeIsHTTPOrHTTPS());
+  ASSERT_EQ(https.spec(), HTTPS_LINK);
+
+  common::uri::GURL http_query(HTTP_QUERY_LINK);
+  ASSERT_TRUE(http_query.is_valid());
+  ASSERT_TRUE(http_query.SchemeIsHTTPOrHTTPS());
+  ASSERT_EQ(http_query.spec(), HTTP_QUERY_LINK);
 
   const std::string originFile = "file://" + std::string(FILE_PATH);
   common::uri::GURL path5(originFile);
@@ -74,10 +99,28 @@ TEST(Url, IsValid) {
   ASSERT_TRUE(udp.SchemeIsUdp());
   ASSERT_EQ(udp.host(), "239.0.3.3");
   ASSERT_EQ(udp.port(), "3003");
+  ASSERT_EQ(udp.spec(), UDP_LINK);
 
   common::uri::GURL tcp(TCP_LINK);
   ASSERT_TRUE(tcp.is_valid());
   ASSERT_TRUE(tcp.SchemeIsTcp());
   ASSERT_EQ(tcp.host(), "google.com");
   ASSERT_EQ(tcp.port(), "2121");
+  ASSERT_EQ(tcp.spec(), TCP_LINK);
+
+  common::uri::GURL rtmp(RTMP_LINK);
+  ASSERT_TRUE(rtmp.is_valid());
+  ASSERT_TRUE(rtmp.SchemeIsRtmp());
+  ASSERT_EQ(rtmp.host(), "192.168.1.105");
+  ASSERT_EQ(rtmp.port(), "5423");
+  ASSERT_EQ(rtmp.path(), "/live");
+  ASSERT_EQ(rtmp.spec(), RTMP_LINK);
+
+  common::uri::GURL rtmp_default(RTMP_LINK_DEFAULT);
+  ASSERT_TRUE(rtmp_default.is_valid());
+  ASSERT_TRUE(rtmp_default.SchemeIsRtmp());
+  ASSERT_EQ(rtmp_default.host(), "a.rtmp.youtube.com");
+  ASSERT_EQ(rtmp_default.EffectiveIntPort(), 1935);
+  ASSERT_EQ(rtmp_default.path(), "/live2");
+  ASSERT_EQ(rtmp_default.spec(), RTMP_LINK_DEFAULT);
 }

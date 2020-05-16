@@ -37,6 +37,7 @@ const char kFileScheme[] = "file";
 const char kDevScheme[] = "dev";
 const char kUdpScheme[] = "udp";
 const char kTcpScheme[] = "tcp";
+const char kRtmpScheme[] = "rtmp";
 const char kFtpScheme[] = "ftp";
 const char kHttpScheme[] = "http";
 const char kHttpsScheme[] = "https";
