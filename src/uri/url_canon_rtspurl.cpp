@@ -35,29 +35,48 @@ namespace uri {
 namespace {
 
 template <typename CHAR, typename UCHAR>
-bool DoCanonicalizeRtmpURL(const URLComponentSource<CHAR>& source,
+bool DoCanonicalizeRtspURL(const URLComponentSource<CHAR>& source,
                            const Parsed& parsed,
                            CharsetConverter* query_converter,
                            CanonOutput* output,
                            Parsed* new_parsed) {
-  // Things we don't set in udp: URLs.
-  new_parsed->username = Component();
-  new_parsed->password = Component();
-  new_parsed->query = Component();
-
   // Scheme (known, so we don't bother running it through the more
   // complicated scheme canonicalizer).
   new_parsed->scheme.begin = output->length();
-  output->Append("rtmp://", 7);
+  output->Append("rtsp://", 7);
   new_parsed->scheme.len = 4;
 
-  bool success = CanonicalizeHost(source.host, parsed.host, output, &new_parsed->host);
-  int default_port = DefaultPortForScheme(&output->data()[new_parsed->scheme.begin], new_parsed->scheme.len);
-  success &= CanonicalizePort(source.port, parsed.port, default_port, output, &new_parsed->port);
+  bool success = true;
+  // Authority (username, password, host, port)
+  bool have_authority;
+  if (((parsed.username.is_valid() || parsed.password.is_valid())) || parsed.host.is_nonempty() ||
+      (parsed.port.is_valid())) {
+    have_authority = true;
+
+    success &= CanonicalizeUserInfo(source.username, parsed.username, source.password, parsed.password, output,
+                                    &new_parsed->username, &new_parsed->password);
+    success &= CanonicalizeHost(source.host, parsed.host, output, &new_parsed->host);
+
+    // Host must not be empty for standard URLs.
+    if (!parsed.host.is_nonempty())
+      success = false;
+
+    int default_port = DefaultPortForScheme(&output->data()[new_parsed->scheme.begin], new_parsed->scheme.len);
+    success &= CanonicalizePort(source.port, parsed.port, default_port, output, &new_parsed->port);
+  } else {
+    // No authority, clear the components.
+    have_authority = false;
+    new_parsed->host.reset();
+    new_parsed->username.reset();
+    new_parsed->password.reset();
+    new_parsed->port.reset();
+    success = false;  // Standard URLs must have an authority.
+  }
+
   // Path
   if (parsed.path.is_valid()) {
     success &= CanonicalizePath(source.path, parsed.path, output, &new_parsed->path);
-  } else if (parsed.query.is_valid() || parsed.ref.is_valid()) {
+  } else if (have_authority || parsed.query.is_valid() || parsed.ref.is_valid()) {
     // When we have an empty path, make up a path when we have an authority
     // or something following the path. The only time we allow an empty
     // output path is when there is nothing else.
@@ -67,28 +86,35 @@ bool DoCanonicalizeRtmpURL(const URLComponentSource<CHAR>& source,
     // No path at all
     new_parsed->path.reset();
   }
+
+  // Query
+  CanonicalizeQuery(source.query, parsed.query, query_converter, output, &new_parsed->query);
+
+  // Ref: ignore failure for this, since the page can probably still be loaded.
+  CanonicalizeRef(source.ref, parsed.ref, output, &new_parsed->ref);
+
   return success;
 }
 
 }  // namespace
 
-bool CanonicalizeRtmpURL(const char* spec,
+bool CanonicalizeRtspURL(const char* spec,
                          int spec_len,
                          const Parsed& parsed,
                          CharsetConverter* query_converter,
                          CanonOutput* output,
                          Parsed* new_parsed) {
-  return DoCanonicalizeRtmpURL<char, unsigned char>(URLComponentSource<char>(spec), parsed, query_converter, output,
+  return DoCanonicalizeRtspURL<char, unsigned char>(URLComponentSource<char>(spec), parsed, query_converter, output,
                                                     new_parsed);
 }
 
-bool CanonicalizeRtmpURL(const char16* spec,
+bool CanonicalizeRtspURL(const char16* spec,
                          int spec_len,
                          const Parsed& parsed,
                          CharsetConverter* query_converter,
                          CanonOutput* output,
                          Parsed* new_parsed) {
-  return DoCanonicalizeRtmpURL<char16, char16>(URLComponentSource<char16>(spec), parsed, query_converter, output,
+  return DoCanonicalizeRtspURL<char16, char16>(URLComponentSource<char16>(spec), parsed, query_converter, output,
                                                new_parsed);
 }
 

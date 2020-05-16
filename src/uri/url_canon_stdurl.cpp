@@ -129,6 +129,8 @@ int DefaultPortForScheme(const char* scheme, int scheme_len) {
         default_port = 80;
       else if (!strncmp(scheme, kRtmpScheme, scheme_len))
         default_port = 1935;
+      else if (!strncmp(scheme, kRtspScheme, scheme_len))
+        default_port = 554;
       break;
     case 5:
       if (!strncmp(scheme, kHttpsScheme, scheme_len))

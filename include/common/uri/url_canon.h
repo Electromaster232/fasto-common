@@ -642,6 +642,21 @@ bool CanonicalizeRtmpURL(const char16* spec,
                          CanonOutput* output,
                          Parsed* new_parsed);
 
+// Use for rtsp URLs.
+bool CanonicalizeRtspURL(const char* spec,
+                         int spec_len,
+                         const Parsed& parsed,
+                         CharsetConverter* query_converter,
+                         CanonOutput* output,
+                         Parsed* new_parsed);
+
+bool CanonicalizeRtspURL(const char16* spec,
+                         int spec_len,
+                         const Parsed& parsed,
+                         CharsetConverter* query_converter,
+                         CanonOutput* output,
+                         Parsed* new_parsed);
+
 // Use for path URLs such as javascript. This does not modify the path in any
 // way, for example, by escaping it.
 

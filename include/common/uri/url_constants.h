@@ -40,6 +40,7 @@ extern const char kDevScheme[];
 extern const char kUdpScheme[];
 extern const char kTcpScheme[];
 extern const char kRtmpScheme[];
+extern const char kRtspScheme[];
 extern const char kFtpScheme[];
 extern const char kHttpScheme[];
 extern const char kHttpsScheme[];

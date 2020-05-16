@@ -38,6 +38,8 @@
 #define TCP_LINK "tcp://google.com:2121"
 #define RTMP_LINK "rtmp://192.168.1.105:5423/live"
 #define RTMP_LINK_DEFAULT "rtmp://a.rtmp.youtube.com/live2"
+#define RTSP_LINK "rtsp://192.168.1.210:555/Streaming/Channels/101"
+#define RTSP_LINK_USER "rtsp://root:password@192.168.1.111/axis-media/media.amp?videocodec=h264&audiocodec=aac"
 
 #define HTTP_COMMON_LINK "http://www.permadi.com/index.html"
 #define HTTP_PORT_LINK "http://111.119.160.90:81/fastocloud/hls/2/5ebeba5ba2ffe6cd5d4488d3/0/master.m3u8"
@@ -123,4 +125,21 @@ TEST(Url, IsValid) {
   ASSERT_EQ(rtmp_default.EffectiveIntPort(), 1935);
   ASSERT_EQ(rtmp_default.path(), "/live2");
   ASSERT_EQ(rtmp_default.spec(), RTMP_LINK_DEFAULT);
+
+  common::uri::GURL rtsp(RTSP_LINK);
+  ASSERT_TRUE(rtsp.is_valid());
+  ASSERT_TRUE(rtsp.SchemeIsRtsp());
+  ASSERT_EQ(rtsp.host(), "192.168.1.210");
+  ASSERT_EQ(rtsp.port(), "555");
+  ASSERT_EQ(rtsp.path(), "/Streaming/Channels/101");
+  ASSERT_EQ(rtsp.spec(), RTSP_LINK);
+
+  common::uri::GURL rtsp_user(RTSP_LINK_USER);
+  ASSERT_TRUE(rtsp_user.is_valid());
+  ASSERT_TRUE(rtsp_user.SchemeIsRtsp());
+  ASSERT_EQ(rtsp_user.host(), "192.168.1.111");
+  ASSERT_EQ(rtsp_user.EffectiveIntPort(), 554);
+  ASSERT_EQ(rtsp_user.path(), "/axis-media/media.amp");
+  ASSERT_EQ(rtsp_user.query(), "videocodec=h264&audiocodec=aac");
+  ASSERT_EQ(rtsp_user.spec(), RTSP_LINK_USER);
 }
