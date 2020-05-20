@@ -192,7 +192,7 @@ Error IHttpClient::ReadResponse(http::HttpResponse* response) {
 
   http::header_t cont;
   if (!response->FindHeaderByKey("Content-Length", false, &cont)) {  // try to get body
-    std::string body;
+    http::HttpResponse::body_t body;
     if (not_parsed) {
       const char* body_str = data_head + nread_head - not_parsed;
       body = std::string(body_str, not_parsed);
@@ -238,7 +238,7 @@ Error IHttpClient::ReadResponse(http::HttpResponse* response) {
     bytes_left -= n;
   }
 
-  std::string body(data, body_len);
+  http::HttpResponse::body_t body(data, body_len);
   response->SetBody(body);
   delete[] data_head;
   delete[] data;

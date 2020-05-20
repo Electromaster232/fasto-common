@@ -136,7 +136,7 @@ int MimeTypes::strcmpi(const char* s1, const char* s2) {
   return 1;
 }
 
-MimeTypes::entry MimeTypes::types[346] = {
+MimeTypes::entry MimeTypes::types[347] = {
     {"*3gpp", "audio/3gpp"},
     {"*jpm", "video/jpm"},
     {"*mp3", "audio/mp3"},
@@ -221,6 +221,7 @@ MimeTypes::entry MimeTypes::types[346] = {
     {"grxml", "application/srgs+xml"},
     {"gxf", "application/gxf"},
     {"gz", "application/gzip"},
+    {"gz", "application/x-gzip"},
     {"h261", "video/h261"},
     {"h263", "video/h263"},
     {"h264", "video/h264"},
@@ -740,7 +741,7 @@ bool HttpResponse::FindHeaderByKey(const std::string& key, bool case_sensitive, 
   return false;
 }
 
-void HttpResponse::SetBody(const std::string& body) {
+void HttpResponse::SetBody(const body_t& body) {
   body_ = body;
 }
 
@@ -748,8 +749,12 @@ bool HttpResponse::IsEmptyBody() const {
   return body_.empty();
 }
 
-std::string HttpResponse::GetBody() const {
+HttpResponse::body_t HttpResponse::GetBody() const {
   return body_;
+}
+
+http_status HttpResponse::GetStatus() const {
+  return status_;
 }
 
 Error parse_http_response(const std::string& response, HttpResponse* res_out, size_t* not_parsed) {

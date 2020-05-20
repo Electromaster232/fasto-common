@@ -171,20 +171,24 @@ std::pair<http_status, Error> parse_http_request(const std::string& request, Htt
 
 class HttpResponse {
  public:
+  typedef std::string body_t;
+
   HttpResponse();
   HttpResponse(http_protocol protocol, http_status status, const headers_t& headers, const std::string& body);
 
   bool FindHeaderByKey(const std::string& key, bool case_sensitive, header_t* hdr) const;
 
-  void SetBody(const std::string& body);
+  void SetBody(const body_t& body);
   bool IsEmptyBody() const;
-  std::string GetBody() const;
+  body_t GetBody() const;
+
+  http_status GetStatus() const;
 
  private:
   http_protocol protocol_;
   http_status status_;
   headers_t headers_;
-  std::string body_;
+  body_t body_;
 };
 
 Error parse_http_response(const std::string& response, HttpResponse* res_out, size_t* not_parsed) WARN_UNUSED_RESULT;
@@ -199,7 +203,7 @@ class MimeTypes {
     const char* fileExtension;
     const char* mimeType;
   };
-  static MimeTypes::entry types[346];
+  static MimeTypes::entry types[347];
   static int strcmpi(const char* s1, const char* s2);
 };
 
