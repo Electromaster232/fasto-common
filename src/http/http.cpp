@@ -423,6 +423,9 @@ Error parse_http_response(const std::string& response, HttpResponse* res_out, si
           *not_parsed = lnot_parsed;
         }
       }
+    } else {
+      size_t lnot_parsed = len - start;
+      *not_parsed = lnot_parsed;
     }
   }
 

@@ -192,6 +192,20 @@ Error IHttpClient::ReadResponse(http::HttpResponse* response) {
 
   http::header_t cont;
   if (!response->FindHeaderByKey("Content-Length", false, &cont)) {  // try to get body
+    std::string body;
+    if (not_parsed) {
+      const char* body_str = data_head + nread_head - not_parsed;
+      body = std::string(body_str, not_parsed);
+    }
+    do {
+      size_t nread;
+      err = sock_->Read(data_head, kHeaderBufInitialSize, &nread);
+      if (!err) {
+        body += std::string(data_head, nread);
+      }
+    } while (!err);
+
+    response->SetBody(body);
     delete[] data_head;
     return Error();
   }
