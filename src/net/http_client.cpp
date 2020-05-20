@@ -222,19 +222,27 @@ Error IHttpClient::ReadResponse(http::HttpResponse* response) {
     const char* body_str = data_head + nread_head - not_parsed;
     memcpy(data, body_str, not_parsed);
   }
-  size_t nread;
-  err = sock_->Read(data + not_parsed, rest, &nread);  // read rest
-  if (!err && nread == rest) {
-    std::string body(data, body_len);
-    response->SetBody(body);
-    delete[] data_head;
-    delete[] data;
-    return Error();
+
+  size_t total = 0;          // how many bytes we've readed
+  size_t bytes_left = rest;  // how many we have left to read
+
+  while (total < rest) {
+    size_t n;
+    err = sock_->Read(data + not_parsed + total, bytes_left, &n);
+    if (err) {
+      delete[] data_head;
+      delete[] data;
+      return make_error("Invalid body read");
+    }
+    total += n;
+    bytes_left -= n;
   }
 
+  std::string body(data, body_len);
+  response->SetBody(body);
   delete[] data_head;
   delete[] data;
-  return make_error("Invalid body read");
+  return Error();
 }
 
 IHttpClient::~IHttpClient() {

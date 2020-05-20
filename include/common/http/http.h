@@ -189,7 +189,19 @@ class HttpResponse {
 
 Error parse_http_response(const std::string& response, HttpResponse* res_out, size_t* not_parsed) WARN_UNUSED_RESULT;
 
-std::string get_mime_type(const std::string& file_name);
+class MimeTypes {
+ public:
+  static const char* GetType(const char* path);
+  static const char* GetExtension(const char* type);
+
+ private:
+  struct entry {
+    const char* fileExtension;
+    const char* mimeType;
+  };
+  static MimeTypes::entry types[346];
+  static int strcmpi(const char* s1, const char* s2);
+};
 
 }  // namespace http
 
