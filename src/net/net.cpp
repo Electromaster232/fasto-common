@@ -93,7 +93,7 @@ ssize_t sendfile(common::net::socket_descr_t out_fd, descriptor_t in_fd, off_t* 
     }
 
     size_t numSent = 0;
-    common::ErrnoError err = common::net::write_to_socket(out_fd, buf, static_cast<size_t>(num_read), &numSent);
+    common::ErrnoError err = common::net::write_to_tcp_socket(out_fd, buf, static_cast<size_t>(num_read), &numSent);
     if (err) {
       return ERROR_RESULT_VALUE;
     }

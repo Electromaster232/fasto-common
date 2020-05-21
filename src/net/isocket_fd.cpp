@@ -53,7 +53,6 @@ ErrnoError ISocketFd::ReadEv(const struct iovec* iovec, int count, size_t* nwrit
   DCHECK(IsValid());
   return read_ev_to_socket(GetFd(), iovec, count, nwrite_out);
 }
-#endif
 
 ErrnoError ISocketFd::WriteImpl(const void* data, size_t size, size_t* nwrite_out) {
   return write_to_socket(GetFd(), data, size, nwrite_out);
@@ -62,6 +61,8 @@ ErrnoError ISocketFd::WriteImpl(const void* data, size_t size, size_t* nwrite_ou
 ErrnoError ISocketFd::ReadImpl(void* out_data, size_t max_size, size_t* nread_out) {
   return read_from_socket(GetFd(), out_data, max_size, nread_out);
 }
+#endif
+
 
 ErrnoError ISocketFd::SendFile(descriptor_t file_fd, size_t file_size) {
   DCHECK(IsValid());
