@@ -49,6 +49,9 @@ class TcpSocketHolder : public ISocketFd {
   void SetFd(socket_descr_t fd) override;
 
  private:
+  ErrnoError WriteImpl(const void* data, size_t size, size_t* nwrite_out) override WARN_UNUSED_RESULT;
+  ErrnoError ReadImpl(void* out_data, size_t max_size, size_t* nread_out) override WARN_UNUSED_RESULT;
+
   socket_info info_;
 
   DISALLOW_COPY_AND_ASSIGN(TcpSocketHolder);

@@ -43,8 +43,7 @@ TcpClient::~TcpClient() {
 }
 
 net::socket_info TcpClient::GetInfo() const {
-  net::TcpSocketHolder* sock = static_cast<net::TcpSocketHolder*>(sock_);
-  return sock->GetInfo();
+  return sock_->GetInfo();
 }
 
 descriptor_t TcpClient::GetFd() const {

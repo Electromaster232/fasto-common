@@ -227,12 +227,16 @@ Error IHttpClient::ReadResponse(http::HttpResponse* response) {
   size_t bytes_left = rest;  // how many we have left to read
 
   while (total < rest) {
-    size_t n;
-    err = sock_->Read(data + not_parsed + total, bytes_left, &n);
+    size_t n = 0;
+    size_t diff = not_parsed + total;
+    char* start = data + diff;
+    err = sock_->Read(start, bytes_left, &n);
     if (err) {
+      http::HttpResponse::body_t body(data, diff);
+      response->SetBody(body);
       delete[] data_head;
       delete[] data;
-      return make_error("Invalid body read");
+      return Error();
     }
     total += n;
     bytes_left -= n;

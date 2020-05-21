@@ -30,9 +30,12 @@
 #pragma once
 
 #include <common/libev/io_client.h>  // for IoClient
-#include <common/net/isocket_fd.h>
+#include <common/net/socket_info.h>
 
 namespace common {
+namespace net {
+class TcpSocketHolder;
+}
 namespace libev {
 namespace tcp {
 
@@ -54,7 +57,7 @@ class TcpClient : public IoClient {
  private:
   ErrnoError DoClose() override;
 
-  net::ISocketFd* sock_;
+  net::TcpSocketHolder* sock_;
 };
 
 }  // namespace tcp
