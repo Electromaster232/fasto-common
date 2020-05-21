@@ -722,7 +722,7 @@ HttpResponse::HttpResponse() : protocol_(), status_(), headers_(), body_() {}
 HttpResponse::HttpResponse(http_protocol protocol,
                            http_status status,
                            const headers_t& headers,
-                           const std::string& body)
+                           const char_buffer_t& body)
     : protocol_(protocol), status_(status), headers_(headers), body_(body) {}
 
 bool HttpResponse::FindHeaderByKey(const std::string& key, bool case_sensitive, header_t* hdr) const {
@@ -776,10 +776,10 @@ Error parse_http_response(const std::string& response, HttpResponse* res_out, si
     std::string line = response.substr(start, pos - start);
     if (line.empty()) {
       start = pos + 2;
-      bool canBeNext = (pos = response.find("\r\n", start)) != std::string::npos;
+      /*bool canBeNext = (pos = response.find("\r\n", start)) != std::string::npos;
       if (canBeNext) {
         continue;
-      }
+      }*/
       break;
     }
 
@@ -832,7 +832,7 @@ Error parse_http_response(const std::string& response, HttpResponse* res_out, si
   }
 
   *not_parsed = 0;
-  HttpResponse lres(lprotocol, static_cast<http_status>(lstatus), lheaders, std::string());
+  HttpResponse lres(lprotocol, static_cast<http_status>(lstatus), lheaders, char_buffer_t());
   if (len != start && line_count != 0) {
     const char* response_str = response.c_str() + start;
     http::header_t cont;
@@ -841,7 +841,7 @@ Error parse_http_response(const std::string& response, HttpResponse* res_out, si
       if (ConvertFromString(cont.value, &body_len)) {
         size_t lnot_parsed = len - start;
         if (lnot_parsed == body_len) {  // full
-          lres.SetBody(std::string(response_str, body_len));
+          lres.SetBody(MAKE_CHAR_BUFFER_SIZE(response_str, body_len));
         } else {
           *not_parsed = lnot_parsed;
         }

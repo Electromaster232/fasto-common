@@ -195,7 +195,7 @@ Error IHttpClient::ReadResponse(http::HttpResponse* response) {
     http::HttpResponse::body_t body;
     if (not_parsed) {
       const char* body_str = data_head + nread_head - not_parsed;
-      body = std::string(body_str, not_parsed);
+      body = MAKE_CHAR_BUFFER_SIZE(body_str, not_parsed);
     }
     do {
       size_t nread;
@@ -232,17 +232,15 @@ Error IHttpClient::ReadResponse(http::HttpResponse* response) {
     char* start = data + diff;
     err = sock_->Read(start, bytes_left, &n);
     if (err) {
-      http::HttpResponse::body_t body(data, diff);
-      response->SetBody(body);
       delete[] data_head;
       delete[] data;
-      return Error();
+      return make_error("Invalid body read");
     }
     total += n;
     bytes_left -= n;
   }
 
-  http::HttpResponse::body_t body(data, body_len);
+  http::HttpResponse::body_t body(MAKE_CHAR_BUFFER_SIZE(data, body_len));
   response->SetBody(body);
   delete[] data_head;
   delete[] data;

@@ -171,10 +171,10 @@ std::pair<http_status, Error> parse_http_request(const std::string& request, Htt
 
 class HttpResponse {
  public:
-  typedef std::string body_t;
+  typedef char_buffer_t body_t;
 
   HttpResponse();
-  HttpResponse(http_protocol protocol, http_status status, const headers_t& headers, const std::string& body);
+  HttpResponse(http_protocol protocol, http_status status, const headers_t& headers, const char_buffer_t& body);
 
   bool FindHeaderByKey(const std::string& key, bool case_sensitive, header_t* hdr) const;
 
