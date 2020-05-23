@@ -2133,7 +2133,7 @@ std::pair<http::http_status, Error> parse_http_request(const frame_headers& fram
 
   http::http_method lmethod = http::HM_GET;
   std::string lpath;
-  std::string lbody;
+  http::HttpRequest::body_t lbody;
   http::headers_t lheaders;
 
   std::vector<http2_nv> nva = frame.nva();

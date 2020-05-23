@@ -31,6 +31,7 @@
 
 #include <common/convert2string.h>  // for ConvertFromString
 #include <common/sprintf.h>
+#include <common/string_split.h>
 #include <common/uri/gurl.h>
 #include <common/uri/url_util.h>
 #include <common/utils.h>
@@ -71,6 +72,84 @@ bool ConvertFromString(const std::string& from, http::http_protocol* out) {
 }
 
 namespace http {
+
+namespace {
+
+common::Error ParseHttpHeader(const std::string& line, HttpHeader* out) {
+  if (line.empty() || !out) {
+    return common::make_error_inval();
+  }
+
+  size_t delem = line.find_first_of(':');
+  if (delem == std::string::npos) {
+    return common::make_error_inval();
+  }
+
+  std::string key = line.substr(0, delem);
+  std::string value = line.substr(delem + 1);
+  std::string trimkey;
+  TrimWhitespaceASCII(key, TRIM_ALL, &trimkey);
+
+  std::string trimvalue;
+  TrimWhitespaceASCII(value, TRIM_ALL, &trimvalue);
+  *out = HttpHeader(trimkey, trimvalue);
+  return common::Error();
+}
+
+common::Error ParseHttpHeaders(const std::string& headers_data, HttpResponse* out) {
+  if (headers_data.empty() || !out) {
+    return common::make_error_inval();
+  }
+
+  http_protocol lprotocol = HP_1_0;
+  headers_t lheaders;
+  uint16_t lstatus = 0;
+
+  std::vector<std::string> result = common::SplitString(headers_data, "\r\n", TRIM_WHITESPACE, SPLIT_WANT_ALL);
+  if (result.empty()) {
+    return common::make_error_inval();
+  }
+
+  std::string first_line = result[0];
+  size_t spaceP = first_line.find_first_of(" ");
+  if (spaceP != std::string::npos) {
+    std::string status_str = first_line.substr(spaceP + 1);
+    std::string protocol_str = first_line.substr(0, spaceP);
+    size_t http_sep = protocol_str.find_first_of("/");
+    if (http_sep == std::string::npos) {
+      return make_error_inval();
+    }
+
+    if (!ConvertFromString(protocol_str, &lprotocol)) {
+      DNOTREACHED() << "Unknown protocol: " << protocol_str;
+    }
+
+    size_t status_sep = status_str.find_first_of(" ");
+    if (status_sep == std::string::npos) {
+      return make_error_inval();
+    }
+
+    std::string status_num = status_str.substr(0, status_sep);
+    if (!ConvertFromString(status_num, &lstatus)) {
+      return make_error_inval();
+    }
+  } else {
+    return make_error_inval();
+  }
+
+  for (size_t i = 1; i < result.size(); ++i) {
+    HttpHeader lhead;
+    common::Error perr = ParseHttpHeader(result[i], &lhead);
+    if (!perr) {
+      lheaders.push_back(lhead);
+    }
+  }
+
+  *out = HttpResponse(lprotocol, static_cast<http_status>(lstatus), lheaders, char_buffer_t());
+  return common::Error();
+}
+
+}  // namespace
 
 const char* MimeTypes::GetType(const char* extension) {
   const char* dot = strrchr(extension, '.');
@@ -501,7 +580,7 @@ HttpRequest::HttpRequest(http_method method,
                          const path_t& relative_url,
                          http_protocol protocol,
                          const headers_t& headers,
-                         const std::string& body)
+                         const body_t& body)
     : method_(method), relative_url_(relative_url), base_url_(), protocol_(protocol), headers_(headers), body_(body) {}
 
 http::http_protocol HttpRequest::GetProtocol() const {
@@ -534,7 +613,7 @@ http::http_method HttpRequest::GetMethod() const {
   return method_;
 }
 
-std::string HttpRequest::GetBody() const {
+HttpRequest::body_t HttpRequest::GetBody() const {
   return body_;
 }
 
@@ -593,7 +672,7 @@ bool HttpRequest::FindHeaderByValue(const std::string& value, bool case_sensitiv
 }
 
 Optional<HttpRequest> MakeHeadRequest(const std::string& path, http_protocol protocol, const headers_t& headers) {
-  http::HttpRequest req(http::HM_HEAD, path, protocol, headers, std::string());
+  http::HttpRequest req(http::HM_HEAD, path, protocol, headers, http::HttpRequest::body_t());
   if (!req.IsValid()) {
     return Optional<HttpRequest>();
   }
@@ -603,7 +682,7 @@ Optional<HttpRequest> MakeHeadRequest(const std::string& path, http_protocol pro
 Optional<HttpRequest> MakeGetRequest(const std::string& path,
                                      http_protocol protocol,
                                      const headers_t& headers,
-                                     const std::string& body) {
+                                     const HttpRequest::body_t& body) {
   http::HttpRequest req(http::HM_GET, path, protocol, headers, body);
   if (!req.IsValid()) {
     return Optional<HttpRequest>();
@@ -614,7 +693,7 @@ Optional<HttpRequest> MakeGetRequest(const std::string& path,
 Optional<HttpRequest> MakePostRequest(const std::string& path,
                                       http_protocol protocol,
                                       const headers_t& headers,
-                                      const std::string& body) {
+                                      const http::HttpRequest::body_t& body) {
   http::HttpRequest req(http::HM_POST, path, protocol, headers, body);
   if (!req.IsValid()) {
     return Optional<HttpRequest>();
@@ -684,17 +763,10 @@ std::pair<http_status, Error> parse_http_request(const std::string& request, Htt
         return std::make_pair(HS_NOT_IMPLEMENTED, make_error("That method is not implemented."));
       }
     } else {
-      string_size_t delem = line.find_first_of(':');
-      if (delem != std::string::npos) {
-        std::string key = line.substr(0, delem);
-        std::string value = line.substr(delem + 1);
-        std::string trimkey;
-        TrimWhitespaceASCII(key, TRIM_ALL, &trimkey);
-
-        std::string trimvalue;
-        TrimWhitespaceASCII(value, TRIM_ALL, &trimvalue);
-        HttpHeader header(trimkey, trimvalue);
-        lheaders.push_back(header);
+      HttpHeader lhead;
+      common::Error perr = ParseHttpHeader(line, &lhead);
+      if (!perr) {
+        lheaders.push_back(lhead);
       }
     }
     line_count++;
@@ -711,9 +783,8 @@ std::pair<http_status, Error> parse_http_request(const std::string& request, Htt
     return std::make_pair(HS_BAD_REQUEST, make_error("Not found CRLF"));
   }
 
-  auto pieace = StringPiece16(unescaped.data(), unescaped.length());
-  std::string body = ConvertToString(pieace);
-  *req_out = HttpRequest(lmethod, lpath, lprotocol, lheaders, body);
+  *req_out =
+      HttpRequest(lmethod, lpath, lprotocol, lheaders, MAKE_CHAR_BUFFER_SIZE(unescaped.data(), unescaped.length()));
   return std::make_pair(HS_OK, Error());
 }
 
@@ -763,99 +834,35 @@ Error parse_http_response(const std::string& response, HttpResponse* res_out, si
   }
 
   typedef std::string::size_type string_size_t;
+  const string_size_t headers_line_pos = response.find("\r\n\r\n");
+  if (headers_line_pos == std::string::npos) {
+    return make_error("Not found CRLFCRLF");
+  }
 
-  const string_size_t len = response.size();
+  const std::string header_data = response.substr(0, headers_line_pos);
+  const std::string body_data = response.substr(headers_line_pos + 4);
 
-  string_size_t pos = 0;
-  string_size_t start = 0;
-  uint8_t line_count = 0;
-  http_protocol lprotocol = HP_1_0;
-  headers_t lheaders;
-  uint16_t lstatus = 0;
-  while ((pos = response.find("\r\n", start)) != std::string::npos) {
-    std::string line = response.substr(start, pos - start);
-    if (line.empty()) {
-      start = pos + 2;
-      /*bool canBeNext = (pos = response.find("\r\n", start)) != std::string::npos;
-      if (canBeNext) {
-        continue;
-      }*/
-      break;
-    }
+  HttpResponse lres;
+  common::Error err = ParseHttpHeaders(header_data, &lres);
+  if (err) {
+    return err;
+  }
 
-    if (line_count == 0) {
-      if (line.size() < 4) {
-        return make_error_inval();
-      }
-
-      size_t spaceP = line.find_first_of(" ");
-      if (spaceP != std::string::npos) {
-        std::string status_str = line.substr(spaceP + 1);
-        std::string protocol_str = line.substr(0, spaceP);
-        size_t http_sep = protocol_str.find_first_of("/");
-        if (http_sep == std::string::npos) {
-          return make_error_inval();
-        }
-
-        if (!ConvertFromString(protocol_str, &lprotocol)) {
-          DNOTREACHED() << "Unknown protocol: " << protocol_str;
-        }
-
-        size_t status_sep = status_str.find_first_of(" ");
-        if (status_sep == std::string::npos) {
-          return make_error_inval();
-        }
-
-        std::string status_num = status_str.substr(0, status_sep);
-        if (!ConvertFromString(status_num, &lstatus)) {
-          return make_error_inval();
-        }
+  size_t lnot_parsed = body_data.size();
+  http::header_t cont;
+  if (lres.FindHeaderByKey("Content-Length", false, &cont)) {
+    size_t body_len = 0;
+    if (ConvertFromString(cont.value, &body_len)) {
+      if (lnot_parsed == body_len) {  // full
+        lres.SetBody(MAKE_CHAR_BUFFER_SIZE(body_data.data(), body_len));
+        lnot_parsed = 0;
       } else {
-        return make_error_inval();
-      }
-    } else {
-      string_size_t delem = line.find_first_of(':');
-      if (delem != std::string::npos) {
-        std::string key = line.substr(0, delem);
-        std::string value = line.substr(delem + 1);
-        std::string trimkey;
-        TrimWhitespaceASCII(key, TRIM_ALL, &trimkey);
-
-        std::string trimvalue;
-        TrimWhitespaceASCII(value, TRIM_ALL, &trimvalue);
-        HttpHeader header(trimkey, trimvalue);
-        lheaders.push_back(header);
+        *not_parsed = lnot_parsed;
       }
     }
-    line_count++;
-    start = pos + 2;
   }
 
-  *not_parsed = 0;
-  HttpResponse lres(lprotocol, static_cast<http_status>(lstatus), lheaders, char_buffer_t());
-  if (len != start && line_count != 0) {
-    const char* response_str = response.c_str() + start;
-    http::header_t cont;
-    if (lres.FindHeaderByKey("Content-Length", false, &cont)) {
-      size_t body_len = 0;
-      if (ConvertFromString(cont.value, &body_len)) {
-        size_t lnot_parsed = len - start;
-        if (lnot_parsed == body_len) {  // full
-          lres.SetBody(MAKE_CHAR_BUFFER_SIZE(response_str, body_len));
-        } else {
-          *not_parsed = lnot_parsed;
-        }
-      }
-    } else {
-      size_t lnot_parsed = len - start;
-      *not_parsed = lnot_parsed;
-    }
-  }
-
-  if (line_count == 0) {
-    return make_error("Not found CRLF");
-  }
-
+  *not_parsed = lnot_parsed;
   *res_out = lres;
   return Error();
 }

@@ -122,13 +122,14 @@ typedef std::vector<header_t> headers_t;
 
 class HttpRequest {
  public:
+  typedef char_buffer_t body_t;
   typedef std::string path_t;
   HttpRequest();
   HttpRequest(http_method method,
               const path_t& relative_url,
               http_protocol protocol,
               const headers_t& headers,
-              const std::string& body);
+              const body_t& body);
 
   http_protocol GetProtocol() const;
   headers_t GetHeaders() const;
@@ -140,7 +141,7 @@ class HttpRequest {
   uri::GURL GetURL() const;
 
   http::http_method GetMethod() const;
-  std::string GetBody() const;
+  body_t GetBody() const;
 
   bool FindHeaderByKeyAndChange(const std::string& key, bool case_sensitive, header_t new_value);
   void RemoveHeaderByKey(const std::string& key, bool case_sensitive);
@@ -154,18 +155,18 @@ class HttpRequest {
   uri::GURL base_url_;
   http_protocol protocol_;
   headers_t headers_;
-  std::string body_;
+  body_t body_;
 };
 
 Optional<HttpRequest> MakeHeadRequest(const std::string& path, http_protocol protocol, const headers_t& headers);
 Optional<HttpRequest> MakeGetRequest(const std::string& path,
                                      http_protocol protocol,
                                      const headers_t& headers,
-                                     const std::string& body = std::string());
+                                     const HttpRequest::body_t& body = HttpRequest::body_t());
 Optional<HttpRequest> MakePostRequest(const std::string& path,
                                       http_protocol protocol,
                                       const headers_t& headers,
-                                      const std::string& body = std::string());
+                                      const HttpRequest::body_t& body = HttpRequest::body_t());
 
 std::pair<http_status, Error> parse_http_request(const std::string& request, HttpRequest* req_out) WARN_UNUSED_RESULT;
 
