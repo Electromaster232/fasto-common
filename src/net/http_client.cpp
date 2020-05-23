@@ -163,7 +163,7 @@ Error IHttpClient::ReadResponse(http::HttpResponse* response) {
     return make_error_inval();
   }
 
-  static const size_t kHeaderBufInitialSize = 4 * 1024;  // 4K
+  static const size_t kHeaderBufInitialSize = 64 * 1024;  // 16K
   char* data_head = new char[kHeaderBufInitialSize];
   size_t nread_head;
   ErrnoError err = sock_->Read(data_head, kHeaderBufInitialSize, &nread_head);
