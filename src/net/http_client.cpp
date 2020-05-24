@@ -47,26 +47,6 @@ namespace net {
 
 namespace {
 
-common::Error StableChunkedBody(char* buf, int buf_len, http::HttpResponse::body_t* out) {
-  if (!out) {
-    return make_error_inval();
-  }
-
-  http::HttpChunkedDecoder dec;
-  int res;
-  common::Error cerr = dec.FilterBuf(buf, buf_len, &res);
-  if (cerr) {
-    return cerr;
-  }
-
-  if (res == 0 && !dec.reached_eof()) {
-    return common::make_error_inval();
-  }
-
-  *out = MAKE_CHAR_BUFFER_SIZE(buf, res);
-  return common::Error();
-}
-
 bool GetHttpHostAndPort(const std::string& host, HostAndPort* out) {
   if (host.empty() || !out) {
     return false;
@@ -184,7 +164,7 @@ Error IHttpClient::ReadResponse(http::HttpResponse* response) {
     return make_error_inval();
   }
 
-  static const size_t kHeaderBufInitialSize = 64 * 1024;  // 16K
+  static const size_t kHeaderBufInitialSize = 16 * 1024;  // 16K
   char* data_head = new char[kHeaderBufInitialSize];
   size_t nread_head;
   ErrnoError err = sock_->Read(data_head, kHeaderBufInitialSize, &nread_head);
@@ -235,11 +215,18 @@ Error IHttpClient::ReadResponse(http::HttpResponse* response) {
     } while (!err);
 
     if (chunked) {
-      common::Error cerr = StableChunkedBody(body.data(), body.size(), &body);
+      http::HttpChunkedDecoder dec;
+      int res;
+      common::Error cerr = dec.FilterBuf(body.data(), body.size(), &res);
       if (cerr) {
         delete[] data_head;
         return cerr;
       }
+
+      if (res == 0 && !dec.reached_eof()) {
+        return common::make_error_inval();
+      }
+      body.resize(res);
     }
 
     response->SetBody(body);
