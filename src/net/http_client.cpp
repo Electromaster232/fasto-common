@@ -218,7 +218,7 @@ Error IHttpClient::ReadResponse(http::HttpResponse* response) {
   }
 
   http::header_t cont;
-  if (!response->FindHeaderByKey("Content-Length", false, &cont)) {  // try to get body
+  if (chunked || !response->FindHeaderByKey("Content-Length", false, &cont)) {  // try to get body
     http::HttpResponse::body_t body;
     if (not_parsed) {
       const char* body_str = data_head + nread_head - not_parsed;
@@ -278,15 +278,6 @@ Error IHttpClient::ReadResponse(http::HttpResponse* response) {
   }
 
   http::HttpResponse::body_t body(MAKE_CHAR_BUFFER_SIZE(data, body_len));
-  if (chunked) {
-    common::Error cerr = StableChunkedBody(body.data(), body.size(), &body);
-    if (cerr) {
-      delete[] data_head;
-      delete[] data;
-      return cerr;
-    }
-  }
-
   response->SetBody(body);
   delete[] data_head;
   delete[] data;
