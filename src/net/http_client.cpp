@@ -34,9 +34,9 @@
 #include <common/net/socket_tcp.h>
 
 #include <common/convert2string.h>
-
 #include <common/file_system/file.h>
 #include <common/file_system/file_system.h>
+#include <common/http/http_chunked_decoder.h>
 
 #define USER_AGENT_VALUE PROJECT_COMPANYNAME "/" PROJECT_NAME "/" PROJECT_VERSION
 
@@ -46,6 +46,27 @@ namespace common {
 namespace net {
 
 namespace {
+
+common::Error StableChunkedBody(char* buf, int buf_len, http::HttpResponse::body_t* out) {
+  if (!out) {
+    return make_error_inval();
+  }
+
+  http::HttpChunkedDecoder dec;
+  int res;
+  common::Error cerr = dec.FilterBuf(buf, buf_len, &res);
+  if (cerr) {
+    return cerr;
+  }
+
+  if (res == 0 && !dec.reached_eof()) {
+    return common::make_error_inval();
+  }
+
+  *out = MAKE_CHAR_BUFFER_SIZE(buf, res);
+  return common::Error();
+}
+
 bool GetHttpHostAndPort(const std::string& host, HostAndPort* out) {
   if (host.empty() || !out) {
     return false;
@@ -190,6 +211,12 @@ Error IHttpClient::ReadResponse(http::HttpResponse* response) {
     return Error();
   }
 
+  bool chunked = false;
+  http::header_t encoding;
+  if (response->FindHeaderByKey("Transfer-Encoding", false, &encoding)) {
+    chunked = EqualsASCII(encoding.value, "chunked", false);
+  }
+
   http::header_t cont;
   if (!response->FindHeaderByKey("Content-Length", false, &cont)) {  // try to get body
     http::HttpResponse::body_t body;
@@ -197,13 +224,23 @@ Error IHttpClient::ReadResponse(http::HttpResponse* response) {
       const char* body_str = data_head + nread_head - not_parsed;
       body = MAKE_CHAR_BUFFER_SIZE(body_str, not_parsed);
     }
+
+    size_t read_size = kHeaderBufInitialSize;
     do {
       size_t nread;
-      err = sock_->Read(data_head, kHeaderBufInitialSize, &nread);
+      err = sock_->Read(data_head, read_size, &nread);
       if (!err) {
         body += std::string(data_head, nread);
       }
     } while (!err);
+
+    if (chunked) {
+      common::Error cerr = StableChunkedBody(body.data(), body.size(), &body);
+      if (cerr) {
+        delete[] data_head;
+        return cerr;
+      }
+    }
 
     response->SetBody(body);
     delete[] data_head;
@@ -241,6 +278,15 @@ Error IHttpClient::ReadResponse(http::HttpResponse* response) {
   }
 
   http::HttpResponse::body_t body(MAKE_CHAR_BUFFER_SIZE(data, body_len));
+  if (chunked) {
+    common::Error cerr = StableChunkedBody(body.data(), body.size(), &body);
+    if (cerr) {
+      delete[] data_head;
+      delete[] data;
+      return cerr;
+    }
+  }
+
   response->SetBody(body);
   delete[] data_head;
   delete[] data;

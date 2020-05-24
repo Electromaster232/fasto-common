@@ -16,7 +16,7 @@
 
 #include <common/license/hardware_hash.h>
 
-#include <common/convert2string.h>
+#include <common/string_number_conversions.h>
 
 namespace common {
 namespace license {

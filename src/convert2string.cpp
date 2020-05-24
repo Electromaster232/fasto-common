@@ -1751,26 +1751,6 @@ bool decode(const StringPiece& input, string16* out) {
 }  // namespace uunicode
 }  // namespace utils
 
-bool HexStringToInt(const StringPiece& input, int32_t* output) {
-  return IteratorRangeToNumber<HexIteratorRangeToIntTraits>::Invoke(input.begin(), input.end(), output);
-}
-
-bool HexStringToUInt(const StringPiece& input, uint32_t* output) {
-  return IteratorRangeToNumber<HexIteratorRangeToUIntTraits>::Invoke(input.begin(), input.end(), output);
-}
-
-bool HexStringToInt64(const StringPiece& input, int64_t* output) {
-  return IteratorRangeToNumber<HexIteratorRangeToInt64Traits>::Invoke(input.begin(), input.end(), output);
-}
-
-bool HexStringToUInt64(const StringPiece& input, uint64_t* output) {
-  return IteratorRangeToNumber<HexIteratorRangeToUInt64Traits>::Invoke(input.begin(), input.end(), output);
-}
-
-bool HexStringToBytes(const std::string& input, std::vector<uint8_t>* output) {
-  return HexStringToBytesT(input, output);
-}
-
 std::string ConvertVersionNumberTo3DotString(uint32_t number) {
   char buffer[16] = {0};
   uint8_t major = PROJECT_GET_MAJOR_VERSION(number);

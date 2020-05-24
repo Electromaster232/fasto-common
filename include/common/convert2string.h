@@ -239,12 +239,6 @@ bool decode(const StringPiece& input, string16* out);
 }  // namespace uunicode
 }  // namespace utils
 
-bool HexStringToInt(const StringPiece& input, int32_t* output);
-bool HexStringToUInt(const StringPiece& input, uint32_t* output);
-bool HexStringToInt64(const StringPiece& input, int64_t* output);
-bool HexStringToUInt64(const StringPiece& input, uint64_t* output);
-bool HexStringToBytes(const std::string& input, std::vector<uint8_t>* output);
-
 std::string ConvertVersionNumberTo3DotString(uint32_t number);
 std::string ConvertVersionNumberTo2DotString(uint32_t number);
 uint32_t ConvertVersionNumberFromString(const std::string& version);

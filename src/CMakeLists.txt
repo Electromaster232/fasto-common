@@ -308,12 +308,14 @@ SET(HTTP_HEADERS
   ${CMAKE_SOURCE_DIR}/include/common/http/http.h
   ${CMAKE_SOURCE_DIR}/include/common/http/http2.h
   ${CMAKE_SOURCE_DIR}/include/common/http/http2_huffman.h
+  ${CMAKE_SOURCE_DIR}/include/common/http/http_chunked_decoder.h
 )
 
 SET(HTTP_SOURCES
   ${CMAKE_SOURCE_DIR}/src/http/http.cpp
   ${CMAKE_SOURCE_DIR}/src/http/http2.cpp
   ${CMAKE_SOURCE_DIR}/src/http/http2_huffman.cpp
+  ${CMAKE_SOURCE_DIR}/src/http/http_chunked_decoder.cpp
 )
 
 SET(TEXT_DECODERS_HEADERS
