@@ -1,7 +1,7 @@
 #include <common/license/utils.h>
 
-#import <Foundation/NSString.h>
 #import <Foundation/NSDictionary.h>
+#import <Foundation/NSString.h>
 
 #import <IOKit/IOKitLib.h>
 
@@ -42,6 +42,10 @@ bool GetHddID(std::string* serial) {
   }
 
   const char* serial_ptr = [hdd_serial UTF8String];
+  if (!serial_ptr) {
+    return false;
+  }
+
   *serial = serial_ptr;
   return true;
 }
