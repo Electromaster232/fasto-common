@@ -29,6 +29,7 @@ bool GetHddID(std::string* serial) {
     if (kr == KERN_SUCCESS) {
       NSDictionary* serviceInfo = (__bridge NSDictionary*)service_properties;
       hdd_serial = [serviceInfo objectForKey:@"Serial Number"];
+      size_t len = [hdd_serial lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
       CFRelease(service_properties);
     }
 
