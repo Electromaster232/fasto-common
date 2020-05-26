@@ -132,7 +132,7 @@ using EnableIfSpanCompatibleContainerAndSpanIsDynamic =
 template <size_t Extent>
 class ExtentStorage {
  public:
-  constexpr explicit ExtentStorage(size_t size) noexcept {}
+  constexpr explicit ExtentStorage(size_t size) noexcept { UNUSED(size); }
   constexpr size_t size() const noexcept { return Extent; }
 };
 
