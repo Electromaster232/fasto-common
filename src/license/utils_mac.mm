@@ -24,17 +24,11 @@ bool GetHddID(std::string* serial) {
 
   io_service_t io_service;
   NSString* hdd_serial = nil;
-  std::string lserial;
   while ((io_service = IOIteratorNext(io_objects))) {
     kr = IORegistryEntryCreateCFProperties(io_service, &service_properties, kCFAllocatorDefault, kNilOptions);
     if (kr == KERN_SUCCESS) {
       NSDictionary* serviceInfo = (__bridge NSDictionary*)service_properties;
       hdd_serial = [serviceInfo objectForKey:@"Serial Number"];
-      if (hdd_serial) {
-        size_t len = [hdd_serial lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
-        const char* serial_ptr = [hdd_serial UTF8String];
-        lserial = std::string(serial_ptr, len);
-      }
       CFRelease(service_properties);
     }
 
@@ -42,11 +36,17 @@ bool GetHddID(std::string* serial) {
   }
   IOObjectRelease(io_objects);
 
-  if (lserial.empty()) {
+  if (!hdd_serial) {
     return false;
   }
 
-  *serial = lserial;
+  size_t len = [hdd_serial lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
+  const char* serial_ptr = [hdd_serial UTF8String];
+  if (!serial_ptr) {
+    return false;
+  }
+
+  *serial = std::string(serial_ptr, len);
   return true;
 }
 
