@@ -142,4 +142,8 @@ TEST(Url, IsValid) {
   ASSERT_EQ(rtsp_user.path(), "/axis-media/media.amp");
   ASSERT_EQ(rtsp_user.query(), "videocodec=h264&audiocodec=aac");
   ASSERT_EQ(rtsp_user.spec(), RTSP_LINK_USER);
+
+  common::uri::GURL post("http://panel.fastotv.com:8083/panel_pro/api/load_balance/log/5ec602f6d392b6b89f1814f7");
+  ASSERT_EQ(post.host(), "panel.fastotv.com");
+  ASSERT_EQ(post.EffectiveIntPort(), 8083);
 }

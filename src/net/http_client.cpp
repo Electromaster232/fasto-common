@@ -45,40 +45,6 @@
 namespace common {
 namespace net {
 
-namespace {
-
-bool GetHttpHostAndPort(const std::string& host, HostAndPort* out) {
-  if (host.empty() || !out) {
-    return false;
-  }
-
-  HostAndPort http_server;
-  size_t del = host.find_last_of(':');
-  if (del != std::string::npos) {
-    http_server.SetHost(host.substr(0, del));
-    std::string port_str = host.substr(del + 1);
-    uint16_t lport;
-    if (ConvertFromString(port_str, &lport)) {
-      http_server.SetPort(lport);
-    }
-  } else {
-    http_server.SetHost(host);
-    http_server.SetPort(80);
-  }
-  *out = http_server;
-  return true;
-}
-
-bool GetPostServerFromUrl(const uri::GURL& url, HostAndPort* out) {
-  if (!url.is_valid() || !out) {
-    return false;
-  }
-
-  const std::string host_str = url.HostNoBrackets();
-  return GetHttpHostAndPort(host_str, out);
-}
-}  // namespace
-
 Error IHttpClient::PostFile(const url_t& path, const file_system::ascii_file_string_path& file_path) {
   file_system::File file;
   ErrnoError errn = file.Open(file_path, file_system::File::FLAG_OPEN | file_system::File::FLAG_READ);
@@ -312,11 +278,11 @@ HostAndPort HttpClient::GetHost() const {
 }
 
 Error PostHttpFile(const file_system::ascii_file_string_path& file_path, const uri::GURL& url) {
-  HostAndPort http_server_address;
-  if (!GetPostServerFromUrl(url, &http_server_address)) {
-    return make_error_inval();
+  if (!url.is_valid() || !file_path.IsValid()) {
+    return common::make_error_inval();
   }
 
+  HostAndPort http_server_address(url.host(), url.EffectiveIntPort());
   HttpClient cl(http_server_address);
   ErrnoError errn = cl.Connect();
   if (errn) {
