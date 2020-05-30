@@ -72,6 +72,7 @@ IF(JSONC_FOUND)
     ${CMAKE_SOURCE_DIR}/include/common/daemon/commands/ping_info.h
     ${CMAKE_SOURCE_DIR}/include/common/daemon/commands/license_info.h
     ${CMAKE_SOURCE_DIR}/include/common/daemon/commands/activate_info.h
+    ${CMAKE_SOURCE_DIR}/include/common/daemon/commands/get_log_info.h
   )
   SET(DAEMON_SOURCES
     ${CMAKE_SOURCE_DIR}/src/daemon/client.cpp
@@ -81,6 +82,7 @@ IF(JSONC_FOUND)
     ${CMAKE_SOURCE_DIR}/src/daemon/commands/ping_info.cpp
     ${CMAKE_SOURCE_DIR}/src/daemon/commands/license_info.cpp
     ${CMAKE_SOURCE_DIR}/src/daemon/commands/activate_info.cpp
+    ${CMAKE_SOURCE_DIR}/src/daemon/commands/get_log_info.cpp
   )
 
   SET(COMMON_INCLUDE_DIRS ${COMMON_INCLUDE_DIRS} ${JSONC_INCLUDE_DIRS})
