@@ -52,6 +52,8 @@ class HostAndPort {
   host_t GetHost() const;
   void SetHost(host_t host);
 
+  host_t GetHostNoBrackets() const;
+
   port_t GetPort() const;
   void SetPort(port_t port);
 

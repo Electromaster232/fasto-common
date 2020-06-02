@@ -544,7 +544,7 @@ ErrnoError resolve(const HostAndPort& to, socket_t socktype, socket_info* out_in
     return make_error_perror("connect", EINVAL);
   }
 
-  const auto host = to.GetHost();
+  const auto host = to.GetHostNoBrackets();
   const auto port = to.GetPort();
 
   return resolve_raw(host.c_str(), port, socktype, out_info);
@@ -555,7 +555,7 @@ ErrnoError connect(const HostAndPort& to, socket_t socktype, struct timeval* tim
     return make_error_perror("connect", EINVAL);
   }
 
-  const auto host = to.GetHost();
+  const auto host = to.GetHostNoBrackets();
   const auto port = to.GetPort();
 
   return connect_raw(host.c_str(), port, socktype, timeout, out_info);

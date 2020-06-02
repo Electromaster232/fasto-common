@@ -170,7 +170,7 @@ TEST(SocketTcpIpv4, bindRandomWorkflow) {
 
 TEST(ServerSocketTcpAndClientSocketTcpIpv6, workflow) {
   using namespace common::net;
-  HostAndPort host("[::1]", 4567);
+  HostAndPort host("[::]", 4567);
   ServerSocketTcp serv(host);
   common::ErrnoError err = serv.Bind(true);
   ASSERT_FALSE(err);

@@ -112,6 +112,14 @@ void HostAndPort::SetHost(host_t host) {
   host_ = StableHost(host);
 }
 
+HostAndPort::host_t HostAndPort::GetHostNoBrackets() const {
+  size_t len = host_.length();
+  if (len >= 2 && host_[0] == '[' && host_[len - 1] == ']') {
+    return host_.substr(1, len - 2);
+  }
+  return host_;
+}
+
 HostAndPort::port_t HostAndPort::GetPort() const {
   return port_;
 }
