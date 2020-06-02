@@ -295,17 +295,9 @@ ErrnoError resolve_raw(const char* host, uint16_t port, socket_t socktype, socke
   hints.ai_canonname = nullptr;
   hints.ai_addr = nullptr;
   hints.ai_next = nullptr;
-  /* Try with IPv6 if no IPv4 address was found. We do it in this order since
-   * in a client you can't afford to test if you have IPv6 connectivity
-   * as this would add latency to every connect. Otherwise a more sensible
-   * route could be: Use IPv6 if both addresses are available and there is IPv6
-   * connectivity. */
-  if (getaddrinfo(host, _port, &hints, &result) != 0) {
-    hints.ai_family = AF_INET6;
-    int rv = getaddrinfo(host, _port, &hints, &result);
-    if (rv != 0) {
-      return make_error_perror("getaddrinfo", rv);
-    }
+  int rv = getaddrinfo(host, _port, &hints, &result);
+  if (rv != 0) {
+    return make_error_perror("getaddrinfo", rv);
   }
 
   for (rp = result; rp != nullptr; rp = rp->ai_next) {
@@ -360,17 +352,9 @@ ErrnoError connect_raw(const char* host,
   hints.ai_canonname = nullptr;
   hints.ai_addr = nullptr;
   hints.ai_next = nullptr;
-  /* Try with IPv6 if no IPv4 address was found. We do it in this order since
-   * in a client you can't afford to test if you have IPv6 connectivity
-   * as this would add latency to every connect. Otherwise a more sensible
-   * route could be: Use IPv6 if both addresses are available and there is IPv6
-   * connectivity. */
-  if (getaddrinfo(host, _port, &hints, &result) != 0) {
-    hints.ai_family = AF_INET6;
-    int rv = getaddrinfo(host, _port, &hints, &result);
-    if (rv != 0) {
-      return make_error_perror("getaddrinfo", rv);
-    }
+  int rv = getaddrinfo(host, _port, &hints, &result);
+  if (rv != 0) {
+    return make_error_perror("getaddrinfo", rv);
   }
 
   for (rp = result; rp != nullptr; rp = rp->ai_next) {
