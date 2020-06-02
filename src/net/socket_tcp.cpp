@@ -46,8 +46,6 @@
 
 #include <common/net/net.h>  // for bind, accept, close, etc
 
-struct addrinfo;
-
 namespace common {
 namespace net {
 
@@ -118,59 +116,34 @@ ServerSocketTcp::ServerSocketTcp(const HostAndPort& host) : SocketTcp(host) {}
 
 ErrnoError ServerSocketTcp::Bind(bool reuseaddr) {
   socket_info linfo;
-  ErrnoError err = socket(IP_DOMAIN, ST_SOCK_STREAM, 0, &linfo);  // init fd
+  const HostAndPort hs = GetHost();
+  ErrnoError err = resolve(hs, ST_SOCK_STREAM, &linfo);  // init fd
   if (err) {
     return err;
   }
 
-  const HostAndPort hs = GetHost();
-  sockaddr_t addr;
-  memset(&addr, 0, sizeof(sockaddr_t));
-#ifdef IPV6_ENABLED
-  addr.sin6_family = IP_DOMAIN;
-  addr.sin6_port = htons(hs.GetPort());
-  addr.sin6_addr = in6addr_any;
-  bool is_random_port = addr.sin6_port == 0;
-#else
-  addr.sin_family = IP_DOMAIN;
-  addr.sin_port = htons(hs.GetPort());
-  addr.sin_addr.s_addr = INADDR_ANY;
-  bool is_random_port = addr.sin_port == 0;
-#endif
-
   socket_descr_t fd = linfo.fd();
   addrinfo* ainf = linfo.addr_info();
+  socket_info lbinfo;
+  err = bind(fd, ainf, reuseaddr, &lbinfo);  // init sockaddr
+  if (err) {
+    return err;
+  }
 
-  if (is_random_port) {  // random port
-    socket_info lbinfo;
-    err = bind(fd, reinterpret_cast<struct sockaddr*>(&addr), sizeof(sockaddr_t), ainf, reuseaddr,
-               &lbinfo);  // init sockaddr
+  bool is_random_port = linfo.port() == 0;
+  if (is_random_port) {                    // random port
+    err = getsockname(fd, ainf, &lbinfo);  // init sockaddr
     if (err) {
       return err;
     }
 
-    sockaddr_t addr2;
-    memset(&addr2, 0, sizeof(sockaddr_t));
-    err = getsockname(fd, reinterpret_cast<struct sockaddr*>(&addr2), sizeof(sockaddr_t), &lbinfo);  // init sockaddr
-    if (err) {
-      return err;
-    }
-
-    struct sockaddr* saddr = reinterpret_cast<struct sockaddr*>(&addr2);
     HostAndPort new_hs = hs;
-    const auto port = ntohs(get_in_port(saddr));
+    const auto port = ntohs(get_in_port(lbinfo.addr_info()));
     new_hs.SetPort(port);
 
     SetInfo(lbinfo);
     SetHost(new_hs);
     return ErrnoError();
-  }
-
-  socket_info lbinfo;
-  err = bind(fd, reinterpret_cast<struct sockaddr*>(&addr), sizeof(sockaddr_t), ainf, reuseaddr,
-             &lbinfo);  // init sockaddr
-  if (err) {
-    return err;
   }
 
   SetInfo(lbinfo);

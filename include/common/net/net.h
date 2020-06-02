@@ -41,19 +41,14 @@ namespace common {
 namespace net {
 
 ErrnoError socket(int domain, socket_t type, int protocol, socket_info* out_info) WARN_UNUSED_RESULT;
-ErrnoError bind(socket_descr_t fd,
-                const struct sockaddr* addr,
-                socklen_t addr_len,
-                const addrinfo* ainf,
-                bool reuseaddr,
-                socket_info* out_info) WARN_UNUSED_RESULT;
-ErrnoError getsockname(socket_descr_t fd, struct sockaddr* addr, socklen_t addr_len, socket_info* out_info)
-    WARN_UNUSED_RESULT;
-uint16_t get_in_port(struct sockaddr* sa);
-char* get_in_addr(struct sockaddr* sa);  // allocate memory, can be null
+ErrnoError bind(socket_descr_t fd, const addrinfo* ainf, bool reuseaddr, socket_info* out_info) WARN_UNUSED_RESULT;
+ErrnoError getsockname(socket_descr_t fd, const addrinfo* ainf, socket_info* out_info) WARN_UNUSED_RESULT;
+uint16_t get_in_port(const addrinfo* ainf);
+char* get_in_addr(const addrinfo* ainf);  // allocate memory, can be null
 ErrnoError listen(const socket_info& info, int backlog) WARN_UNUSED_RESULT;
 ErrnoError accept(const socket_info& info, socket_info* out_info) WARN_UNUSED_RESULT;
 
+ErrnoError resolve(const HostAndPort& to, socket_t socktype, socket_info* out_info) WARN_UNUSED_RESULT;
 ErrnoError connect(const HostAndPort& to, socket_t socktype, struct timeval* timeout, socket_info* out_info)
     WARN_UNUSED_RESULT;
 ErrnoError connect(const socket_info& info, struct timeval* timeout, socket_info* out_info) WARN_UNUSED_RESULT;

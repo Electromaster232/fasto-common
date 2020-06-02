@@ -87,7 +87,7 @@ TEST(HostAndPortAndSlot, ConvertToString) {
   ASSERT_EQ(host_str2, common::ConvertToString(local_host));
 }
 
-TEST(ServerSocketTcpAndClientSocketTcp, workflow) {
+TEST(ServerSocketTcpAndClientSocketTcpIpv4, workflow) {
   using namespace common::net;
   HostAndPort host("localhost", 4567);
   ServerSocketTcp serv(host);
@@ -114,9 +114,67 @@ TEST(ServerSocketTcpAndClientSocketTcp, workflow) {
   ASSERT_FALSE(err);
 }
 
-TEST(SocketTcp, bindRandomWorkflow) {
+TEST(SocketTcpIpv4, bindRandomWorkflow) {
   using namespace common::net;
   HostAndPort host("localhost", RANDOM_PORT);
+  ServerSocketTcp serv(host);
+
+  common::ErrnoError err = serv.Bind(false);
+  ASSERT_FALSE(err);
+  err = serv.Listen(5);
+  ASSERT_FALSE(err);
+
+  HostAndPort chost = serv.GetHost();
+  ASSERT_FALSE(chost == host);
+
+  ClientSocketTcp tcp(chost);
+  socket_info inf = tcp.GetInfo();
+  ASSERT_TRUE(inf.addr_info() == NULL);
+  auto ex_handler = THREAD_MANAGER()->CreateThread(&exec_serv, &serv);
+  bool res = ex_handler->Start();
+  DCHECK(res);
+  sleep(1);
+  err = tcp.Connect();
+  ASSERT_FALSE(err);
+  inf = tcp.GetInfo();
+  ASSERT_FALSE(inf.addr_info() == NULL);
+  ex_handler->Join();
+  err = tcp.Close();
+  ASSERT_FALSE(err);
+  err = serv.Close();
+  ASSERT_FALSE(err);
+}
+
+TEST(ServerSocketTcpAndClientSocketTcpIpv6, workflow) {
+  using namespace common::net;
+  HostAndPort host("::1", 4567);
+  ServerSocketTcp serv(host);
+  common::ErrnoError err = serv.Bind(true);
+  ASSERT_FALSE(err);
+  err = serv.Listen(5);
+  ASSERT_FALSE(err);
+
+  ClientSocketTcp tcp(host);
+  socket_info inf = tcp.GetInfo();
+  ASSERT_TRUE(inf.addr_info() == NULL);
+  auto ex_handler = THREAD_MANAGER()->CreateThread(&exec_serv, &serv);
+  bool res = ex_handler->Start();
+  DCHECK(res);
+  sleep(1);
+  err = tcp.Connect();
+  ASSERT_FALSE(err);
+  inf = tcp.GetInfo();
+  ASSERT_FALSE(inf.addr_info() == NULL);
+  ex_handler->Join();
+  err = tcp.Close();
+  ASSERT_FALSE(err);
+  err = serv.Close();
+  ASSERT_FALSE(err);
+}
+
+TEST(SocketTcpIpv6, bindRandomWorkflow) {
+  using namespace common::net;
+  HostAndPort host("::1", RANDOM_PORT);
   ServerSocketTcp serv(host);
 
   common::ErrnoError err = serv.Bind(false);

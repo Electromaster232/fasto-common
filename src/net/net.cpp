@@ -276,6 +276,67 @@ ErrnoError do_connect(socket_descr_t sock, const struct sockaddr* addr, socklen_
   return ErrnoError();
 }
 
+ErrnoError resolve_raw(const char* host, uint16_t port, socket_t socktype, socket_info* out_info) {
+  if (!host || !out_info) {
+    return make_error_perror("connect", EINVAL);
+  }
+
+  socket_descr_t sfd = INVALID_SOCKET_VALUE;
+
+  struct addrinfo hints, *rp = nullptr;
+  struct addrinfo* result = nullptr;
+  char _port[6];
+  snprintf(_port, sizeof(_port), "%u", port);
+  memset(&hints, 0, sizeof(hints));
+  hints.ai_family = AF_UNSPEC;
+  hints.ai_socktype = socket_type_to_native(socktype);
+  hints.ai_flags = AI_PASSIVE; /* For wildcard IP address */
+  hints.ai_protocol = 0;       /* Any protocol */
+  hints.ai_canonname = nullptr;
+  hints.ai_addr = nullptr;
+  hints.ai_next = nullptr;
+  /* Try with IPv6 if no IPv4 address was found. We do it in this order since
+   * in a client you can't afford to test if you have IPv6 connectivity
+   * as this would add latency to every connect. Otherwise a more sensible
+   * route could be: Use IPv6 if both addresses are available and there is IPv6
+   * connectivity. */
+  if (getaddrinfo(host, _port, &hints, &result) != 0) {
+    hints.ai_family = AF_INET6;
+    int rv = getaddrinfo(host, _port, &hints, &result);
+    if (rv != 0) {
+      return make_error_perror("getaddrinfo", rv);
+    }
+  }
+
+  for (rp = result; rp != nullptr; rp = rp->ai_next) {
+    if (rp->ai_socktype != socktype) {
+      continue;
+    }
+
+    sfd = ::socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+    if (sfd == INVALID_SOCKET_VALUE) {
+      continue;
+    }
+
+    break;
+  }
+
+  if (!rp) { /* No address succeeded */
+    int err = errno;
+    DCHECK(err) << "Errno(" << err << ") should be not zero!";
+    freeaddrinfo(result); /* No longer needed */
+    return make_error_perror("getaddrinfo", err);
+  }
+
+  out_info->set_addrinfo(rp);
+  out_info->set_fd(sfd);
+  out_info->set_host(host);
+  out_info->set_port(port);
+
+  freeaddrinfo(result); /* No longer needed */
+  return ErrnoError();
+}
+
 ErrnoError connect_raw(const char* host,
                        uint16_t port,
                        socket_t socktype,
@@ -376,13 +437,8 @@ ErrnoError socket(int domain, socket_t type, int protocol, socket_info* out_info
   return ErrnoError();
 }
 
-ErrnoError bind(socket_descr_t fd,
-                const struct sockaddr* addr,
-                socklen_t addr_len,
-                const struct addrinfo* ainf,
-                bool reuseaddr,
-                socket_info* out_info) {
-  if (!addr || fd == INVALID_SOCKET_VALUE || !out_info) {
+ErrnoError bind(socket_descr_t fd, const struct addrinfo* ainf, bool reuseaddr, socket_info* out_info) {
+  if (!ainf || fd == INVALID_SOCKET_VALUE || !out_info) {
     return make_error_perror("bind", EINVAL);
   }
 
@@ -394,50 +450,49 @@ ErrnoError bind(socket_descr_t fd,
     }
   }
 
-  int res = ::bind(fd, addr, addr_len);
+  int res = ::bind(fd, ainf->ai_addr, ainf->ai_addrlen);
   if (res == ERROR_RESULT_VALUE) {
     return make_error_perror("bind", errno);
   }
 
   out_info->set_fd(fd);
   out_info->set_addrinfo(ainf);
-  out_info->set_sockaddr(addr, addr_len);
   return ErrnoError();
 }
 
-ErrnoError getsockname(socket_descr_t fd, struct sockaddr* addr, socklen_t addr_len, socket_info* out_info) {
-  if (!addr || fd == INVALID_SOCKET_VALUE || !out_info) {
+ErrnoError getsockname(socket_descr_t fd, const struct addrinfo* ainf, socket_info* out_info) {
+  if (!ainf || fd == INVALID_SOCKET_VALUE || !out_info) {
     return make_error_perror("getsockname", EINVAL);
   }
 
-  int res = ::getsockname(fd, addr, &addr_len);
+  socklen_t len = ainf->ai_addrlen;
+  int res = ::getsockname(fd, ainf->ai_addr, &len);
   if (res == ERROR_RESULT_VALUE) {
     return make_error_perror("getsockname", errno);
   }
 
   out_info->set_fd(fd);
-  out_info->set_sockaddr(addr, addr_len);
-
+  out_info->set_addrinfo(ainf);
   return ErrnoError();
 }
 
-uint16_t get_in_port(struct sockaddr* sa) {
-  if (sa->sa_family == AF_INET) {
-    struct sockaddr_in* sin = reinterpret_cast<struct sockaddr_in*>(sa);
+uint16_t get_in_port(const addrinfo* ainf) {
+  if (ainf->ai_family == AF_INET) {
+    struct sockaddr_in* sin = reinterpret_cast<struct sockaddr_in*>(ainf->ai_addr);
     return sin->sin_port;
   }
 
-  struct sockaddr_in6* sin = reinterpret_cast<struct sockaddr_in6*>(sa);
+  struct sockaddr_in6* sin = reinterpret_cast<struct sockaddr_in6*>(ainf->ai_addr);
   return sin->sin6_port;
 }
 
-char* get_in_addr(struct sockaddr* sa) {
+char* get_in_addr(const addrinfo* ainf) {
 #if defined(OS_WIN)
-  struct sockaddr_in* sin = reinterpret_cast<struct sockaddr_in*>(sa);
+  struct sockaddr_in* sin = reinterpret_cast<struct sockaddr_in*>(ainf->ai_addr);
   return strdup(inet_ntoa(sin->sin_addr));
 #else
-  if (sa->sa_family == AF_INET) {
-    struct sockaddr_in* sin = reinterpret_cast<struct sockaddr_in*>(sa);
+  if (ainf->ai_family == AF_INET) {
+    struct sockaddr_in* sin = reinterpret_cast<struct sockaddr_in*>(ainf->ai_addr);
     char* str = static_cast<char*>(calloc(INET_ADDRSTRLEN, sizeof(char)));
     const char* result = inet_ntop(AF_INET, &sin->sin_addr, str, INET_ADDRSTRLEN);
     if (!result) {
@@ -447,7 +502,7 @@ char* get_in_addr(struct sockaddr* sa) {
     return str;
   }
 
-  struct sockaddr_in6* sin = reinterpret_cast<struct sockaddr_in6*>(sa);
+  struct sockaddr_in6* sin = reinterpret_cast<struct sockaddr_in6*>(ainf->ai_addr);
   char* str = static_cast<char*>(calloc(INET6_ADDRSTRLEN, sizeof(char)));
   const char* result = inet_ntop(AF_INET6, &sin->sin6_addr, str, INET6_ADDRSTRLEN);
   if (!result) {
@@ -480,21 +535,19 @@ ErrnoError accept(const socket_info& info, socket_info* out_info) {
 
   *out_info = info;
   struct addrinfo* ainf = out_info->addr_info();
-
-  struct sockaddr* addr = ainf->ai_addr;
 #ifdef OS_POSIX
   socklen_t* addr_len = &ainf->ai_addrlen;
 #else
   int* addr_len = reinterpret_cast<int*>(&ainf->ai_addrlen);
 #endif
-  int res = ::accept(fd, addr, addr_len);
+  int res = ::accept(fd, ainf->ai_addr, addr_len);
   if (res == ERROR_RESULT_VALUE) {
     return make_error_perror("accept", errno);
   }
 
   out_info->set_fd(res);
-  out_info->set_port(get_in_port(addr));
-  char* host = get_in_addr(addr);
+  out_info->set_port(get_in_port(ainf));
+  char* host = get_in_addr(ainf);
   if (host) {
     out_info->set_host(host);
     free(host);
@@ -502,13 +555,24 @@ ErrnoError accept(const socket_info& info, socket_info* out_info) {
   return ErrnoError();
 }
 
+ErrnoError resolve(const HostAndPort& to, socket_t socktype, socket_info* out_info) {
+  if (!to.IsValid() || !out_info) {
+    return make_error_perror("connect", EINVAL);
+  }
+
+  const auto host = to.GetHost();
+  const auto port = to.GetPort();
+
+  return resolve_raw(host.c_str(), port, socktype, out_info);
+}
+
 ErrnoError connect(const HostAndPort& to, socket_t socktype, struct timeval* timeout, socket_info* out_info) {
   if (!to.IsValid() || !out_info) {
     return make_error_perror("connect", EINVAL);
   }
 
-  const HostAndPort::host_t host = to.GetHost();
-  const HostAndPort::port_t port = to.GetPort();
+  const auto host = to.GetHost();
+  const auto port = to.GetPort();
 
   return connect_raw(host.c_str(), port, socktype, timeout, out_info);
 }

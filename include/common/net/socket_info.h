@@ -49,12 +49,6 @@ struct addrinfo;
 #define INVALID_SOCKET_VALUE INVALID_DESCRIPTOR
 #endif
 
-#ifdef IPV6_ENABLED
-#define IP_DOMAIN PF_INET6
-#else
-#define IP_DOMAIN PF_INET
-#endif
-
 namespace common {
 namespace net {
 
@@ -62,12 +56,6 @@ namespace net {
 typedef SOCKET socket_descr_t;
 #else
 typedef int socket_descr_t;
-#endif
-
-#ifdef IPV6_ENABLED
-typedef sockaddr_in6 sockaddr_t;
-#else
-typedef sockaddr_in sockaddr_t;
 #endif
 
 /* Types of sockets.  */
