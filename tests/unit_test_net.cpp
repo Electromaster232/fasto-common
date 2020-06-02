@@ -27,6 +27,11 @@ TEST(HostAndPort, methods) {
   ASSERT_EQ(local_host2.GetPort(), RANDOM_PORT);
   ASSERT_EQ(local_host, local_host2);
 
+  const common::net::HostAndPort local_host3("::1", RANDOM_PORT);
+  ASSERT_TRUE(local_host3.IsValid());
+  ASSERT_TRUE(local_host3.IsLocalHost());
+  ASSERT_EQ(local_host3.GetPort(), RANDOM_PORT);
+
   const uint16_t valid_port = 8080;
   const common::net::HostAndPort valid_host = common::net::HostAndPort("192.168.1.2", valid_port);
   ASSERT_TRUE(valid_host.IsValid());
@@ -50,6 +55,24 @@ TEST(HostAndPort, ConvertToString) {
   ASSERT_TRUE(local_host.IsLocalHost());
   ASSERT_EQ(local_host.GetPort(), valid_port);
   ASSERT_EQ(host_str2, common::ConvertToString(local_host));
+
+  const std::string host_str3 = common::MemSPrintf("[1fff:0:a88:85a3::ac1f]:%u", valid_port);
+  ASSERT_TRUE(common::ConvertFromString(host_str3, &local_host));
+  ASSERT_TRUE(local_host.IsValid());
+  ASSERT_FALSE(local_host.IsLocalHost());
+  ASSERT_FALSE(local_host.IsDefaultRoute());
+  ASSERT_EQ(local_host.GetPort(), valid_port);
+  ASSERT_EQ(local_host.GetHost(), "[1fff:0:a88:85a3::ac1f]");
+  ASSERT_EQ(host_str3, common::ConvertToString(local_host));
+
+  const std::string host_str4 = common::MemSPrintf("[::]:%u", valid_port);
+  ASSERT_TRUE(common::ConvertFromString(host_str4, &local_host));
+  ASSERT_TRUE(local_host.IsValid());
+  ASSERT_FALSE(local_host.IsLocalHost());
+  ASSERT_TRUE(local_host.IsDefaultRoute());
+  ASSERT_EQ(local_host.GetPort(), valid_port);
+  ASSERT_EQ(local_host.GetHost(), "[::]");
+  ASSERT_EQ(host_str4, common::ConvertToString(local_host));
 }
 
 TEST(HostAndPortAndSlot, methods) {
@@ -147,7 +170,7 @@ TEST(SocketTcpIpv4, bindRandomWorkflow) {
 
 TEST(ServerSocketTcpAndClientSocketTcpIpv6, workflow) {
   using namespace common::net;
-  HostAndPort host("::1", 4567);
+  HostAndPort host("[::1]", 4567);
   ServerSocketTcp serv(host);
   common::ErrnoError err = serv.Bind(true);
   ASSERT_FALSE(err);
@@ -174,7 +197,7 @@ TEST(ServerSocketTcpAndClientSocketTcpIpv6, workflow) {
 
 TEST(SocketTcpIpv6, bindRandomWorkflow) {
   using namespace common::net;
-  HostAndPort host("::1", RANDOM_PORT);
+  HostAndPort host("[::1]", RANDOM_PORT);
   ServerSocketTcp serv(host);
 
   common::ErrnoError err = serv.Bind(false);

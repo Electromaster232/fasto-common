@@ -43,6 +43,7 @@ class HostAndPort {
   HostAndPort(host_t host, port_t port);
   bool IsValid() const;
   bool IsLocalHost() const;
+  bool IsDefaultRoute() const;
 
   static HostAndPort CreateLocalHost(uint16_t port);
 
@@ -93,6 +94,7 @@ inline bool operator!=(const HostAndPortAndSlot& left, const HostAndPortAndSlot&
 
 std::string StableHost(std::string host);
 bool IsLocalHost(const std::string& host);
+bool IsDefaultRoute(const std::string& host);
 }  // namespace net
 
 std::string ConvertToString(const net::HostAndPort& from);

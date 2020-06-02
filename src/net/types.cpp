@@ -38,6 +38,8 @@ const char kLocalhostText[] = "localhost";
 const char kLocalhostDigits[] = "127.0.0.1";
 const char kLocalhostIPV6Text[] = "::1";
 const char kLocalhostIPV6Digits[] = "::ffff:127.0.0.1";
+
+const char kDefaultRouteDigits[] = "0.0.0.0";
 }  // namespace
 
 namespace common {
@@ -57,6 +59,10 @@ bool HostAndPort::IsLocalHost() const {
   return net::IsLocalHost(host_);
 }
 
+bool HostAndPort::IsDefaultRoute() const {
+  return net::IsDefaultRoute(host_);
+}
+
 std::string StableHost(std::string host) {
   std::transform(host.begin(), host.end(), host.begin(), ::tolower);
   return host;
@@ -69,6 +75,25 @@ bool IsLocalHost(const std::string& host) {
 
   return host == kLocalhostText || host == kLocalhostDigits || host == kLocalhostIPV6Text ||
          host == kLocalhostIPV6Digits;
+}
+
+bool IsDefaultRoute(const std::string& host) {
+  if (host.empty()) {
+    return false;
+  }
+
+  if (host == kDefaultRouteDigits) {
+    return true;
+  }
+
+  // There are multiple ways to write IPv6 addresses.
+  // We're looking for any representation of the address "0:0:0:0:0:0:0:0".
+  // A single sequence of "0" bytes in an IPv6 address may be represented as "::",
+  // so we must also match addresses like "::" or "0::0:0".
+  // Return false if a character other than ':' or '0' is contained in the address.
+  auto FirstNonDefaultIPv6Char = std::find_if(
+      std::begin(host), std::end(host), [](const char& c) { return c != ':' && c != '0' && c != '[' && c != ']'; });
+  return FirstNonDefaultIPv6Char == std::end(host);
 }
 
 HostAndPort HostAndPort::CreateLocalHost(uint16_t port) {
@@ -130,7 +155,7 @@ bool ConvertFromString(const std::string& from, net::HostAndPort* out) {
   }
 
   net::HostAndPort res;
-  size_t del = from.find_first_of(':');
+  size_t del = from.find_last_of(':');
   if (del != std::string::npos) {
     res.SetHost(from.substr(0, del));
     uint16_t lport;
@@ -160,10 +185,10 @@ bool ConvertFromString(const std::string& from, net::HostAndPortAndSlot* out) {
   }
 
   net::HostAndPortAndSlot lout;
-  size_t del = from.find_first_of(':');
+  size_t del = from.find_last_of(':');
   if (del != std::string::npos) {
     lout.SetHost(from.substr(0, del));
-    size_t del_s = from.find_first_of('@');
+    size_t del_s = from.find_last_of('@');
     if (del_s != std::string::npos) {
       uint16_t lport;
       bool res = ConvertFromString(from.substr(del + 1, del_s - del - 1), &lport);
