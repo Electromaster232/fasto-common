@@ -138,8 +138,11 @@ ErrnoError ServerSocketTcp::Bind(bool reuseaddr) {
     }
 
     HostAndPort new_hs = hs;
-    const auto port = ntohs(get_in_port(lbinfo.addr_info()));
-    new_hs.SetPort(port);
+    uint16_t port = 0;
+    ErrnoError errn = get_in_port(lbinfo.addr_info(), &port);
+    if (!errn) {
+      new_hs.SetPort(port);
+    }
 
     SetInfo(lbinfo);
     SetHost(new_hs);

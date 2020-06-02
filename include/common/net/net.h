@@ -43,8 +43,8 @@ namespace net {
 ErrnoError socket(int domain, socket_t type, int protocol, socket_info* out_info) WARN_UNUSED_RESULT;
 ErrnoError bind(socket_descr_t fd, const addrinfo* ainf, bool reuseaddr, socket_info* out_info) WARN_UNUSED_RESULT;
 ErrnoError getsockname(socket_descr_t fd, const addrinfo* ainf, socket_info* out_info) WARN_UNUSED_RESULT;
-uint16_t get_in_port(const addrinfo* ainf);
-char* get_in_addr(const addrinfo* ainf);  // allocate memory, can be null
+ErrnoError get_in_port(const addrinfo* ainf, uint16_t* out);
+ErrnoError get_in_addr(const addrinfo* ainf, std::string* out);
 ErrnoError listen(const socket_info& info, int backlog) WARN_UNUSED_RESULT;
 ErrnoError accept(const socket_info& info, socket_info* out_info) WARN_UNUSED_RESULT;
 

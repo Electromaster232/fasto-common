@@ -295,6 +295,7 @@ ErrnoError resolve_raw(const char* host, uint16_t port, socket_t socktype, socke
   hints.ai_canonname = nullptr;
   hints.ai_addr = nullptr;
   hints.ai_next = nullptr;
+
   int rv = getaddrinfo(host, _port, &hints, &result);
   if (rv != 0) {
     return make_error_perror("getaddrinfo", rv);
@@ -460,20 +461,35 @@ ErrnoError getsockname(socket_descr_t fd, const struct addrinfo* ainf, socket_in
   return ErrnoError();
 }
 
-uint16_t get_in_port(const addrinfo* ainf) {
+ErrnoError get_in_port(const addrinfo* ainf, uint16_t* out) {
+  if (!ainf || !out) {
+    return make_errno_error_inval();
+  }
+
   if (ainf->ai_family == AF_INET) {
     struct sockaddr_in* sin = reinterpret_cast<struct sockaddr_in*>(ainf->ai_addr);
-    return sin->sin_port;
+    *out = sin->sin_port;
+    return ErrnoError();
   }
 
   struct sockaddr_in6* sin = reinterpret_cast<struct sockaddr_in6*>(ainf->ai_addr);
-  return sin->sin6_port;
+  *out = sin->sin6_port;
+  return ErrnoError();
 }
 
-char* get_in_addr(const addrinfo* ainf) {
+ErrnoError get_in_addr(const addrinfo* ainf, std::string* out) {
+  if (!ainf || !out) {
+    return make_errno_error_inval();
+  }
+
 #if defined(OS_WIN)
   struct sockaddr_in* sin = reinterpret_cast<struct sockaddr_in*>(ainf->ai_addr);
-  return strdup(inet_ntoa(sin->sin_addr));
+  char* data = inet_ntoa(sin->sin_addr);
+  if (!data) {
+    return make_errno_error_inval();
+  }
+  *out = data;
+  return ErrnoError();
 #else
   if (ainf->ai_family == AF_INET) {
     struct sockaddr_in* sin = reinterpret_cast<struct sockaddr_in*>(ainf->ai_addr);
@@ -481,9 +497,11 @@ char* get_in_addr(const addrinfo* ainf) {
     const char* result = inet_ntop(AF_INET, &sin->sin_addr, str, INET_ADDRSTRLEN);
     if (!result) {
       free(str);
-      return nullptr;
+      return make_errno_error_inval();
     }
-    return str;
+    *out = str;
+    free(str);
+    return ErrnoError();
   }
 
   struct sockaddr_in6* sin = reinterpret_cast<struct sockaddr_in6*>(ainf->ai_addr);
@@ -491,9 +509,11 @@ char* get_in_addr(const addrinfo* ainf) {
   const char* result = inet_ntop(AF_INET6, &sin->sin6_addr, str, INET6_ADDRSTRLEN);
   if (!result) {
     free(str);
-    return nullptr;
+    return make_errno_error_inval();
   }
-  return str;
+  *out = str;
+  free(str);
+  return ErrnoError();
 #endif
 }
 
@@ -530,11 +550,15 @@ ErrnoError accept(const socket_info& info, socket_info* out_info) {
   }
 
   out_info->set_fd(res);
-  out_info->set_port(get_in_port(ainf));
-  char* host = get_in_addr(ainf);
-  if (host) {
-    out_info->set_host(host);
-    free(host);
+  uint16_t port = 0;
+  ErrnoError errn = get_in_port(ainf, &port);
+  if (!errn) {
+    out_info->set_port(port);
+  }
+  std::string host;
+  errn = get_in_addr(ainf, &host);
+  if (!errn) {
+    out_info->set_host(host.c_str());
   }
   return ErrnoError();
 }
