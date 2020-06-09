@@ -1194,7 +1194,7 @@ std::ostream& operator<<(std::ostream& out, const Value& value) {
   } else if (value_type == Value::TYPE_STRING) {
     Value::string_t res;
     if (value.GetAsString(&res)) {
-      return out << res.as_string();
+      return out << '"' << res.as_string() << '"';
     }
   } else if (value_type == Value::TYPE_ARRAY) {
     const ArrayValue* array = nullptr;
@@ -1210,6 +1210,26 @@ std::ostream& operator<<(std::ostream& out, const Value& value) {
         }
       }
       out << ']';
+      return out;
+    }
+  } else if (value_type == Value::TYPE_HASH) {
+    const HashValue* hash = nullptr;
+    if (value.GetAsHash(&hash)) {
+      auto last_iter = std::prev(hash->end());
+      out << '{';
+      for (auto it = hash->begin(); it != hash->end(); ++it) {
+        auto mapped = *it;
+        out << '"' << mapped.first.as_string() << '"';
+        out << " : ";
+
+        const Value& rval = *(mapped.second);
+        out << rval;
+
+        if (last_iter != it) {
+          out << ',';
+        }
+      }
+      out << '}';
       return out;
     }
   }
