@@ -1205,7 +1205,7 @@ std::ostream& operator<<(std::ostream& out, const Value& value) {
         const Value& rval = *val;
         out << rval;
         if (std::next(it) != it) {
-          out << ',';
+          out << ", ";
         }
       }
       out << ']';
@@ -1218,13 +1218,13 @@ std::ostream& operator<<(std::ostream& out, const Value& value) {
       for (auto it = hash->begin(); it != hash->end(); ++it) {
         auto mapped = *it;
         out << '"' << mapped.first.as_string() << '"';
-        out << " : ";
+        out << ": ";
 
         const Value& rval = *(mapped.second);
         out << rval;
 
         if (std::next(it) != hash->end()) {
-          out << ',';
+          out << ", ";
         }
       }
       out << '}';
