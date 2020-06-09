@@ -63,6 +63,7 @@ struct SchemeRegistry {
       {kFileScheme, SCHEME_WITH_HOST},
       {kDevScheme, SCHEME_WITH_HOST},
       {kUdpScheme, SCHEME_WITH_HOST_AND_PORT},
+      {kSrtScheme, SCHEME_WITH_HOST_AND_PORT},
       {kTcpScheme, SCHEME_WITH_HOST_AND_PORT},
       {kRtmpScheme, SCHEME_WITH_HOST_AND_PORT},
       {kRtspScheme, SCHEME_WITH_HOST_PORT_AND_USER_INFORMATION},
@@ -257,6 +258,10 @@ bool DoCanonicalize(const CHAR* spec,
     // Udp URLs are special.
     ParseUdpURL(spec, spec_len, &parsed_input);
     success = CanonicalizeUdpURL(spec, spec_len, parsed_input, charset_converter, output, output_parsed);
+  } else if (DoCompareSchemeComponent(spec, scheme, uri::kSrtScheme)) {
+    // Srt URLs are special.
+    ParseSrtURL(spec, spec_len, &parsed_input);
+    success = CanonicalizeSrtURL(spec, spec_len, parsed_input, charset_converter, output, output_parsed);
   } else if (DoCompareSchemeComponent(spec, scheme, uri::kTcpScheme)) {
     // Tcp URLs are special.
     ParseTcpURL(spec, spec_len, &parsed_input);
