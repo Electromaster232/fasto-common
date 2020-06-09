@@ -1199,13 +1199,12 @@ std::ostream& operator<<(std::ostream& out, const Value& value) {
   } else if (value_type == Value::TYPE_ARRAY) {
     const ArrayValue* array = nullptr;
     if (value.GetAsList(&array)) {
-      auto last_iter = std::prev(array->end());
       out << '[';
       for (auto it = array->begin(); it != array->end(); ++it) {
         Value* val = *it;
         const Value& rval = *val;
         out << rval;
-        if (last_iter != it) {
+        if (std::next(it) != it) {
           out << ',';
         }
       }
@@ -1215,7 +1214,6 @@ std::ostream& operator<<(std::ostream& out, const Value& value) {
   } else if (value_type == Value::TYPE_HASH) {
     const HashValue* hash = nullptr;
     if (value.GetAsHash(&hash)) {
-      auto last_iter = std::prev(hash->end());
       out << '{';
       for (auto it = hash->begin(); it != hash->end(); ++it) {
         auto mapped = *it;
@@ -1225,7 +1223,7 @@ std::ostream& operator<<(std::ostream& out, const Value& value) {
         const Value& rval = *(mapped.second);
         out << rval;
 
-        if (last_iter != it) {
+        if (std::next(it) != hash->end()) {
           out << ',';
         }
       }
