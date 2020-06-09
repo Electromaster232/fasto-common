@@ -1202,12 +1202,15 @@ std::ostream& operator<<(std::ostream& out, const Value& value) {
       auto last_iter = std::prev(array->end());
       out << '[';
       for (auto it = array->begin(); it != array->end(); ++it) {
-        out << *it;
+        Value* val = *it;
+        const Value& rval = *val;
+        out << rval;
         if (last_iter != it) {
           out << ',';
         }
       }
       out << ']';
+      return out;
     }
   }
   return out;
