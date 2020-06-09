@@ -36,6 +36,7 @@
 #define DEV_VIDEO_PATH "/dev/video3"
 #define UDP_LINK "udp://239.0.3.3:3003"
 #define SRT_LINK "srt://239.0.3.3:3003"
+#define SRT_LINK2 "srt://:7001"
 #define TCP_LINK "tcp://google.com:2121"
 #define RTMP_LINK "rtmp://192.168.1.105:5423/live"
 #define RTMP_LINK_DEFAULT "rtmp://a.rtmp.youtube.com/live2"
@@ -110,6 +111,13 @@ TEST(Url, IsValid) {
   ASSERT_EQ(srt.host(), "239.0.3.3");
   ASSERT_EQ(srt.port(), "3003");
   ASSERT_EQ(srt.spec(), SRT_LINK);
+
+  common::uri::GURL srt_query(SRT_LINK2);
+  ASSERT_TRUE(srt_query.is_valid());
+  ASSERT_TRUE(srt_query.SchemeIsSrt());
+  ASSERT_EQ(srt_query.host(), "");
+  ASSERT_EQ(srt_query.port(), "7001");
+  ASSERT_EQ(srt_query.spec(), SRT_LINK2);
 
   common::uri::GURL tcp(TCP_LINK);
   ASSERT_TRUE(tcp.is_valid());
