@@ -1211,25 +1211,59 @@ std::ostream& operator<<(std::ostream& out, const Value& value) {
       out << ']';
       return out;
     }
+  } else if (value_type == Value::TYPE_BYTE_ARRAY) {
+    byte_array_t res;
+    if (value.GetAsByteArray(&res)) {
+      return out << '"' << res.as_string() << '"';
+    }
+    return out;
+  } else if (value_type == Value::TYPE_SET) {
+    const SetValue* set = nullptr;
+    if (value.GetAsSet(&set)) {
+      out << '(';
+      for (auto it = set->begin(); it != set->end(); ++it) {
+        Value* val = *it;
+        const Value& rval = *val;
+        out << rval;
+        if (std::next(it) != it) {
+          out << ", ";
+        }
+      }
+      out << ')';
+    }
+    return out;
+  } else if (value_type == Value::TYPE_ZSET) {
+    const ZSetValue* zset = nullptr;
+    if (value.GetAsZSet(&zset)) {
+      out << '{';
+      for (auto it = zset->begin(); it != zset->end(); ++it) {
+        auto mapped = *it;
+        const Value& rkey = *(mapped.first);
+        const Value& rval = *(mapped.second);
+        out << rkey << ": " << rval;
+        if (std::next(it) != zset->end()) {
+          out << ", ";
+        }
+      }
+      out << '}';
+    }
+    return out;
   } else if (value_type == Value::TYPE_HASH) {
     const HashValue* hash = nullptr;
     if (value.GetAsHash(&hash)) {
       out << '{';
       for (auto it = hash->begin(); it != hash->end(); ++it) {
         auto mapped = *it;
-        out << '"' << mapped.first.as_string() << '"';
-        out << ": ";
-
+        const std::string key = mapped.first.as_string();
         const Value& rval = *(mapped.second);
-        out << rval;
-
+        out << '"' << key << '"' << ": " << rval;
         if (std::next(it) != hash->end()) {
           out << ", ";
         }
       }
       out << '}';
-      return out;
     }
+    return out;
   }
   return out;
 }
