@@ -53,8 +53,12 @@ bool JsonRPCRequest::IsValid() const {
   return true;
 }
 
+bool JsonRPCRequest::IsRequest() const {
+  return id.has_value();
+}
+
 bool JsonRPCRequest::IsNotification() const {
-  return !id;
+  return !id.has_value();
 }
 
 bool JsonRPCRequest::Equals(const JsonRPCRequest& req) const {

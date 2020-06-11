@@ -70,7 +70,8 @@ JsonRPCResponse JsonRPCResponse::MakeErrorInvalidJson() {
   JsonRPCResponse resp;
   resp.id = null_json_rpc_id;
   resp.error = err;
-  CHECK(resp.IsValid() && resp.IsError()) << "JsonRPCResponse should be valid.";
+  CHECK(resp.IsValid()) << "JsonRPCResponse should be valid.";
+  CHECK(resp.IsError()) << "JsonRPCResponse should be error.";
   return resp;
 }
 
@@ -81,7 +82,8 @@ JsonRPCResponse JsonRPCResponse::MakeErrorInvalidRequest() {
   JsonRPCResponse resp;
   resp.id = null_json_rpc_id;
   resp.error = err;
-  CHECK(resp.IsValid() && resp.IsError()) << "JsonRPCResponse should be valid.";
+  CHECK(resp.IsValid()) << "JsonRPCResponse should be valid.";
+  CHECK(resp.IsError()) << "JsonRPCResponse should be error.";
   return resp;
 }
 
@@ -89,7 +91,8 @@ JsonRPCResponse JsonRPCResponse::MakeError(json_rpc_id jid, JsonRPCError error) 
   JsonRPCResponse resp;
   resp.id = jid;
   resp.error = error;
-  CHECK(resp.IsValid() && resp.IsError()) << "JsonRPCResponse should be valid.";
+  CHECK(resp.IsValid()) << "JsonRPCResponse should be valid.";
+  CHECK(resp.IsError()) << "JsonRPCResponse should be error.";
   return resp;
 }
 
@@ -97,7 +100,8 @@ JsonRPCResponse JsonRPCResponse::MakeMessage(json_rpc_id jid, JsonRPCMessage msg
   JsonRPCResponse resp;
   resp.id = jid;
   resp.message = msg;
-  CHECK(resp.IsValid() && resp.IsMessage()) << "JsonRPCResponse should be valid.";
+  CHECK(resp.IsValid()) << "JsonRPCResponse should be valid.";
+  CHECK(resp.IsMessage()) << "JsonRPCResponse should be message.";
   return resp;
 }
 
