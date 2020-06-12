@@ -608,9 +608,16 @@ void HttpRequest::SetRelativeUrl(const path_t& path) {
 }
 
 uri::GURL HttpRequest::GetURL() const {
-  if (base_url_.is_valid())
+  if (base_url_.is_valid()) {
     return base_url_.Resolve(relative_url_);
-  return uri::GURL("http://localhost" + relative_url_);
+  }
+
+  std::string host = "localhost";
+  header_t server;
+  if (FindHeaderByKey("Host", false, &server)) {
+    host = server.value;
+  }
+  return uri::GURL(MemSPrintf("http://%s%s", host, relative_url_));
 }
 
 http::http_method HttpRequest::GetMethod() const {
