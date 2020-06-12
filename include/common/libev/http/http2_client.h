@@ -53,14 +53,14 @@ class Http2Client : public HttpClient {
 
   ErrnoError SendError(common::http::http_protocol protocol,
                        common::http::http_status status,
-                       const char* extra_header,
+                       const common::http::headers_t& extra_headers,
                        const char* text,
                        bool is_keep_alive,
                        const HttpServerInfo& info) override WARN_UNUSED_RESULT;
   ErrnoError SendFileByFd(common::http::http_protocol protocol, int fdesc, off_t size) override WARN_UNUSED_RESULT;
   ErrnoError SendHeaders(common::http::http_protocol protocol,
                          common::http::http_status status,
-                         const char* extra_header,
+                         const common::http::headers_t& extra_headers,
                          const char* mime_type,
                          off_t* length,
                          time_t* mod,
@@ -70,7 +70,7 @@ class Http2Client : public HttpClient {
   ErrnoError SendRequest(common::http::http_method method,
                          const uri::GURL& url,
                          common::http::http_protocol protocol,
-                         const char* extra_header,
+                         const common::http::headers_t& extra_headers,
                          bool is_keep_alive) override WARN_UNUSED_RESULT;
 
   void ProcessFrames(const http2::frames_t& frames);

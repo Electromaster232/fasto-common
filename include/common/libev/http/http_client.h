@@ -52,20 +52,20 @@ class HttpClient : public libev::tcp::TcpClient {
   virtual ErrnoError Head(const uri::GURL& url, bool is_keep_alive) WARN_UNUSED_RESULT;
 
   ErrnoError SendOk(common::http::http_protocol protocol,
-                    const char* extra_header,
+                    const common::http::headers_t& extra_headers,
                     const char* text,
                     bool is_keep_alive,
                     const HttpServerInfo& info) WARN_UNUSED_RESULT;
   virtual ErrnoError SendError(common::http::http_protocol protocol,
                                common::http::http_status status,
-                               const char* extra_header,
+                               const common::http::headers_t& extra_headers,
                                const char* text,
                                bool is_keep_alive,
                                const HttpServerInfo& info) WARN_UNUSED_RESULT;
   virtual ErrnoError SendFileByFd(common::http::http_protocol protocol, int fdesc, off_t size) WARN_UNUSED_RESULT;
   virtual ErrnoError SendHeaders(common::http::http_protocol protocol,
                                  common::http::http_status status,
-                                 const char* extra_header,
+                                 const common::http::headers_t& extra_headers,
                                  const char* mime_type,
                                  off_t* length,
                                  time_t* mod,
@@ -74,7 +74,7 @@ class HttpClient : public libev::tcp::TcpClient {
   virtual ErrnoError SendRequest(common::http::http_method method,
                                  const uri::GURL& url,
                                  common::http::http_protocol protocol,
-                                 const char* extra_header,
+                                 const common::http::headers_t& extra_headers,
                                  bool is_keep_alive) WARN_UNUSED_RESULT;
 
   const char* ClassName() const override;

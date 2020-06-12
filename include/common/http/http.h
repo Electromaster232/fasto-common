@@ -111,6 +111,8 @@ struct HttpHeader {
 
   bool IsValid() const;
 
+  std::string as_string() const;
+
   std::string key;
   std::string value;
 };

@@ -574,6 +574,10 @@ bool HttpHeader::IsValid() const {
   return !key.empty();
 }
 
+std::string HttpHeader::as_string() const {
+  return MemSPrintf("%s: %s", key, value);
+}
+
 HttpRequest::HttpRequest() : method_(), relative_url_(), base_url_(), protocol_(), headers_(), body_() {}
 
 HttpRequest::HttpRequest(http_method method,

@@ -93,11 +93,11 @@ namespace http {
 Http2Client::Http2Client(libev::IoLoop* server, const net::socket_info& info) : HttpClient(server, info), streams_() {}
 
 ErrnoError Http2Client::Get(const uri::GURL& url, bool is_keep_alive) {
-  return SendRequest(common::http::HM_GET, url, common::http::HP_2_0, nullptr, is_keep_alive);
+  return SendRequest(common::http::HM_GET, url, common::http::HP_2_0, {}, is_keep_alive);
 }
 
 ErrnoError Http2Client::Head(const uri::GURL& url, bool is_keep_alive) {
-  return SendRequest(common::http::HM_HEAD, url, common::http::HP_2_0, nullptr, is_keep_alive);
+  return SendRequest(common::http::HM_HEAD, url, common::http::HP_2_0, {}, is_keep_alive);
 }
 
 const char* Http2Client::ClassName() const {
@@ -111,7 +111,7 @@ bool Http2Client::IsHttp2() const {
 
 ErrnoError Http2Client::SendError(common::http::http_protocol protocol,
                                   common::http::http_status status,
-                                  const char* extra_header,
+                                  const common::http::headers_t& extra_headers,
                                   const char* text,
                                   bool is_keep_alive,
                                   const HttpServerInfo& info) {
@@ -120,7 +120,7 @@ ErrnoError Http2Client::SendError(common::http::http_protocol protocol,
     char err_data[1024] = {0};
     off_t err_len = SNPrintf(err_data, sizeof(err_data), HTML_PATTERN_ISISSSS7, status, title, status, title, text,
                              info.server_url, info.server_name);
-    ErrnoError err = SendHeaders(protocol, status, extra_header, "text/html", &err_len, nullptr, is_keep_alive, info);
+    ErrnoError err = SendHeaders(protocol, status, extra_headers, "text/html", &err_len, nullptr, is_keep_alive, info);
     if (err) {
       DEBUG_MSG_ERROR(err, logging::LOG_LEVEL_ERR);
       return err;
@@ -138,7 +138,7 @@ ErrnoError Http2Client::SendError(common::http::http_protocol protocol,
     return header_stream->SendFrame(fdata);
   }
 
-  return HttpClient::SendError(protocol, status, extra_header, text, is_keep_alive, info);
+  return HttpClient::SendError(protocol, status, extra_headers, text, is_keep_alive, info);
 }
 
 ErrnoError Http2Client::SendFileByFd(common::http::http_protocol protocol, int fdesc, off_t size) {
@@ -166,7 +166,7 @@ ErrnoError Http2Client::SendFileByFd(common::http::http_protocol protocol, int f
 
 ErrnoError Http2Client::SendHeaders(common::http::http_protocol protocol,
                                     common::http::http_status status,
-                                    const char* extra_header,
+                                    const common::http::headers_t& extra_headers,
                                     const char* mime_type,
                                     off_t* length,
                                     time_t* mod,
@@ -236,13 +236,13 @@ ErrnoError Http2Client::SendHeaders(common::http::http_protocol protocol,
     return header_stream->SendFrame(fhdr);
   }
 
-  return HttpClient::SendHeaders(protocol, status, extra_header, mime_type, length, mod, is_keep_alive, info);
+  return HttpClient::SendHeaders(protocol, status, extra_headers, mime_type, length, mod, is_keep_alive, info);
 }
 
 ErrnoError Http2Client::SendRequest(common::http::http_method method,
                                     const uri::GURL& url,
                                     common::http::http_protocol protocol,
-                                    const char* extra_header,
+                                    const common::http::headers_t& extra_headers,
                                     bool is_keep_alive) {
   if (IsHttp2() && protocol == common::http::HP_2_0) {
     StreamSPtr header_stream = FindStreamByType(http2::HTTP2_HEADERS);
@@ -291,7 +291,7 @@ ErrnoError Http2Client::SendRequest(common::http::http_method method,
     return header_stream->SendFrame(fhdr);
   }
 
-  return HttpClient::SendRequest(method, url, protocol, extra_header, is_keep_alive);
+  return HttpClient::SendRequest(method, url, protocol, extra_headers, is_keep_alive);
 }
 
 StreamSPtr Http2Client::FindStreamByStreamID(IStream::stream_id_t stream_id) const {

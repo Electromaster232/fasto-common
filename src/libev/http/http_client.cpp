@@ -78,24 +78,24 @@ bool HttpClient::IsAuthenticated() const {
 }
 
 ErrnoError HttpClient::Get(const uri::GURL& url, bool is_keep_alive) {
-  return SendRequest(common::http::HM_GET, url, common::http::HP_1_1, nullptr, is_keep_alive);
+  return SendRequest(common::http::HM_GET, url, common::http::HP_1_1, {}, is_keep_alive);
 }
 
 ErrnoError HttpClient::Head(const uri::GURL& url, bool is_keep_alive) {
-  return SendRequest(common::http::HM_HEAD, url, common::http::HP_1_1, nullptr, is_keep_alive);
+  return SendRequest(common::http::HM_HEAD, url, common::http::HP_1_1, {}, is_keep_alive);
 }
 
 ErrnoError HttpClient::SendOk(common::http::http_protocol protocol,
-                              const char* extra_header,
+                              const common::http::headers_t& extra_headers,
                               const char* text,
                               bool is_keep_alive,
                               const HttpServerInfo& info) {
-  return SendError(protocol, common::http::HS_OK, extra_header, text, is_keep_alive, info);
+  return SendError(protocol, common::http::HS_OK, extra_headers, text, is_keep_alive, info);
 }
 
 ErrnoError HttpClient::SendError(common::http::http_protocol protocol,
                                  common::http::http_status status,
-                                 const char* extra_header,
+                                 const common::http::headers_t& extra_headers,
                                  const char* text,
                                  bool is_keep_alive,
                                  const HttpServerInfo& info) {
@@ -105,7 +105,7 @@ ErrnoError HttpClient::SendError(common::http::http_protocol protocol,
   char err_data[1024] = {0};
   off_t err_len = SNPrintf(err_data, sizeof(err_data), HTML_PATTERN_ISISSSS7, status, title, status, title, text,
                            info.server_url, info.server_name);
-  ErrnoError err = SendHeaders(protocol, status, extra_header, "text/html", &err_len, nullptr, is_keep_alive, info);
+  ErrnoError err = SendHeaders(protocol, status, extra_headers, "text/html", &err_len, nullptr, is_keep_alive, info);
   if (err) {
     DEBUG_MSG_ERROR(err, logging::LOG_LEVEL_ERR);
   }
@@ -125,7 +125,7 @@ ErrnoError HttpClient::SendFileByFd(common::http::http_protocol protocol, int fd
 
 ErrnoError HttpClient::SendHeaders(common::http::http_protocol protocol,
                                    common::http::http_status status,
-                                   const char* extra_header,
+                                   const common::http::headers_t& extra_headers,
                                    const char* mime_type,
                                    off_t* length,
                                    time_t* mod,
@@ -138,7 +138,7 @@ ErrnoError HttpClient::SendHeaders(common::http::http_protocol protocol,
   char timebuf[100];
   strftime(timebuf, sizeof(timebuf), RFC1123FMT, gmtime(&now));
 
-  char header_data[1024] = {0};
+  char header_data[2048] = {0};
   int cur_pos = SNPrintf(header_data, sizeof(header_data),
                          protocol == common::http::HP_2_0 ? HTTP_2_0_PROTOCOL_NAME
                              " %d %s\r\n"
@@ -150,8 +150,10 @@ ErrnoError HttpClient::SendHeaders(common::http::http_protocol protocol,
                              "Date: %s\r\n",
                          status, title, info.server_name, timebuf);
 
-  if (extra_header) {
-    int exlen = SNPrintf(header_data + cur_pos, sizeof(header_data) - cur_pos, "%s\r\n", extra_header);
+  for (size_t i = 0; i < extra_headers.size(); ++i) {
+    const auto header = extra_headers[i];
+    const std::string header_str = header.as_string();
+    int exlen = SNPrintf(header_data + cur_pos, sizeof(header_data) - cur_pos, "%s\r\n", header_str);
     cur_pos += exlen;
   }
   if (mime_type) {
@@ -189,7 +191,7 @@ ErrnoError HttpClient::SendHeaders(common::http::http_protocol protocol,
 ErrnoError HttpClient::SendRequest(common::http::http_method method,
                                    const uri::GURL& url,
                                    common::http::http_protocol protocol,
-                                   const char* extra_header,
+                                   const common::http::headers_t& extra_headers,
                                    bool is_keep_alive) {
   CHECK(protocol <= common::http::HP_1_1);
 
@@ -208,7 +210,7 @@ ErrnoError HttpClient::SendRequest(common::http::http_method method,
 
   std::string host = url.HostNoBrackets();
   std::string path = url.PathForRequest();
-  char header_data[1024] = {0};
+  char header_data[2048] = {0};
   int cur_pos = SNPrintf(header_data, sizeof(header_data),
                          protocol == common::http::HP_2_0 ? "%s %s " HTTP_2_0_PROTOCOL_NAME
                                                             "\r\n"
@@ -220,8 +222,10 @@ ErrnoError HttpClient::SendRequest(common::http::http_method method,
                                                             "Date: %s\r\n",
                          method_str, path, host, timebuf);
 
-  if (extra_header) {
-    int exlen = SNPrintf(header_data + cur_pos, sizeof(header_data) - cur_pos, "%s\r\n", extra_header);
+  for (size_t i = 0; i < extra_headers.size(); ++i) {
+    const auto header = extra_headers[i];
+    const std::string header_str = header.as_string();
+    int exlen = SNPrintf(header_data + cur_pos, sizeof(header_data) - cur_pos, "%s\r\n", header_str);
     cur_pos += exlen;
   }
 
