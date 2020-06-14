@@ -65,7 +65,7 @@ class ServerWebHandler : public common::libev::IoLoopObserver {
 
     common::libev::websocket::WebSocketClient* cl = new common::libev::websocket::WebSocketClient(sserver, sc);
     ignore_result(cl->SetBlocking(false));
-    sserver->RegisterClient(cl);
+    ignore_result(sserver->RegisterClient(cl));
     errn = cl->StartHandshake(ws_url);
     ASSERT_FALSE(errn);
   }

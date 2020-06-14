@@ -34,12 +34,6 @@
 #include <common/libev/io_base.h>
 
 namespace common {
-namespace net {
-class socket_info;
-}
-}  // namespace common
-
-namespace common {
 namespace libev {
 
 class IoLoopObserver;
@@ -55,8 +49,9 @@ class IoLoop : public EvLoopObserver, public IoBase<IoLoop> {
   int Exec() WARN_UNUSED_RESULT;
   virtual void Stop();
 
-  IoClient* RegisterClient(const net::socket_info& info);
-  void RegisterClient(IoClient* client);
+  virtual bool IsCanBeRegistered(IoClient* client) const WARN_UNUSED_RESULT = 0;
+
+  bool RegisterClient(IoClient* client) WARN_UNUSED_RESULT;
   void UnRegisterClient(IoClient* client);
   virtual void CloseClient(IoClient* client);
 
@@ -79,7 +74,6 @@ class IoLoop : public EvLoopObserver, public IoBase<IoLoop> {
   static IoLoop* FindExistLoopByPredicate(std::function<bool(IoLoop*)> pred);
 
  protected:
-  virtual IoClient* CreateClient(const net::socket_info& info) = 0;
   virtual IoChild* CreateChild() = 0;
 
   virtual void PreLooped(LibEvLoop* loop) override;

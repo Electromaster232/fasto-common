@@ -73,15 +73,9 @@ void IoLoop::Stop() {
   loop_->Stop();
 }
 
-IoClient* IoLoop::RegisterClient(const net::socket_info& info) {
-  IoClient* client = CreateClient(info);
-  RegisterClient(client);
-  return client;
-}
-
 void IoLoop::UnRegisterClient(IoClient* client) {
   if (!client) {
-    NOTREACHED();
+    DNOTREACHED();
     return;
   }
 
@@ -102,13 +96,16 @@ void IoLoop::UnRegisterClient(IoClient* client) {
              << clients_.size() << " client(s) connected.";
 }
 
-void IoLoop::RegisterClient(IoClient* client) {
+bool IoLoop::RegisterClient(IoClient* client) {
   if (!client) {
-    NOTREACHED();
-    return;
+    DNOTREACHED();
+    return false;
   }
 
   CHECK(IsLoopThread()) << "Must be called in loop thread!";
+  if (!IsCanBeRegistered(client)) {
+    return false;
+  }
   const std::string formated_name = client->GetFormatedName();
 
   if (client->GetServer()) {
@@ -122,7 +119,7 @@ void IoLoop::RegisterClient(IoClient* client) {
   bool is_inited = client_ev->Init(loop_, read_write_cb, client->GetFd(), client->GetFlags());
   if (!is_inited) {
     DNOTREACHED();
-    return;
+    return false;
   }
   client_ev->Start();
 
@@ -133,11 +130,12 @@ void IoLoop::RegisterClient(IoClient* client) {
   clients_.push_back(client);
   INFO_LOG() << "Successfully connected with client[" << formated_name << "], from server[" << GetFormatedName()
              << "], " << clients_.size() << " client(s) connected.";
+  return true;
 }
 
 void IoLoop::CloseClient(IoClient* client) {
   if (!client) {
-    NOTREACHED();
+    DNOTREACHED();
     return;
   }
 

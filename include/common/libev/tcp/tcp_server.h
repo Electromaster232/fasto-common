@@ -39,6 +39,7 @@ namespace tcp {
 
 class TcpServer : public IoLoop {
  public:
+  typedef IoLoop base_class;
   explicit TcpServer(const net::HostAndPort& host, bool is_default, IoLoopObserver* observer = nullptr);
   ~TcpServer() override;
 
@@ -48,10 +49,15 @@ class TcpServer : public IoLoop {
   const char* ClassName() const override;
   net::HostAndPort GetHost() const;
 
+  bool IsCanBeRegistered(IoClient* client) const override WARN_UNUSED_RESULT;
+
+  using IoLoop::RegisterClient;
+  IoClient* RegisterClient(const net::socket_info& info) WARN_UNUSED_RESULT;
+
   static IoLoop* FindExistServerByHost(const net::HostAndPort& host);
 
  private:
-  TcpClient* CreateClient(const net::socket_info& info) override;
+  virtual IoClient* CreateClient(const net::socket_info& info);
   IoChild* CreateChild() override;
   void PreLooped(LibEvLoop* loop) override;
   void PostLooped(LibEvLoop* loop) override;

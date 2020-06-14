@@ -100,7 +100,18 @@ IoLoop* TcpServer::FindExistServerByHost(const net::HostAndPort& host) {
   return FindExistLoopByPredicate(find_by_host);
 }
 
-TcpClient* TcpServer::CreateClient(const net::socket_info& info) {
+IoClient* TcpServer::RegisterClient(const net::socket_info& info) {
+  IoClient* client = CreateClient(info);
+  bool registered = base_class::RegisterClient(client);
+  if (registered) {
+    return client;
+  }
+  ignore_result(client->Close());
+  delete client;
+  return nullptr;
+}
+
+IoClient* TcpServer::CreateClient(const net::socket_info& info) {
   return new TcpClient(this, info);
 }
 
@@ -149,6 +160,13 @@ net::HostAndPort TcpServer::GetHost() const {
   return sock_.GetHost();
 }
 
+bool TcpServer::IsCanBeRegistered(IoClient* client) const {
+  if (!client) {
+    return false;
+  }
+  return true;
+}
+
 ErrnoError TcpServer::Accept(net::socket_info* info) {
   return sock_.Accept(info);
 }
@@ -173,7 +191,7 @@ void TcpServer::accept_cb(LibEvLoop* loop, LibevIO* io, int revents) {
     return;
   }
 
-  pserver->RegisterClient(sinfo);
+  ignore_result(pserver->RegisterClient(sinfo));
 }
 
 }  // namespace tcp
