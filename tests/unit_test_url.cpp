@@ -30,6 +30,7 @@
 #include <gtest/gtest.h>
 
 #include <common/uri/gurl.h>
+#include <common/string_split.h>
 
 #define HTTP_PATH "/home/index.html"
 #define FILE_PATH "/home/sasha/1.mp4"
@@ -162,4 +163,10 @@ TEST(Url, IsValid) {
   common::uri::GURL post("http://panel.fastotv.com:8083/panel_pro/api/load_balance/log/5ec602f6d392b6b89f1814f7");
   ASSERT_EQ(post.host(), "panel.fastotv.com");
   ASSERT_EQ(post.EffectiveIntPort(), 8083);
+
+  common::uri::GURL dvb("dvb://?modulation=\"QAM 64\"&trans-mode=8k&bandwidth=8&frequency=514000000");
+  ASSERT_TRUE(dvb.SchemeIs("dvb"));
+  const auto spl = common::SplitString(dvb.query(), "&", common::TRIM_WHITESPACE, common::SPLIT_WANT_ALL);
+  ASSERT_EQ(spl.size(), 4);
+  ASSERT_EQ(dvb.query(), "modulation=\"QAM 64\"&trans-mode=8k&bandwidth=8&frequency=514000000");
 }
