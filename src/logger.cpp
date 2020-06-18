@@ -75,7 +75,7 @@ class LoggerInternal {
 
     char buf[80];
     struct timespec spec;
-#ifdef OS_MACOSX
+#if defined(OS_MACOSX)
     clock_serv_t cclock;
     mach_timespec_t mts;
     host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
@@ -88,7 +88,11 @@ class LoggerInternal {
 #endif
     long ms = spec.tv_nsec / 1.0e6;  // Convert nanoseconds to milliseconds
     struct tm info;
+#if defined(OS_WIN)
+    localtime_s(&info, &spec.tv_sec);
+#else
     localtime_r(&spec.tv_sec, &info);
+#endif
     strftime(buf, sizeof(buf), "%H:%M:%S", &info);
 
     if (file) {
