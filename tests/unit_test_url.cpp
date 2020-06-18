@@ -29,8 +29,8 @@
 
 #include <gtest/gtest.h>
 
-#include <common/uri/gurl.h>
 #include <common/string_split.h>
+#include <common/uri/gurl.h>
 
 #define HTTP_PATH "/home/index.html"
 #define FILE_PATH "/home/sasha/1.mp4"
