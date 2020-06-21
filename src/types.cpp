@@ -29,7 +29,7 @@
 
 #include <common/types.h>
 
-#include <sstream>
+#include <ostream>
 
 namespace common {
 

@@ -43,20 +43,26 @@ bool Point::Equals(const Point& pt) const {
   return x == pt.x && y == pt.y;
 }
 
-Size::Size() : width(-1), height(-1) {}
-
-Size::Size(int width, int height) : width(width), height(height) {}
-
-bool Size::IsValid() const {
-  return IsValidSize(width, height);
-}
-
 bool Size::Equals(const Size& sz) const {
-  return width == sz.width && height == sz.height;
+  return width_ == sz.width_ && height_ == sz.height_;
 }
 
-bool IsValidSize(int width, int height) {
-  return width >= 0 && height >= 0;
+void Size::SetToMin(const Size& other) {
+  width_ = width() <= other.width() ? width() : other.width();
+  height_ = height() <= other.height() ? height() : other.height();
+}
+
+void Size::SetToMax(const Size& other) {
+  width_ = width() >= other.width() ? width() : other.width();
+  height_ = height() >= other.height() ? height() : other.height();
+}
+
+std::ostream& operator<<(std::ostream& out, const Point& point) {
+  return out << ConvertToString(point);
+}
+
+std::ostream& operator<<(std::ostream& out, const Size& size) {
+  return out << ConvertToString(size);
 }
 
 }  // namespace draw
@@ -91,7 +97,7 @@ bool ConvertFromString(const std::string& from, draw::Point* out) {
 }
 
 std::string ConvertToString(const draw::Size& value) {
-  return MemSPrintf("%dx%d", value.width, value.height);
+  return MemSPrintf("%dx%d", value.width(), value.height());
 }
 
 bool ConvertFromString(const std::string& from, draw::Size* out) {
@@ -106,13 +112,13 @@ bool ConvertFromString(const std::string& from, draw::Size* out) {
     if (!ConvertFromString(from.substr(0, del), &lwidth)) {
       return false;
     }
-    res.width = lwidth;
+    res.set_width(lwidth);
 
     int lheight;
     if (!ConvertFromString(from.substr(del + 1), &lheight)) {
       return false;
     }
-    res.height = lheight;
+    res.set_height(lheight);
   }
 
   *out = res;

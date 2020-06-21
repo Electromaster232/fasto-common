@@ -52,24 +52,44 @@ inline bool operator!=(const Point& left, const Point& right) {
   return !(left == right);
 }
 
-struct Size {
-  Size();  // invalid size
-  Size(int width, int height);
+class Size {
+ public:
+  constexpr Size() : width_(0), height_(0) {}
+  constexpr Size(int width, int height) : width_(std::max(0, width)), height_(std::max(0, height)) {}
 
-  bool IsValid() const;
+  constexpr int width() const { return width_; }
+  constexpr int height() const { return height_; }
+
+  void set_width(int width) { width_ = std::max(0, width); }
+  void set_height(int height) { height_ = std::max(0, height); }
+
+  void SetSize(int width, int height) {
+    set_width(width);
+    set_height(height);
+  }
+
+  void SetToMin(const Size& other);
+  void SetToMax(const Size& other);
+
+  bool IsEmpty() const { return !width() || !height(); }
+
   bool Equals(const Size& sz) const;
 
-  int width;
-  int height;
+ private:
+  int width_;
+  int height_;
 };
 
-inline bool operator==(const Size& left, const Size& right) {
-  return left.Equals(right);
+inline bool operator==(const Size& lhs, const Size& rhs) {
+  return lhs.Equals(rhs);
 }
 
-inline bool operator!=(const Size& left, const Size& right) {
-  return !(left == right);
+inline bool operator!=(const Size& lhs, const Size& rhs) {
+  return !(lhs == rhs);
 }
+
+std::ostream& operator<<(std::ostream& out, const Point& point);
+std::ostream& operator<<(std::ostream& out, const Size& size);
 
 bool IsValidSize(int width, int height);
 
