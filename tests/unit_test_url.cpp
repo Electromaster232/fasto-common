@@ -89,6 +89,15 @@ TEST(Url, IsValid) {
   ASSERT_EQ(FILE_PATH, path5.path());
   ASSERT_EQ(originFile, path5.spec());
 
+  const std::string templateFile = "file:///home/sasha/object_%m_%d_%Y_%H:%M:%S.mp4";
+  time_t now = time(nullptr);
+  char timebuf[1024];
+  strftime(timebuf, sizeof(timebuf), templateFile.c_str(), gmtime(&now));
+  common::uri::GURL path51(templateFile);
+  ASSERT_TRUE(path51.is_valid());
+  ASSERT_TRUE(path51.SchemeIsFile());
+  ASSERT_EQ(originFile, path5.spec());
+
   const std::string originDev = "dev://" + std::string(DEV_VIDEO_PATH);
   common::uri::GURL path6(originDev);
   ASSERT_TRUE(path6.is_valid());
