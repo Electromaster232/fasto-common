@@ -59,6 +59,14 @@ flags_t IoClient::GetFlags() const {
   return flags_;
 }
 
+size_t IoClient::GetWroteBytes() const {
+  return wrote_bytes_;
+}
+
+size_t IoClient::GetReadBytes() const {
+  return read_bytes_;
+}
+
 const char* IoClient::ClassName() const {
   return "IoClient";
 }

@@ -54,6 +54,9 @@ class IoClient : public IoBase<IoClient> {
 
   flags_t GetFlags() const;
 
+  size_t GetWroteBytes() const;
+  size_t GetReadBytes() const;
+
   const char* ClassName() const override;
 
   ErrnoError Write(const void* data, size_t size, size_t* nwrite_out) WARN_UNUSED_RESULT;
@@ -64,11 +67,11 @@ class IoClient : public IoBase<IoClient> {
 
  protected:  // executed IoLoop
   virtual descriptor_t GetFd() const = 0;
-  virtual ErrnoError DoClose() = 0;
 
  private:
   virtual ErrnoError DoSingleWrite(const void* data, size_t size, size_t* nwrite_out) WARN_UNUSED_RESULT = 0;
   virtual ErrnoError DoSingleRead(void* out_data, size_t max_size, size_t* nread_out) WARN_UNUSED_RESULT = 0;
+  virtual ErrnoError DoClose() WARN_UNUSED_RESULT = 0;
 
   IoLoop* server_;
   LibevIO* read_write_io_;
