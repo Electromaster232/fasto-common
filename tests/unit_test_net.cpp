@@ -112,7 +112,7 @@ TEST(HostAndPortAndSlot, ConvertToString) {
 
 TEST(ServerSocketTcpAndClientSocketTcpIpv4, workflow) {
   using namespace common::net;
-  HostAndPort host("localhost", 4567);
+  HostAndPort host("127.0.0.1", 4567);
   ServerSocketTcp serv(host);
   common::ErrnoError err = serv.Bind(true);
   ASSERT_FALSE(err);
@@ -139,7 +139,7 @@ TEST(ServerSocketTcpAndClientSocketTcpIpv4, workflow) {
 
 TEST(SocketTcpIpv4, bindRandomWorkflow) {
   using namespace common::net;
-  HostAndPort host("localhost", RANDOM_PORT);
+  HostAndPort host("127.0.0.1", RANDOM_PORT);
   ServerSocketTcp serv(host);
 
   common::ErrnoError err = serv.Bind(false);

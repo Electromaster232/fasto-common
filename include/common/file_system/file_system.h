@@ -63,9 +63,9 @@ ErrnoError create_directory(const std::string& path, bool is_recursive) WARN_UNU
 ErrnoError remove_directory(const std::string& path, bool is_recursive) WARN_UNUSED_RESULT;
 ErrnoError change_directory(const std::string& path) WARN_UNUSED_RESULT;
 
-ErrnoError write_to_descriptor(descriptor_t fd_desc, const void* buf, size_t len, size_t* nwrite_out)
+ErrnoError write_to_descriptor(descriptor_t fd_desc, const void* buf, size_t size, size_t* nwrite_out)
     WARN_UNUSED_RESULT;
-ErrnoError read_from_descriptor(descriptor_t fd_desc, void* buf, size_t len, size_t* readlen) WARN_UNUSED_RESULT;
+ErrnoError read_from_descriptor(descriptor_t fd_desc, void* buf, size_t size, size_t* nread_out) WARN_UNUSED_RESULT;
 
 ErrnoError get_file_time_last_modification(const std::string& file_path,
                                            utctime_t* mod_time_sec) WARN_UNUSED_RESULT;  // utc time

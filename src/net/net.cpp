@@ -57,6 +57,7 @@
 #include <io.h>
 #endif
 
+#include <common/eintr_wrapper.h>
 #include <common/sprintf.h>
 
 #if defined(OS_WIN) || defined(OS_ANDROID) || defined(OS_MACOSX) || defined(OS_FREEBSD) || defined(OS_IOS)
@@ -468,12 +469,12 @@ ErrnoError get_in_port(const addrinfo* ainf, uint16_t* out) {
 
   if (ainf->ai_family == AF_INET) {
     struct sockaddr_in* sin = reinterpret_cast<struct sockaddr_in*>(ainf->ai_addr);
-    *out = sin->sin_port;
+    *out = htons(sin->sin_port);
     return ErrnoError();
   }
 
   struct sockaddr_in6* sin = reinterpret_cast<struct sockaddr_in6*>(ainf->ai_addr);
-  *out = sin->sin6_port;
+  *out = htons(sin->sin6_port);
   return ErrnoError();
 }
 
@@ -728,11 +729,14 @@ ErrnoError write_to_tcp_socket(socket_descr_t fd, const void* data, size_t size,
 #ifdef OS_WIN
   ssize_t lnwritten = send(fd, reinterpret_cast<const char*>(data), size, 0);
 #else
-  ssize_t lnwritten = send(fd, data, size, 0);
-  // ssize_t lnwritten = ::write(fd, data, size);
+#if defined(OS_LINUX) || defined(OS_ANDROID)
+  ssize_t lnwritten = HANDLE_EINTR(send(fd, data, size, MSG_NOSIGNAL));
+#else
+  ssize_t lnwritten = HANDLE_EINTR(write(socket_fd_, buf->data(), buf_len));
+#endif
 #endif
 
-  if (lnwritten == ERROR_RESULT_VALUE && errno != 0) {
+  if (lnwritten == ERROR_RESULT_VALUE) {
     return make_error_perror("write", errno);
   }
 
@@ -748,16 +752,11 @@ ErrnoError read_from_tcp_socket(socket_descr_t fd, void* buf, size_t size, size_
 #ifdef OS_WIN
   ssize_t lnread = recv(fd, reinterpret_cast<char*>(buf), size, 0);
 #else
-  ssize_t lnread = recv(fd, buf, size, 0);
-  // ssize_t lnread = ::read(fd, buf, size);
+  ssize_t lnread = HANDLE_EINTR(read(fd, buf, size));
 #endif
 
-  if (lnread == ERROR_RESULT_VALUE && errno != 0) {
+  if (lnread == ERROR_RESULT_VALUE) {
     return make_error_perror("read", errno);
-  }
-
-  if (lnread == 0) {
-    return make_errno_error(ECONNRESET);
   }
 
   *nread_out = lnread;

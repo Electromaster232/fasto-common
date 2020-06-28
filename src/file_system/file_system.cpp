@@ -562,12 +562,12 @@ ErrnoError close_descriptor(descriptor_t fd_desc) {
   return ErrnoError();
 }
 
-ErrnoError write_to_descriptor(descriptor_t fd_desc, const void* buf, size_t len, size_t* nwrite_out) {
-  if (fd_desc == INVALID_DESCRIPTOR || !nwrite_out) {
+ErrnoError write_to_descriptor(descriptor_t fd_desc, const void* buf, size_t size, size_t* nwrite_out) {
+  if (fd_desc == INVALID_DESCRIPTOR || !buf || size == 0 || !nwrite_out) {
     return make_error_perror("write_to_descriptor", EINVAL);
   }
 
-  ssize_t res = write(fd_desc, buf, len);
+  ssize_t res = write(fd_desc, buf, size);
   if (res == ERROR_RESULT_VALUE) {
     return make_error_perror("write", errno);
   }
@@ -576,21 +576,17 @@ ErrnoError write_to_descriptor(descriptor_t fd_desc, const void* buf, size_t len
   return ErrnoError();
 }
 
-ErrnoError read_from_descriptor(descriptor_t fd_desc, void* buf, size_t len, size_t* readlen) {
-  if (fd_desc == INVALID_DESCRIPTOR || !readlen) {
+ErrnoError read_from_descriptor(descriptor_t fd_desc, void* buf, size_t size, size_t* nread_out) {
+  if (fd_desc == INVALID_DESCRIPTOR || !buf || size == 0 || !nread_out) {
     return make_error_perror("read_from_descriptor", EINVAL);
   }
 
-  ssize_t lnread = read(fd_desc, buf, len);
-  if (lnread == ERROR_RESULT_VALUE && errno != 0) {
+  ssize_t lnread = read(fd_desc, buf, size);
+  if (lnread == ERROR_RESULT_VALUE) {
     return make_error_perror("read", errno);
   }
 
-  if (lnread == 0) {
-    return make_errno_error(ECONNRESET);
-  }
-
-  *readlen = lnread;
+  *nread_out = lnread;
   return ErrnoError();
 }
 

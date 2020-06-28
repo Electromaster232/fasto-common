@@ -55,16 +55,16 @@ ErrnoError TcpClient::SetBlocking(bool block) {
 }
 
 ErrnoError TcpClient::DoSingleWrite(const void* data, size_t size, size_t* nwrite_out) {
-  if (!data || !size || !nwrite_out || !sock_) {
-    return make_errno_error_inval();
+  if (!sock_) {
+    return make_error_perror("TcpClient::DoSingleWrite", EINVAL);
   }
 
   return sock_->Write(data, size, nwrite_out);
 }
 
 ErrnoError TcpClient::DoSingleRead(void* out_data, size_t max_size, size_t* nread_out) {
-  if (!out_data || !max_size || !nread_out || !sock_) {
-    return make_errno_error_inval();
+  if (!sock_) {
+    return make_error_perror("TcpClient::DoSingleRead", EINVAL);
   }
 
   return sock_->Read(static_cast<char*>(out_data), max_size, nread_out);

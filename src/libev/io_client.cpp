@@ -105,13 +105,13 @@ ErrnoError IoClient::Read(void* out_data, size_t max_size, size_t* nread_out) {
     size_t n;
     ErrnoError err = SingleRead(static_cast<char*>(out_data) + total, bytes_left, &n);
     if (err) {
-      *nread_out = total;  // return number actually readed here eagain
       return err;
     }
     total += n;
     bytes_left -= n;
   }
 
+  CHECK_EQ(total, max_size);
   *nread_out = total;  // return number actually readed here
   return ErrnoError();
 }

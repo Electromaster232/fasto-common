@@ -132,9 +132,9 @@ Error IHttpClient::ReadResponse(http::HttpResponse* response) {
 
   static const size_t kHeaderBufInitialSize = 16 * 1024;  // 16K
   char* data_head = new char[kHeaderBufInitialSize];
-  size_t nread_head;
+  size_t nread_head = 0;
   ErrnoError err = sock_->Read(data_head, kHeaderBufInitialSize, &nread_head);
-  if (err) {
+  if (err || nread_head == 0) {
     delete[] data_head;
     return make_error_from_errno(err);
   }
@@ -173,11 +173,12 @@ Error IHttpClient::ReadResponse(http::HttpResponse* response) {
 
     size_t read_size = kHeaderBufInitialSize;
     do {
-      size_t nread;
+      size_t nread = 0;
       err = sock_->Read(data_head, read_size, &nread);
-      if (!err) {
-        body += std::string(data_head, nread);
+      if (err || nread == 0) {
+        break;
       }
+      body += std::string(data_head, nread);
     } while (!err);
 
     if (chunked) {
@@ -221,7 +222,7 @@ Error IHttpClient::ReadResponse(http::HttpResponse* response) {
     size_t diff = not_parsed + total;
     char* start = data + diff;
     err = sock_->Read(start, bytes_left, &n);
-    if (err) {
+    if (err || n == 0) {
       delete[] data_head;
       delete[] data;
       return make_error("Invalid body read");
