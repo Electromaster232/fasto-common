@@ -54,7 +54,7 @@ ErrnoError TcpClient::SetBlocking(bool block) {
   return sock_->SetBlocking(block);
 }
 
-ErrnoError TcpClient::SingleWrite(const void* data, size_t size, size_t* nwrite_out) {
+ErrnoError TcpClient::DoSingleWrite(const void* data, size_t size, size_t* nwrite_out) {
   if (!data || !size || !nwrite_out || !sock_) {
     return make_errno_error_inval();
   }
@@ -62,7 +62,7 @@ ErrnoError TcpClient::SingleWrite(const void* data, size_t size, size_t* nwrite_
   return sock_->Write(data, size, nwrite_out);
 }
 
-ErrnoError TcpClient::SingleRead(void* out_data, size_t max_size, size_t* nread_out) {
+ErrnoError TcpClient::DoSingleRead(void* out_data, size_t max_size, size_t* nread_out) {
   if (!out_data || !max_size || !nread_out || !sock_) {
     return make_errno_error_inval();
   }

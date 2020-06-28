@@ -42,14 +42,14 @@ class DescriptorClient : public IoClient {
 
   const char* ClassName() const override;
 
-  ErrnoError SingleWrite(const void* data, size_t size, size_t* nwrite_out) override WARN_UNUSED_RESULT;
-  ErrnoError SingleRead(void* out_data, size_t max_size, size_t* nread_out) override WARN_UNUSED_RESULT;
-
  protected:
   descriptor_t GetFd() const override;
   ErrnoError DoClose() override;
 
  private:
+  ErrnoError DoSingleWrite(const void* data, size_t size, size_t* nwrite_out) override WARN_UNUSED_RESULT;
+  ErrnoError DoSingleRead(void* out_data, size_t max_size, size_t* nread_out) override WARN_UNUSED_RESULT;
+
   file_system::DescriptorHolder desc_;
 };
 

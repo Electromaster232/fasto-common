@@ -59,17 +59,22 @@ class IoClient : public IoBase<IoClient> {
   ErrnoError Write(const void* data, size_t size, size_t* nwrite_out) WARN_UNUSED_RESULT;
   ErrnoError Read(void* out_data, size_t max_size, size_t* nread_out) WARN_UNUSED_RESULT;
 
-  virtual ErrnoError SingleWrite(const void* data, size_t size, size_t* nwrite_out) WARN_UNUSED_RESULT = 0;
-  virtual ErrnoError SingleRead(void* out_data, size_t max_size, size_t* nread_out) WARN_UNUSED_RESULT = 0;
+  ErrnoError SingleWrite(const void* data, size_t size, size_t* nwrite_out) WARN_UNUSED_RESULT;
+  ErrnoError SingleRead(void* out_data, size_t max_size, size_t* nread_out) WARN_UNUSED_RESULT;
 
  protected:  // executed IoLoop
   virtual descriptor_t GetFd() const = 0;
   virtual ErrnoError DoClose() = 0;
 
  private:
+  virtual ErrnoError DoSingleWrite(const void* data, size_t size, size_t* nwrite_out) WARN_UNUSED_RESULT = 0;
+  virtual ErrnoError DoSingleRead(void* out_data, size_t max_size, size_t* nread_out) WARN_UNUSED_RESULT = 0;
+
   IoLoop* server_;
   LibevIO* read_write_io_;
   flags_t flags_;
+  size_t wrote_bytes_;
+  size_t read_bytes_;
   DISALLOW_COPY_AND_ASSIGN(IoClient);
 };
 

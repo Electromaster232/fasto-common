@@ -45,7 +45,7 @@ descriptor_t DescriptorClient::GetFd() const {
   return desc_.GetFd();
 }
 
-ErrnoError DescriptorClient::SingleWrite(const void* data, size_t size, size_t* nwrite_out) {
+ErrnoError DescriptorClient::DoSingleWrite(const void* data, size_t size, size_t* nwrite_out) {
   if (!data || !size || !nwrite_out) {
     return make_errno_error_inval();
   }
@@ -53,7 +53,7 @@ ErrnoError DescriptorClient::SingleWrite(const void* data, size_t size, size_t* 
   return desc_.Write(data, size, nwrite_out);
 }
 
-ErrnoError DescriptorClient::SingleRead(void* out_data, size_t max_size, size_t* nread_out) {
+ErrnoError DescriptorClient::DoSingleRead(void* out_data, size_t max_size, size_t* nread_out) {
   if (!out_data || !max_size || !nread_out) {
     return make_errno_error_inval();
   }

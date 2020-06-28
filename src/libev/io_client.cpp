@@ -36,7 +36,7 @@ namespace common {
 namespace libev {
 
 IoClient::IoClient(IoLoop* server, flags_t flags)
-    : base_class(), server_(server), read_write_io_(new LibevIO), flags_(flags) {
+    : base_class(), server_(server), read_write_io_(new LibevIO), flags_(flags), wrote_bytes_(), read_bytes_() {
   read_write_io_->SetUserData(this);
 }
 
@@ -106,6 +106,30 @@ ErrnoError IoClient::Read(void* out_data, size_t max_size, size_t* nread_out) {
 
   *nread_out = total;  // return number actually readed here
   return ErrnoError();
+}
+
+ErrnoError IoClient::SingleWrite(const void* data, size_t size, size_t* nwrite_out) {
+  if (!data || !size || !nwrite_out) {
+    return make_errno_error_inval();
+  }
+
+  ErrnoError err = DoSingleWrite(data, size, nwrite_out);
+  if (!err) {
+    wrote_bytes_ += *nwrite_out;
+  }
+  return err;
+}
+
+ErrnoError IoClient::SingleRead(void* out_data, size_t max_size, size_t* nread_out) {
+  if (!out_data || !max_size || !nread_out) {
+    return make_errno_error_inval();
+  }
+
+  ErrnoError err = DoSingleRead(out_data, max_size, nread_out);
+  if (!err) {
+    read_bytes_ += *nread_out;
+  }
+  return err;
 }
 
 }  // namespace libev
