@@ -21,7 +21,7 @@ TEST(HostAndPort, methods) {
   ASSERT_TRUE(local_host.IsLocalHost());
   ASSERT_EQ(local_host.GetPort(), RANDOM_PORT);
 
-  const common::net::HostAndPort local_host2("Localhost", RANDOM_PORT);
+  const common::net::HostAndPort local_host2("127.0.0.1", RANDOM_PORT);
   ASSERT_TRUE(local_host2.IsValid());
   ASSERT_TRUE(local_host2.IsLocalHost());
   ASSERT_EQ(local_host2.GetPort(), RANDOM_PORT);
@@ -73,6 +73,12 @@ TEST(HostAndPort, ConvertToString) {
   ASSERT_EQ(local_host.GetPort(), valid_port);
   ASSERT_EQ(local_host.GetHost(), "[::]");
   ASSERT_EQ(host_str4, common::ConvertToString(local_host));
+
+  ASSERT_TRUE(common::net::HostAndPort("localhost", 0).IsLocalHost());
+  ASSERT_TRUE(common::net::HostAndPort("127.0.0.1", 0).IsLocalHost());
+  ASSERT_TRUE(common::net::HostAndPort("::1", 0).IsLocalHost());
+  ASSERT_TRUE(common::net::HostAndPort("0.0.0.0", 0).IsDefaultRoute());
+  ASSERT_TRUE(common::net::HostAndPort("::", 0).IsDefaultRoute());
 }
 
 TEST(HostAndPortAndSlot, methods) {

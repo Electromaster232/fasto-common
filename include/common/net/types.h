@@ -48,6 +48,7 @@ class HostAndPort {
   static HostAndPort CreateLocalHostIPV4(uint16_t port);
   static HostAndPort CreateLocalHostIPV6(uint16_t port);
   static HostAndPort CreateDefaultRouteIPV4(uint16_t port);
+  static HostAndPort CreateDefaultRouteIPV6(uint16_t port);
 
   bool Equals(const HostAndPort& other) const;
 

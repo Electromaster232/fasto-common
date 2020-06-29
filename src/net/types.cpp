@@ -40,6 +40,7 @@ const char kLocalhostIPV6Text[] = "::1";
 const char kLocalhostIPV6Digits[] = "::ffff:127.0.0.1";
 
 const char kDefaultRouteDigits[] = "0.0.0.0";
+const char kDefaultRouteIPV6Digits[] = "::";
 }  // namespace
 
 namespace common {
@@ -106,6 +107,10 @@ HostAndPort HostAndPort::CreateLocalHostIPV6(uint16_t port) {
 
 HostAndPort HostAndPort::CreateDefaultRouteIPV4(uint16_t port) {
   return HostAndPort(kDefaultRouteDigits, port);
+}
+
+HostAndPort HostAndPort::CreateDefaultRouteIPV6(uint16_t port) {
+  return HostAndPort(kDefaultRouteIPV6Digits, port);
 }
 
 bool HostAndPort::Equals(const HostAndPort& other) const {
