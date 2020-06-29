@@ -82,7 +82,8 @@ ErrnoError IoClient::Write(const void* data, size_t size, size_t* nwrite_out) {
   while (total < size) {
     size_t n;
     ErrnoError err = SingleWrite(data, size, &n);
-    if (err) {
+    if (err || n == 0) {
+      *nwrite_out = 0;
       return err;
     }
     total += n;
@@ -104,7 +105,8 @@ ErrnoError IoClient::Read(void* out_data, size_t max_size, size_t* nread_out) {
   while (total < max_size) {
     size_t n;
     ErrnoError err = SingleRead(static_cast<char*>(out_data) + total, bytes_left, &n);
-    if (err) {
+    if (err || n == 0) {
+      *nread_out = 0;
       return err;
     }
     total += n;
