@@ -16,7 +16,7 @@ TEST(HostAndPort, methods) {
   ASSERT_FALSE(invalid.IsValid());
   ASSERT_FALSE(invalid.IsLocalHost());
 
-  const common::net::HostAndPort local_host = common::net::HostAndPort::CreateLocalHost(RANDOM_PORT);
+  const common::net::HostAndPort local_host = common::net::HostAndPort::CreateLocalHostIPV4(RANDOM_PORT);
   ASSERT_TRUE(local_host.IsValid());
   ASSERT_TRUE(local_host.IsLocalHost());
   ASSERT_EQ(local_host.GetPort(), RANDOM_PORT);

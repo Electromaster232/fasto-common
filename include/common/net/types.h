@@ -45,7 +45,9 @@ class HostAndPort {
   bool IsLocalHost() const;
   bool IsDefaultRoute() const;
 
-  static HostAndPort CreateLocalHost(uint16_t port);
+  static HostAndPort CreateLocalHostIPV4(uint16_t port);
+  static HostAndPort CreateLocalHostIPV6(uint16_t port);
+  static HostAndPort CreateDefaultRouteIPV4(uint16_t port);
 
   bool Equals(const HostAndPort& other) const;
 

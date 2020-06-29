@@ -96,8 +96,16 @@ bool IsDefaultRoute(const std::string& host) {
   return FirstNonDefaultIPv6Char == std::end(host);
 }
 
-HostAndPort HostAndPort::CreateLocalHost(uint16_t port) {
-  return HostAndPort(kLocalhostText, port);
+HostAndPort HostAndPort::CreateLocalHostIPV4(uint16_t port) {
+  return HostAndPort(kLocalhostDigits, port);
+}
+
+HostAndPort HostAndPort::CreateLocalHostIPV6(uint16_t port) {
+  return HostAndPort(kLocalhostIPV6Text, port);
+}
+
+HostAndPort HostAndPort::CreateDefaultRouteIPV4(uint16_t port) {
+  return HostAndPort(kDefaultRouteDigits, port);
 }
 
 bool HostAndPort::Equals(const HostAndPort& other) const {
