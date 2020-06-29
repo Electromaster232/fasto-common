@@ -69,10 +69,11 @@ ErrnoError ReadDataSize(libev::IoClient* client, protocoled_size_t* sz) {
     return err;
   }
 
-  if (nread != sizeof(protocoled_size_t)) {  // connection closed
-    if (nread == 0) {
-      return make_errno_error("Connection closed", EAGAIN);
-    }
+  if (nread == 0) {
+    return make_errno_error("Connection closed", EAGAIN);
+  }
+
+  if (nread != sizeof(protocoled_size_t)) {
     return make_errno_error(
         MemSPrintf("Error when reading needed to read: %lu bytes, but readed: %lu", sizeof(protocoled_size_t), nread),
         EAGAIN);
@@ -93,10 +94,11 @@ ErrnoError ReadMessage(libev::IoClient* client, char* out, protocoled_size_t siz
     return err;
   }
 
-  if (nread != size) {  // connection closed
-    if (nread == 0) {
-      return make_errno_error("Connection closed", EAGAIN);
-    }
+  if (nread == 0) {
+    return make_errno_error("Connection closed", EAGAIN);
+  }
+
+  if (nread != size) {
     return make_errno_error(MemSPrintf("Error when reading needed to read: %lu bytes, but readed: %lu", size, nread),
                             EAGAIN);
   }
