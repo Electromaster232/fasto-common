@@ -242,11 +242,28 @@ SET(MEMORY_SOURCES
 )
 
 SET(DRAW_HEADERS
-  ${CMAKE_SOURCE_DIR}/include/common/draw/types.h
+  ${CMAKE_SOURCE_DIR}/include/common/draw/size.h
+  ${CMAKE_SOURCE_DIR}/include/common/draw/size_f.h
+  ${CMAKE_SOURCE_DIR}/include/common/draw/size_conversions.h
+  ${CMAKE_SOURCE_DIR}/include/common/draw/vector2d.h
+  ${CMAKE_SOURCE_DIR}/include/common/draw/vector2d_f.h
+  ${CMAKE_SOURCE_DIR}/include/common/draw/rect.h
+  ${CMAKE_SOURCE_DIR}/include/common/draw/point.h
+  ${CMAKE_SOURCE_DIR}/include/common/draw/point_f.h
+  ${CMAKE_SOURCE_DIR}/include/common/draw/point_conversions.h
+  ${CMAKE_SOURCE_DIR}/include/common/draw/safe_integer_conversions.h
 )
 
 SET(DRAW_SOURCES
-  ${CMAKE_SOURCE_DIR}/src/draw/types.cpp
+  ${CMAKE_SOURCE_DIR}/src/draw/size.cpp
+  ${CMAKE_SOURCE_DIR}/src/draw/size_f.cpp
+  ${CMAKE_SOURCE_DIR}/src/draw/size_conversions.cpp
+  ${CMAKE_SOURCE_DIR}/src/draw/vector2d.cpp
+  ${CMAKE_SOURCE_DIR}/src/draw/vector2d_f.cpp
+  ${CMAKE_SOURCE_DIR}/src/draw/rect.cpp
+  ${CMAKE_SOURCE_DIR}/src/draw/point.cpp
+  ${CMAKE_SOURCE_DIR}/src/draw/point_f.cpp
+  ${CMAKE_SOURCE_DIR}/src/draw/point_conversions.cpp
 )
 
 SET(MEDIA_HEADERS
@@ -618,6 +635,16 @@ SET(COMMON_CONFIG_GEN_PATH ${CMAKE_SOURCE_DIR}/include/common/config.h)
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/src/config.h.in ${COMMON_CONFIG_GEN_PATH} @ONLY IMMEDIATE)
 
 SET(COMMON_HEADERS
+  ${CMAKE_SOURCE_DIR}/include/common/numerics/clamped_math.h
+  ${CMAKE_SOURCE_DIR}/include/common/numerics/clamped_math_impl.h
+  ${CMAKE_SOURCE_DIR}/include/common/numerics/checked_math.h
+  ${CMAKE_SOURCE_DIR}/include/common/numerics/checked_math_impl.h
+  ${CMAKE_SOURCE_DIR}/include/common/numerics/safe_conversions.h
+  #${CMAKE_SOURCE_DIR}/include/common/numerics/safe_conversions_impl.h
+  #${CMAKE_SOURCE_DIR}/include/common/numerics/safe_conversions_arm_impl.h
+  ${CMAKE_SOURCE_DIR}/include/common/numerics/safe_math_shared_impl.h
+  ${CMAKE_SOURCE_DIR}/include/common/numerics/safe_math_clang_gcc_impl.h
+
   ${CMAKE_SOURCE_DIR}/include/common/log_levels.h
   ${CMAKE_SOURCE_DIR}/include/common/logger.h
   ${CMAKE_SOURCE_DIR}/include/common/macros.h

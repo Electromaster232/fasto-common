@@ -68,7 +68,7 @@ struct is_non_const_reference<const T&> : std::false_type {};
 
 namespace internal {
 
-// Implementation detail of base::void_t below.
+// Implementation detail of common::void_t below.
 template <typename...>
 struct make_void {
   using type = void;
@@ -76,9 +76,9 @@ struct make_void {
 
 }  // namespace internal
 
-// base::void_t is an implementation of std::void_t from C++17.
+// common::void_t is an implementation of std::void_t from C++17.
 //
-// We use |base::internal::make_void| as a helper struct to avoid a C++14
+// We use |common::internal::make_void| as a helper struct to avoid a C++14
 // defect:
 //   http://en.cppreference.com/w/cpp/types/void_t
 //   http://open-std.org/JTC1/SC22/WG21/docs/cwg_defects.html#1558
@@ -167,7 +167,7 @@ template <typename T>
 using is_trivially_copy_constructible = std::is_trivially_copy_constructible<T>;
 #endif
 
-// base::in_place_t is an implementation of std::in_place_t from
+// common::in_place_t is an implementation of std::in_place_t from
 // C++17. A tag type used to request in-place construction in template vararg
 // constructors.
 
@@ -176,9 +176,9 @@ using is_trivially_copy_constructible = std::is_trivially_copy_constructible<T>;
 struct in_place_t {};
 constexpr in_place_t in_place = {};
 
-// base::in_place_type_t is an implementation of std::in_place_type_t from
+// common::in_place_type_t is an implementation of std::in_place_type_t from
 // C++17. A tag type used for in-place construction when the type to construct
-// needs to be specified, such as with base::unique_any, designed to be a
+// needs to be specified, such as with common::unique_any, designed to be a
 // drop-in replacement.
 
 // Specification:

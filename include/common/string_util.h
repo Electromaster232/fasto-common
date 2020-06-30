@@ -39,7 +39,7 @@
 namespace common {
 
 // C standard-library functions like "strncasecmp" and "snprintf" that aren't
-// cross-platform are provided as "base::strncasecmp", and their prototypes
+// cross-platform are provided as "common::strncasecmp", and their prototypes
 // are listed below.  These functions are then implemented as inline calls
 // to the platform-specific equivalents in the platform-specific headers.
 
@@ -116,7 +116,7 @@ size_t wcslcpy(wchar_t* dst, const wchar_t* src, size_t dst_size);
 // Note that there is no portable conversion specifier for char data when
 // working with wprintf.
 //
-// This function is intended to be called from base::vswprintf.
+// This function is intended to be called from common::vswprintf.
 bool IsWprintfFormatPortable(const wchar_t* format);
 
 // ASCII-specific tolower.  The standard library's tolower is locale sensitive,

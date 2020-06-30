@@ -37,7 +37,7 @@ namespace uri {
 #ifdef WIN32
 
 // We allow both "c:" and "c|" as drive identifiers.
-inline bool IsWindowsDriveSeparator(base::char16 ch) {
+inline bool IsWindowsDriveSeparator(common::char16 ch) {
   return ch == ':' || ch == '|';
 }
 
@@ -66,7 +66,7 @@ inline bool DoesBeginWindowsDriveSpec(const CHAR* spec, int start_offset, int sp
   int remaining_len = spec_len - start_offset;
   if (remaining_len < 2)
     return false;  // Not enough room.
-  if (!base::IsAsciiAlpha(spec[start_offset]))
+  if (!common::IsAsciiAlpha(spec[start_offset]))
     return false;  // Doesn't start with a valid drive letter.
   if (!IsWindowsDriveSeparator(spec[start_offset + 1]))
     return false;  // Isn't followed with a drive separator.

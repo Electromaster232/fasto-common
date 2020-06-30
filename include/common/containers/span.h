@@ -185,12 +185,12 @@ struct ExtentStorage<dynamic_extent> {
 //
 // With span:
 //   Read-Only:
-//     // std::string HexEncode(base::span<const uint8_t> data);
+//     // std::string HexEncode(common::span<const uint8_t> data);
 //     std::vector<uint8_t> data_buffer = GenerateData();
 //     std::string r = HexEncode(data_buffer);
 //
 //  Mutable:
-//     // ssize_t SafeSNPrintf(base::span<char>, const char* fmt, Args...);
+//     // ssize_t SafeSNPrintf(common::span<char>, const char* fmt, Args...);
 //     char str_buffer[100];
 //     SafeSNPrintf(str_buffer, "Pi ~= %lf", 3.14);
 //
@@ -200,9 +200,9 @@ struct ExtentStorage<dynamic_extent> {
 // Const and pointers can get confusing. Here are vectors of pointers and their
 // corresponding spans:
 //
-//   const std::vector<int*>        =>  base::span<int* const>
-//   std::vector<const int*>        =>  base::span<const int*>
-//   const std::vector<const int*>  =>  base::span<const int* const>
+//   const std::vector<int*>        =>  common::span<int* const>
+//   std::vector<const int*>        =>  common::span<const int*>
+//   const std::vector<const int*>  =>  common::span<const int* const>
 //
 // Differences from the C++20 draft
 // --------------------------------
@@ -275,8 +275,8 @@ class span : public internal::ExtentStorage<Extent> {
   template <typename U, size_t N, typename = internal::EnableIfSpanCompatibleArray<const std::array<U, N>&, T, Extent>>
   constexpr span(const std::array<U, N>& array) noexcept : span(data(array), N) {}
 
-  // Conversion from a container that has compatible base::data() and integral
-  // base::size().
+  // Conversion from a container that has compatible common::data() and integral
+  // common::size().
   template <typename Container,
             typename = internal::EnableIfSpanCompatibleContainerAndSpanIsDynamic<Container&, T, Extent>>
   constexpr span(Container& container) noexcept : span(data(container), size(container)) {}
@@ -409,7 +409,7 @@ constexpr span<T> make_span(T* begin, T* end) noexcept {
 // make_span utility function that deduces both the span's value_type and extent
 // from the passed in argument.
 //
-// Usage: auto span = base::make_span(...);
+// Usage: auto span = common::make_span(...);
 template <int&... ExplicitArgumentBarrier, typename Container>
 constexpr auto make_span(Container&& container) noexcept {
   using T = std::remove_pointer_t<decltype(data(std::declval<Container>()))>;
@@ -424,7 +424,7 @@ constexpr auto make_span(Container&& container) noexcept {
 //
 // Note: This will CHECK that N indeed matches size(container).
 //
-// Usage: auto static_span = base::make_span<N>(...);
+// Usage: auto static_span = common::make_span<N>(...);
 template <size_t N, int&... ExplicitArgumentBarrier, typename Container>
 constexpr auto make_span(Container&& container) noexcept {
   using T = std::remove_pointer_t<decltype(data(std::declval<Container>()))>;

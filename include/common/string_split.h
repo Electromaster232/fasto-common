@@ -66,9 +66,9 @@ enum SplitResult {
 //
 // To split on either commas or semicolons, keeping all whitespace:
 //
-//   std::vector<std::string> tokens = base::SplitString(
-//       input, ", WARN_UNUSED_RESULT;", base::KEEP_WHITESPACE,
-//       base::SPLIT_WANT_ALL) WARN_UNUSED_RESULT;
+//   std::vector<std::string> tokens = common::SplitString(
+//       input, ", WARN_UNUSED_RESULT;", common::KEEP_WHITESPACE,
+//       common::SPLIT_WANT_ALL) WARN_UNUSED_RESULT;
 std::vector<std::string> SplitString(StringPiece input,
                                      StringPiece separators,
                                      WhitespaceHandling whitespace,
@@ -88,9 +88,9 @@ std::vector<string16> SplitString(StringPiece16 input,
 // To iterate through all whitespace-separated tokens in an input string:
 //
 //   for (const auto& cur :
-//        base::SplitStringPiece(input, base::kWhitespaceASCII,
-//                               base::KEEP_WHITESPACE,
-//                               base::SPLIT_WANT_NONEMPTY)) {
+//        common::SplitStringPiece(input, common::kWhitespaceASCII,
+//                               common::KEEP_WHITESPACE,
+//                               common::SPLIT_WANT_NONEMPTY)) {
 //     ...
 std::vector<StringPiece> SplitStringPiece(StringPiece input,
                                           StringPiece separators,
@@ -138,9 +138,9 @@ std::vector<std::string> SplitStringUsingSubstr(StringPiece input,
 // To iterate through all newline-separated tokens in an input string:
 //
 //   for (const auto& cur :
-//        base::SplitStringUsingSubstr(input, "\r\n",
-//                                     base::KEEP_WHITESPACE,
-//                                     base::SPLIT_WANT_NONEMPTY)) {
+//        common::SplitStringUsingSubstr(input, "\r\n",
+//                                     common::KEEP_WHITESPACE,
+//                                     common::SPLIT_WANT_NONEMPTY)) {
 //     ...
 std::vector<StringPiece16> SplitStringPieceUsingSubstr(StringPiece16 input,
                                                        StringPiece16 delimiter,

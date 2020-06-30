@@ -27,98 +27,62 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <common/draw/types.h>
+#include <common/draw/point_conversions.h>
 
 #include <common/convert2string.h>
+#include <common/draw/safe_integer_conversions.h>
 #include <common/sprintf.h>
 
 namespace common {
 namespace draw {
 
-Point::Point() : x(0), y(0) {}
-
-Point::Point(int x, int y) : x(x), y(y) {}
-
-bool Point::Equals(const Point& pt) const {
-  return x == pt.x && y == pt.y;
+Point ToFlooredPoint(const PointF& point) {
+  int x = ToFlooredInt(point.x());
+  int y = ToFlooredInt(point.y());
+  return Point(x, y);
 }
 
-bool Size::Equals(const Size& sz) const {
-  return width_ == sz.width_ && height_ == sz.height_;
+Point ToCeiledPoint(const PointF& point) {
+  int x = ToCeiledInt(point.x());
+  int y = ToCeiledInt(point.y());
+  return Point(x, y);
 }
 
-void Size::SetToMin(const Size& other) {
-  width_ = width() <= other.width() ? width() : other.width();
-  height_ = height() <= other.height() ? height() : other.height();
+Point ToRoundedPoint(const PointF& point) {
+  int x = ToRoundedInt(point.x());
+  int y = ToRoundedInt(point.y());
+  return Point(x, y);
 }
 
-void Size::SetToMax(const Size& other) {
-  width_ = width() >= other.width() ? width() : other.width();
-  height_ = height() >= other.height() ? height() : other.height();
-}
-
-std::ostream& operator<<(std::ostream& out, const Point& point) {
-  return out << ConvertToString(point);
-}
-
-std::ostream& operator<<(std::ostream& out, const Size& size) {
-  return out << ConvertToString(size);
+std::ostream& operator<<(std::ostream& out, const PointF& point) {
+  return out << point.ToString();
 }
 
 }  // namespace draw
 
-std::string ConvertToString(const draw::Point& value) {
-  return MemSPrintf("%d,%d", value.x, value.y);
+std::string ConvertToString(const draw::PointF& value) {
+  return MemSPrintf("%f,%f", value.x(), value.y());
 }
 
-bool ConvertFromString(const std::string& from, draw::Point* out) {
+bool ConvertFromString(const std::string& from, draw::PointF* out) {
   if (!out) {
     return false;
   }
 
-  draw::Point res;
+  draw::PointF res;
   size_t del = from.find_first_of(',');
   if (del != std::string::npos) {
-    int lx;
+    float lx;
     if (!ConvertFromString(from.substr(0, del), &lx)) {
       return false;
     }
-    res.x = lx;
+    res.set_x(lx);
 
-    int ly;
+    float ly;
     if (!ConvertFromString(from.substr(del + 1), &ly)) {
       return false;
     }
-    res.y = ly;
-  }
-
-  *out = res;
-  return true;
-}
-
-std::string ConvertToString(const draw::Size& value) {
-  return MemSPrintf("%dx%d", value.width(), value.height());
-}
-
-bool ConvertFromString(const std::string& from, draw::Size* out) {
-  if (!out) {
-    return false;
-  }
-
-  draw::Size res;
-  size_t del = from.find_first_of('x');
-  if (del != std::string::npos) {
-    int lwidth;
-    if (!ConvertFromString(from.substr(0, del), &lwidth)) {
-      return false;
-    }
-    res.set_width(lwidth);
-
-    int lheight;
-    if (!ConvertFromString(from.substr(del + 1), &lheight)) {
-      return false;
-    }
-    res.set_height(lheight);
+    res.set_y(ly);
   }
 
   *out = res;

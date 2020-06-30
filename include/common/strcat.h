@@ -49,9 +49,9 @@ namespace common {
 // It is preferrable to a sequence of "a + b + c" because it is both faster and
 // generates less code.
 //
-//   std::string result = base::StrCat({"foo ", result, "\nfoo ", bar});
+//   std::string result = common::StrCat({"foo ", result, "\nfoo ", bar});
 //
-// To join an array of strings with a separator, see base::JoinString in
+// To join an array of strings with a separator, see common::JoinString in
 // base/strings/string_util.h.
 //
 // MORE INFO

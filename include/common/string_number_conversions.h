@@ -50,8 +50,8 @@
 // write code that doesn't properly handle the error conditions.
 //
 // DO NOT use these functions in any UI unless it's NOT localized on purpose.
-// Instead, use base::MessageFormatter for a complex message with numbers
-// (integer, float, double) embedded or base::Format{Number,Double,Percent} to
+// Instead, use common::MessageFormatter for a complex message with numbers
+// (integer, float, double) embedded or common::Format{Number,Double,Percent} to
 // just format a single number/percent. Note that some languages use native
 // digits instead of ASCII digits while others use a group separator or decimal
 // point different from ',' and '.'. Using these functions in the UI would lead

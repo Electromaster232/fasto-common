@@ -29,33 +29,36 @@
 
 #pragma once
 
+#include <limits>
 #include <string>
+
+#include <common/numerics/checked_math.h>
 
 namespace common {
 namespace draw {
 
-struct Point {
-  Point();
-  Point(int x, int y);
-
-  bool Equals(const Point& pt) const;
-
-  int x;
-  int y;
-};
-
-inline bool operator==(const Point& left, const Point& right) {
-  return left.Equals(right);
-}
-
-inline bool operator!=(const Point& left, const Point& right) {
-  return !(left == right);
-}
-
+// A size has width and height values.
 class Size {
  public:
   constexpr Size() : width_(0), height_(0) {}
   constexpr Size(int width, int height) : width_(std::max(0, width)), height_(std::max(0, height)) {}
+#if defined(OS_MACOSX) || defined(OS_IOS)
+  explicit Size(const CGSize& s);
+#endif
+
+#if defined(OS_MACOSX) || defined(OS_IOS)
+  Size& operator=(const CGSize& s);
+#endif
+
+  void operator+=(const Size& size);
+
+  void operator-=(const Size& size);
+
+#if defined(OS_WIN)
+  SIZE ToSIZE() const;
+#elif defined(OS_MACOSX) || defined(OS_IOS)
+  CGSize ToCGSize() const;
+#endif
 
   constexpr int width() const { return width_; }
   constexpr int height() const { return height_; }
@@ -63,17 +66,24 @@ class Size {
   void set_width(int width) { width_ = std::max(0, width); }
   void set_height(int height) { height_ = std::max(0, height); }
 
+  // This call will CHECK if the area of this size would overflow int.
+  int GetArea() const;
+  // Returns a checked numeric representation of the area.
+  common::CheckedNumeric<int> GetCheckedArea() const;
+
   void SetSize(int width, int height) {
     set_width(width);
     set_height(height);
   }
+
+  void Enlarge(int grow_width, int grow_height);
 
   void SetToMin(const Size& other);
   void SetToMax(const Size& other);
 
   bool IsEmpty() const { return !width() || !height(); }
 
-  bool Equals(const Size& sz) const;
+  std::string ToString() const;
 
  private:
   int width_;
@@ -81,22 +91,33 @@ class Size {
 };
 
 inline bool operator==(const Size& lhs, const Size& rhs) {
-  return lhs.Equals(rhs);
+  return lhs.width() == rhs.width() && lhs.height() == rhs.height();
 }
 
 inline bool operator!=(const Size& lhs, const Size& rhs) {
   return !(lhs == rhs);
 }
 
-std::ostream& operator<<(std::ostream& out, const Point& point);
+inline Size operator+(Size lhs, const Size& rhs) {
+  lhs += rhs;
+  return lhs;
+}
+
+inline Size operator-(Size lhs, const Size& rhs) {
+  lhs -= rhs;
+  return lhs;
+}
+
+// Helper methods to scale a gfx::Size to a new gfx::Size.
+Size ScaleToCeiledSize(const Size& size, float x_scale, float y_scale);
+Size ScaleToCeiledSize(const Size& size, float scale);
+Size ScaleToFlooredSize(const Size& size, float x_scale, float y_scale);
+Size ScaleToFlooredSize(const Size& size, float scale);
+Size ScaleToRoundedSize(const Size& size, float x_scale, float y_scale);
+Size ScaleToRoundedSize(const Size& size, float scale);
+
 std::ostream& operator<<(std::ostream& out, const Size& size);
-
-bool IsValidSize(int width, int height);
-
 }  // namespace draw
-
-std::string ConvertToString(const draw::Point& value);
-bool ConvertFromString(const std::string& from, draw::Point* out);
 
 std::string ConvertToString(const draw::Size& value);
 bool ConvertFromString(const std::string& from, draw::Size* out);

@@ -35,11 +35,11 @@
 // network protocols.
 //
 // Q: Doesn't //base already provide these in string_number_conversions.h, with
-//    functions like base::StringToInt()?
+//    functions like common::StringToInt()?
 //
 // A: Yes, and those functions are used under the hood by these implementations.
 //
-//    However using the base::StringTo*() has historically led to subtle bugs
+//    However using the common::StringTo*() has historically led to subtle bugs
 //    in the context of parsing network protocols:
 //
 //      * Permitting a leading '+'
