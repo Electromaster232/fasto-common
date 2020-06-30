@@ -36,22 +36,24 @@
 namespace common {
 namespace draw {
 
-Point ToFlooredPoint(const PointF& point) {
-  int x = ToFlooredInt(point.x());
-  int y = ToFlooredInt(point.y());
-  return Point(x, y);
+void PointF::SetToMin(const PointF& other) {
+  x_ = x_ <= other.x_ ? x_ : other.x_;
+  y_ = y_ <= other.y_ ? y_ : other.y_;
 }
 
-Point ToCeiledPoint(const PointF& point) {
-  int x = ToCeiledInt(point.x());
-  int y = ToCeiledInt(point.y());
-  return Point(x, y);
+void PointF::SetToMax(const PointF& other) {
+  x_ = x_ >= other.x_ ? x_ : other.x_;
+  y_ = y_ >= other.y_ ? y_ : other.y_;
 }
 
-Point ToRoundedPoint(const PointF& point) {
-  int x = ToRoundedInt(point.x());
-  int y = ToRoundedInt(point.y());
-  return Point(x, y);
+std::string PointF::ToString() const {
+  return common::ConvertToString(*this);
+}
+
+PointF ScalePoint(const PointF& p, float x_scale, float y_scale) {
+  PointF scaled_p(p);
+  scaled_p.Scale(x_scale, y_scale);
+  return scaled_p;
 }
 
 std::ostream& operator<<(std::ostream& out, const PointF& point) {

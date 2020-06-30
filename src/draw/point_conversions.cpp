@@ -27,130 +27,30 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <common/draw/point.h>
-
-#include <common/convert2string.h>
 #include <common/draw/point_conversions.h>
-#include <common/draw/point_f.h>
-#include <common/numerics/safe_conversions_impl.h>
-#include <common/sprintf.h>
+
+#include <common/draw/safe_integer_conversions.h>
 
 namespace common {
 namespace draw {
 
-#if defined(OS_WIN)
-Point::Point(DWORD point) {
-  POINTS points = MAKEPOINTS(point);
-  x_ = points.x;
-  y_ = points.y;
+Point ToFlooredPoint(const PointF& point) {
+  int x = ToFlooredInt(point.x());
+  int y = ToFlooredInt(point.y());
+  return Point(x, y);
 }
 
-Point::Point(const POINT& point) : x_(point.x), y_(point.y) {}
-
-Point& Point::operator=(const POINT& point) {
-  x_ = point.x;
-  y_ = point.y;
-  return *this;
-}
-#elif defined(OS_MACOSX) || defined(OS_IOS)
-Point::Point(const CGPoint& point) : x_(point.x), y_(point.y) {}
-#endif
-
-#if defined(OS_WIN)
-POINT Point::ToPOINT() const {
-  POINT p;
-  p.x = x();
-  p.y = y();
-  return p;
-}
-#elif defined(OS_MACOSX) || defined(OS_IOS)
-CGPoint Point::ToCGPoint() const {
-  return CGPointMake(x(), y());
-}
-#endif
-
-void Point::SetToMin(const Point& other) {
-  x_ = x_ <= other.x_ ? x_ : other.x_;
-  y_ = y_ <= other.y_ ? y_ : other.y_;
+Point ToCeiledPoint(const PointF& point) {
+  int x = ToCeiledInt(point.x());
+  int y = ToCeiledInt(point.y());
+  return Point(x, y);
 }
 
-void Point::SetToMax(const Point& other) {
-  x_ = x_ >= other.x_ ? x_ : other.x_;
-  y_ = y_ >= other.y_ ? y_ : other.y_;
-}
-
-std::string Point::ToString() const {
-  return ConvertToString(*this);
-}
-
-Point ScaleToCeiledPoint(const Point& point, float x_scale, float y_scale) {
-  if (x_scale == 1.f && y_scale == 1.f)
-    return point;
-  return ToCeiledPoint(ScalePoint(PointF(point), x_scale, y_scale));
-}
-
-Point ScaleToCeiledPoint(const Point& point, float scale) {
-  if (scale == 1.f)
-    return point;
-  return ToCeiledPoint(ScalePoint(PointF(point), scale, scale));
-}
-
-Point ScaleToFlooredPoint(const Point& point, float x_scale, float y_scale) {
-  if (x_scale == 1.f && y_scale == 1.f)
-    return point;
-  return ToFlooredPoint(ScalePoint(PointF(point), x_scale, y_scale));
-}
-
-Point ScaleToFlooredPoint(const Point& point, float scale) {
-  if (scale == 1.f)
-    return point;
-  return ToFlooredPoint(ScalePoint(PointF(point), scale, scale));
-}
-
-Point ScaleToRoundedPoint(const Point& point, float x_scale, float y_scale) {
-  if (x_scale == 1.f && y_scale == 1.f)
-    return point;
-  return ToRoundedPoint(ScalePoint(PointF(point), x_scale, y_scale));
-}
-
-Point ScaleToRoundedPoint(const Point& point, float scale) {
-  if (scale == 1.f)
-    return point;
-  return ToRoundedPoint(ScalePoint(PointF(point), scale, scale));
-}
-
-std::ostream& operator<<(std::ostream& out, const Point& point) {
-  return out << ConvertToString(point);
+Point ToRoundedPoint(const PointF& point) {
+  int x = ToRoundedInt(point.x());
+  int y = ToRoundedInt(point.y());
+  return Point(x, y);
 }
 
 }  // namespace draw
-
-std::string ConvertToString(const draw::Point& value) {
-  return MemSPrintf("%d,%d", value.x(), value.y());
-}
-
-bool ConvertFromString(const std::string& from, draw::Point* out) {
-  if (!out) {
-    return false;
-  }
-
-  draw::Point res;
-  size_t del = from.find_first_of(',');
-  if (del != std::string::npos) {
-    int lx;
-    if (!ConvertFromString(from.substr(0, del), &lx)) {
-      return false;
-    }
-    res.set_x(lx);
-
-    int ly;
-    if (!ConvertFromString(from.substr(del + 1), &ly)) {
-      return false;
-    }
-    res.set_y(ly);
-  }
-
-  *out = res;
-  return true;
-}
 }  // namespace common
