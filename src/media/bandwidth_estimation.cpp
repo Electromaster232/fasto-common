@@ -226,6 +226,46 @@ DesireBytesPerSec CalculateDesireH264BandwidthBytesPerSec(int width, int height,
   return DesireBytesPerSec(KBITS_TO_BYTES(0), KBITS_TO_BYTES(0));
 }
 
+DesireBytesPerSec CalculateDesireH264BandwidthBytesPerSec(int width,
+                                                          int height,
+                                                          double framerate,
+                                                          const std::string& profile) {
+  int prof = PROFILE_H264_MAIN;
+  if (profile == "main") {
+    prof = PROFILE_H264_MAIN;
+  } else if (profile == "high") {
+    prof = PROFILE_H264_HIGH;
+  } else if (profile == "baseline") {
+    prof = PROFILE_H264_BASELINE;
+  } else if (profile == "constrained-baseline") {
+    prof = PROFILE_H264_CONSTRAINED_BASELINE;
+  }
+
+  return CalculateDesireH264BandwidthBytesPerSec(width, height, framerate, prof);
+}
+
+DesireBytesPerSec CalculateDesireH265BandwidthBytesPerSec(int width,
+                                                          int height,
+                                                          double framerate,
+                                                          const std::string& profile) {
+  int prof = PROFILE_H264_MAIN;
+  if (profile == "main") {
+    prof = PROFILE_H264_MAIN;
+  } else if (profile == "high") {
+    prof = PROFILE_H264_HIGH;
+  } else if (profile == "baseline") {
+    prof = PROFILE_H264_BASELINE;
+  } else if (profile == "constrained-baseline") {
+    prof = PROFILE_H264_CONSTRAINED_BASELINE;
+  }
+
+  return CalculateDesireH264BandwidthBytesPerSec(width, height, framerate, prof);
+}
+
+DesireBytesPerSec CalculateDesireH265BandwidthBytesPerSec(int width, int height, double framerate, int profile) {
+  return CalculateDesireH264BandwidthBytesPerSec(width, height, framerate, profile);
+}
+
 DesireBytesPerSec CalculateDesireMPEGBandwidthBytesPerSec(int width, int height) {
   // https://en.wikipedia.org/wiki/H.262/MPEG-2_Part_2#Video_profiles_and_levels
   // http://www.iem.thm.de/telekom-labor/zinke/mk/mpeg2beg/beginnzi.htm#Profiles

@@ -70,6 +70,15 @@ DesireBytesPerSec CalculateDesireMP2BandwidthBytesPerSec(int channels);
 
 DesireBytesPerSec VideoBitrateAverage(bandwidth_t bytes_per_sec);
 DesireBytesPerSec CalculateDesireH264BandwidthBytesPerSec(int width, int height, double framerate, int profile);
+DesireBytesPerSec CalculateDesireH264BandwidthBytesPerSec(int width,
+                                                          int height,
+                                                          double framerate,
+                                                          const std::string& profile);
+DesireBytesPerSec CalculateDesireH265BandwidthBytesPerSec(int width, int height, double framerate, int profile);
+DesireBytesPerSec CalculateDesireH265BandwidthBytesPerSec(int width,
+                                                          int height,
+                                                          double framerate,
+                                                          const std::string& profile);
 DesireBytesPerSec CalculateDesireMPEGBandwidthBytesPerSec(int width, int height);
 
 }  // namespace media
