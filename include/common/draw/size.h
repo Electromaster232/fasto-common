@@ -38,6 +38,12 @@
 
 #include <common/numerics/checked_math.h>
 
+#if defined(OS_WIN)
+typedef struct tagSIZE SIZE;
+#elif defined(OS_MACOSX) || defined(OS_IOS)
+typedef struct CGSize CGSize;
+#endif
+
 namespace common {
 namespace draw {
 
