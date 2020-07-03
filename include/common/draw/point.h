@@ -29,10 +29,6 @@
 
 #pragma once
 
-#if defined(OS_WIN)
-#include <windef.h>
-#endif
-
 #include <iosfwd>
 #include <string>
 #include <tuple>
@@ -40,6 +36,13 @@
 #include <common/draw/vector2d.h>
 #include <common/macros.h>
 #include <common/numerics/clamped_math.h>
+
+#if defined(OS_WIN)
+typedef unsigned long DWORD;
+typedef struct tagPOINT POINT;
+#elif defined(OS_MACOSX) || defined(OS_IOS)
+typedef struct CGPoint CGPoint;
+#endif
 
 namespace common {
 namespace draw {
