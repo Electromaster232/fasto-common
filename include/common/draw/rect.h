@@ -34,6 +34,12 @@
 #include <common/draw/vector2d.h>
 #include <common/numerics/checked_math.h>
 
+#if defined(OS_WIN)
+typedef struct tagRECT RECT;
+#elif defined(OS_MACOSX) || defined(OS_IOS)
+typedef struct CGRect CGRect;
+#endif
+
 namespace common {
 namespace draw {
 
