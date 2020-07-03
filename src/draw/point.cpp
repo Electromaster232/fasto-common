@@ -29,6 +29,10 @@
 
 #include <common/draw/point.h>
 
+#if defined(OS_WIN)
+#include <windows.h>
+#endif
+
 #include <common/convert2string.h>
 #include <common/draw/point_conversions.h>
 #include <common/draw/point_f.h>

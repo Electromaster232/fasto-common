@@ -29,6 +29,10 @@
 
 #pragma once
 
+#if defined(OS_WIN)
+#include <windef.h>
+#endif
+
 #include <iosfwd>
 #include <string>
 #include <tuple>
