@@ -29,12 +29,6 @@
 
 #include <common/draw/rect.h>
 
-#include <algorithm>
-
-#include <common/draw/vector2d.h>
-#include <common/numerics/clamped_math.h>
-#include <common/sprintf.h>
-
 #if defined(OS_WIN)
 #include <windows.h>
 #elif defined(OS_IOS)
@@ -42,6 +36,12 @@
 #elif defined(OS_MACOSX)
 #include <ApplicationServices/ApplicationServices.h>
 #endif
+
+#include <algorithm>
+
+#include <common/draw/vector2d.h>
+#include <common/numerics/clamped_math.h>
+#include <common/sprintf.h>
 
 namespace common {
 namespace draw {

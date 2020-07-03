@@ -29,10 +29,6 @@
 
 #pragma once
 
-#if defined(OS_WIN)
-#include <windef.h>
-#endif
-
 #include <limits>
 #include <string>
 
