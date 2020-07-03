@@ -31,6 +31,10 @@
 
 #if defined(OS_WIN)
 #include <windows.h>
+#elif defined(OS_IOS)
+#include <CoreGraphics/CoreGraphics.h>
+#elif defined(OS_MACOSX)
+#include <ApplicationServices/ApplicationServices.h>
 #endif
 
 #include <common/convert2string.h>
