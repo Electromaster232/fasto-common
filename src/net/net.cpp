@@ -732,7 +732,7 @@ ErrnoError write_to_tcp_socket(socket_descr_t fd, const void* data, size_t size,
 #if defined(OS_LINUX) || defined(OS_ANDROID)
   ssize_t lnwritten = HANDLE_EINTR(send(fd, data, size, MSG_NOSIGNAL));
 #else
-  ssize_t lnwritten = HANDLE_EINTR(write(socket_fd_, buf->data(), buf_len));
+  ssize_t lnwritten = HANDLE_EINTR(write(fd, data, size));
 #endif
 #endif
 
