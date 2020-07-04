@@ -153,8 +153,8 @@ class ServerWebHandler : public common::libev::IoLoopObserver {
     ASSERT_FALSE(errn);
 
     common::libev::http::HttpClient* cl = new common::libev::http::HttpClient(sserver, sc);
-    cl->SetBlocking(false);
-    sserver->RegisterClient(cl);
+    ignore_result(cl->SetBlocking(false));
+    ignore_result(sserver->RegisterClient(cl));
     errn = cl->Get(http_url, true);
     ASSERT_FALSE(errn);
   }
@@ -198,7 +198,7 @@ class ServerWebHandler : public common::libev::IoLoopObserver {
     size_t nread = 0;
     common::ErrnoError errn = client->Read(buff, BUF_SIZE, &nread);
     if ((errn && errn->GetErrorCode() != EAGAIN) || nread == 0) {
-      client->Close();
+      ignore_result(client->Close());
       delete client;
       return;
     }
