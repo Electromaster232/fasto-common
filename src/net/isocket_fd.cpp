@@ -61,6 +61,12 @@ ErrnoError ISocketFd::WriteImpl(const void* data, size_t size, size_t* nwrite_ou
 ErrnoError ISocketFd::ReadImpl(void* out_data, size_t max_size, size_t* nread_out) {
   return read_from_socket(GetFd(), out_data, max_size, nread_out);
 }
+
+ErrnoError ISocketFd::SendFileImpl(descriptor_t file_fd, size_t file_size) {
+  const socket_descr_t fd = GetFd();
+  return send_file_to_fd(fd, file_fd, 0, file_size);
+}
+
 #else
 ErrnoError ISocketFd::WriteImpl(const void* data, size_t size, size_t* nwrite_out) {
   return write_to_tcp_socket(GetFd(), data, size, nwrite_out);
@@ -71,16 +77,14 @@ ErrnoError ISocketFd::ReadImpl(void* out_data, size_t max_size, size_t* nread_ou
 }
 #endif
 
-
 ErrnoError ISocketFd::SendFile(descriptor_t file_fd, size_t file_size) {
   DCHECK(IsValid());
-
   const socket_descr_t fd = GetFd();
   if (file_fd == INVALID_DESCRIPTOR || fd == INVALID_SOCKET_VALUE) {
     return make_error_perror("SendFile", EINVAL);
   }
 
-  return send_file_to_fd(fd, file_fd, 0, file_size);
+  return SendFileImpl(file_fd, file_size);
 }
 
 ErrnoError ISocketFd::CloseImpl() {

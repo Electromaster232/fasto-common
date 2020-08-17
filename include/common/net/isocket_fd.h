@@ -54,6 +54,7 @@ class ISocketFd : public ISocket {
  private:
   ErrnoError WriteImpl(const void* data, size_t size, size_t* nwrite_out) override WARN_UNUSED_RESULT;
   ErrnoError ReadImpl(void* out_data, size_t max_size, size_t* nread_out) override WARN_UNUSED_RESULT;
+  virtual ErrnoError SendFileImpl(descriptor_t file_fd, size_t file_size) WARN_UNUSED_RESULT;
   ErrnoError CloseImpl() override WARN_UNUSED_RESULT;
 };
 

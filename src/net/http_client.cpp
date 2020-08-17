@@ -30,6 +30,7 @@
 #include <common/net/http_client.h>
 
 #include <string.h>
+#include <unistd.h>
 
 #if defined(HAVE_OPENSSL)
 #include <openssl/err.h>
@@ -47,6 +48,81 @@
 
 #undef SetPort
 
+#define BUF_SIZE 8192
+
+namespace {
+
+common::ErrnoError SSLWrite(SSL* ssl, const void* data, size_t size, size_t* nwrite_out) {
+  int len = SSL_write(ssl, data, size);
+  if (len < 0) {
+    int err = SSL_get_error(ssl, len);
+    char* str = ERR_error_string(err, nullptr);
+    return common::make_errno_error(str, EINTR);
+  }
+
+  *nwrite_out = len;
+  return common::ErrnoError();
+}
+
+ssize_t sendfilessl(SSL* ssl, descriptor_t in_fd, off_t* offset, size_t count) {
+  off_t orig = 0;
+  char buf[BUF_SIZE] = {0};
+
+  if (offset) {
+    /* Save current file offset and set offset to value in '*offset' */
+
+    orig = lseek(in_fd, 0, SEEK_CUR);
+    if (orig == -1) {
+      return ERROR_RESULT_VALUE;
+    }
+    if (lseek(in_fd, *offset, SEEK_SET) == -1) {
+      return ERROR_RESULT_VALUE;
+    }
+  }
+
+  ssize_t totSent = 0;
+
+  while (count > 0) {
+    ssize_t num_read = read(in_fd, buf, BUF_SIZE);
+    if (num_read == ERROR_RESULT_VALUE) {
+      return ERROR_RESULT_VALUE;
+    }
+    if (num_read == 0) {
+      break; /* EOF */
+    }
+
+    size_t numSent = 0;
+    common::ErrnoError err = SSLWrite(ssl, buf, static_cast<size_t>(num_read), &numSent);
+    if (err) {
+      return ERROR_RESULT_VALUE;
+    }
+
+    if (numSent == 0) {
+      return ERROR_RESULT_VALUE;
+    }
+
+    count -= numSent;
+    totSent += numSent;
+  }
+
+  if (offset) {
+    /* Return updated file offset in '*offset', and reset the file offset
+       to the value it had when we were called. */
+
+    *offset = lseek(in_fd, 0, SEEK_CUR);
+    if (*offset == -1) {
+      return ERROR_RESULT_VALUE;
+    }
+    if (lseek(in_fd, orig, SEEK_SET) == -1) {
+      return ERROR_RESULT_VALUE;
+    }
+  }
+
+  return totSent;
+}
+
+}  // namespace
+
 namespace common {
 namespace net {
 
@@ -59,7 +135,12 @@ class SocketTls : public common::net::ISocketFd {
     SSL_load_error_strings();
   }
 
-  common::net::socket_descr_t GetFd() const override { return hs_.GetFd(); }
+  common::net::socket_descr_t GetFd() const override {
+    if (!ssl_) {
+      return INVALID_SOCKET_VALUE;
+    }
+    return hs_.GetFd();
+  }
 
   void SetFd(common::net::socket_descr_t fd) override { hs_.SetFd(fd); }
 
@@ -120,15 +201,7 @@ class SocketTls : public common::net::ISocketFd {
 
  private:
   common::ErrnoError WriteImpl(const void* data, size_t size, size_t* nwrite_out) override {
-    int len = SSL_write(ssl_, data, size);
-    if (len < 0) {
-      int err = SSL_get_error(ssl_, len);
-      char* str = ERR_error_string(err, nullptr);
-      return common::make_errno_error(str, EINTR);
-    }
-
-    *nwrite_out = len;
-    return common::ErrnoError();
+    return SSLWrite(ssl_, data, size, nwrite_out);
   }
 
   common::ErrnoError ReadImpl(void* out_data, size_t max_size, size_t* nread_out) override {
@@ -145,6 +218,24 @@ class SocketTls : public common::net::ISocketFd {
 
     *nread_out = len;
     return common::ErrnoError();
+  }
+
+  ErrnoError SendFileImpl(descriptor_t file_fd, size_t file_size) override {
+    off_t offset = 0;
+    for (size_t size_to_send = file_size; size_to_send > 0;) {
+      off_t off = offset;
+      ssize_t sent = sendfilessl(ssl_, file_fd, &off, size_to_send);
+      if (sent == ERROR_RESULT_VALUE) {
+        return make_error_perror("sendfile", errno);
+      } else if (sent == 0) {
+        return ErrnoError();
+      }
+
+      offset += sent;
+      size_to_send -= sent;
+    }
+
+    return ErrnoError();
   }
 
   common::ErrnoError CloseImpl() override {

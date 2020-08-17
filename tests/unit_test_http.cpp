@@ -511,4 +511,11 @@ TEST(https_client, get) {
   ASSERT_FALSE(err);
 }
 
+TEST(https_client, post) {
+  Error err2 =
+      net::PostHttpsFile(file_system::ascii_file_string_path("/home/sasha/1.txt"),
+                         common::uri::GURL("https://fastocloud.com/panel_pro/api/server/log/5f301ee271a51735471bc7e9"));
+  ASSERT_FALSE(err2);
+}
+
 #endif
