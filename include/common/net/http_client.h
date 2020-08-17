@@ -78,5 +78,18 @@ class HttpClient : public IHttpClient {
 
 Error PostHttpFile(const file_system::ascii_file_string_path& file_path, const uri::GURL& url);
 
+class HttpsClient : public common::net::IHttpClient {
+ public:
+  typedef common::net::IHttpClient base_class;
+  explicit HttpsClient(const common::net::HostAndPort& host);
+  common::ErrnoError Connect(struct timeval* tv = nullptr) override;
+  bool IsConnected() const override;
+  common::ErrnoError Disconnect() override;
+  common::net::HostAndPort GetHost() const override;
+  ErrnoError SendFile(descriptor_t file_fd, size_t file_size) override;
+};
+
+Error PostHttpsFile(const file_system::ascii_file_string_path& file_path, const uri::GURL& url);
+
 }  // namespace net
 }  // namespace common
