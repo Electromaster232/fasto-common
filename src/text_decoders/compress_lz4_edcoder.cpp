@@ -36,7 +36,7 @@ namespace common {
 CompressLZ4EDcoder::CompressLZ4EDcoder(bool sized) : IEDcoder(ED_LZ4), sized_(sized) {}
 
 Error CompressLZ4EDcoder::DoEncode(const StringPiece& data, char_buffer_t* out) {
-#ifdef HAVE_LZ4
+#if defined(HAVE_LZ4)
   return compress::EncodeLZ4(data, sized_, out);
 #else
   UNUSED(data);
@@ -46,7 +46,7 @@ Error CompressLZ4EDcoder::DoEncode(const StringPiece& data, char_buffer_t* out) 
 }
 
 Error CompressLZ4EDcoder::DoDecode(const StringPiece& data, char_buffer_t* out) {
-#ifdef HAVE_LZ4
+#if defined(HAVE_LZ4)
   return compress::DecodeLZ4(data, sized_, out);
 #else
   UNUSED(data);
@@ -56,7 +56,7 @@ Error CompressLZ4EDcoder::DoDecode(const StringPiece& data, char_buffer_t* out) 
 }
 
 Error CompressLZ4EDcoder::DoEncode(const char_buffer_t& data, char_buffer_t* out) {
-#ifdef HAVE_LZ4
+#if defined(HAVE_LZ4)
   return compress::EncodeLZ4(data, sized_, out);
 #else
   UNUSED(data);
@@ -66,7 +66,7 @@ Error CompressLZ4EDcoder::DoEncode(const char_buffer_t& data, char_buffer_t* out
 }
 
 Error CompressLZ4EDcoder::DoDecode(const char_buffer_t& data, char_buffer_t* out) {
-#ifdef HAVE_LZ4
+#if defined(HAVE_LZ4)
   return compress::DecodeLZ4(data, sized_, out);
 #else
   UNUSED(data);

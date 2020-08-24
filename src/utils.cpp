@@ -356,7 +356,7 @@ void freeifnotnull(void* ptr) {
 
 }  // namespace utils
 
-#ifdef OS_POSIX
+#if defined(OS_POSIX)
 bool create_as_daemon() {
   pid_t pid = fork();
   if (pid < 0) {

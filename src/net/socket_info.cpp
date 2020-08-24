@@ -29,7 +29,7 @@
 
 #include <common/net/socket_info.h>
 
-#ifdef OS_POSIX
+#if defined(OS_POSIX)
 #include <netdb.h>  // for addrinfo
 #else
 #include <winsock2.h>

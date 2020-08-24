@@ -62,7 +62,7 @@ bool AreSchemesEqual(const char* base, const Component& base_scheme, const CHAR*
   return true;
 }
 
-#ifdef WIN32
+#if defined(WIN32)
 
 // Here, we also allow Windows paths to be represented as "/C:/" so we can be
 // consistent about URL paths beginning with slashes. This function is like
@@ -135,7 +135,7 @@ bool DoIsRelativeURL(const char* base,
     return true;
   }
 
-#ifdef WIN32
+#if defined(WIN32)
   // We special case paths like "C:\foo" so they can link directly to the
   // file on Windows (IE compatibility). The security domain stuff should
   // prevent a link like this from actually being followed if its on a
@@ -255,7 +255,7 @@ void CopyOneComponent(const char* source,
   output_component->len = output->length() - output_component->begin;
 }
 
-#ifdef WIN32
+#if defined(WIN32)
 
 // Called on Windows when the base URL is a file URL, this will copy the "C:"
 // to the output, if there is a drive letter and if that drive letter is not
@@ -333,7 +333,7 @@ bool DoResolveRelativePath(const char* base_url,
     // incoming URL does not provide a drive spec. We save the true path
     // beginning so we can fix it up after we are done.
     int base_path_begin = base_parsed.path.begin;
-#ifdef WIN32
+#if defined(WIN32)
     if (base_is_file) {
       base_path_begin =
           CopyBaseDriveSpecIfNecessary(base_url, base_parsed.path.begin, base_parsed.path.end(), relative_url,
@@ -502,7 +502,7 @@ bool DoResolveRelativeURL(const char* base_url,
 
   int num_slashes = CountConsecutiveSlashes(relative_url, relative_component.begin, relative_component.end());
 
-#ifdef WIN32
+#if defined(WIN32)
   // On Windows, two slashes for a file path (regardless of which direction
   // they are) means that it's UNC. Two backslashes on any base scheme mean
   // that it's an absolute UNC path (we use the base_is_file flag to control

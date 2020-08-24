@@ -16,7 +16,7 @@
 
 #include <sys/stat.h>
 
-#ifdef HAVE_UDEV
+#if defined(HAVE_UDEV)
 #include <libudev.h>
 #endif
 
@@ -30,7 +30,7 @@ bool GetHddID(std::string* serial) {
     return false;
   }
 
-#ifdef HAVE_UDEV
+#if defined(HAVE_UDEV)
   struct stat stats;
   int err = stat("/", &stats);
   if (err < 0) {

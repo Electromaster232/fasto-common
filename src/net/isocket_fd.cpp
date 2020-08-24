@@ -43,7 +43,7 @@ ErrnoError ISocketFd::SetBlocking(bool block) {
   return set_blocking_socket(GetFd(), block);
 }
 
-#ifdef OS_POSIX
+#if defined(OS_POSIX)
 ErrnoError ISocketFd::WriteEv(const struct iovec* iovec, int count, size_t* nwrite_out) {
   DCHECK(IsValid());
   return write_ev_to_socket(GetFd(), iovec, count, nwrite_out);

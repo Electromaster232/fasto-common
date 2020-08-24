@@ -135,7 +135,7 @@ void PrepareForUTF8Output(const CHAR* src, size_t src_len, std::string* output) 
 
 // Instantiate versions we know callers will need.
 template void PrepareForUTF8Output(const wchar_t*, size_t, std::string*);
-#ifdef WCHAR_T_IS_UTF32
+#if defined(WCHAR_T_IS_UTF32)
 template void PrepareForUTF8Output(const char16*, size_t, std::string*);
 #endif
 
@@ -157,7 +157,7 @@ void PrepareForUTF16Or32Output(const char* src, size_t src_len, STRING* output) 
 
 // Instantiate versions we know callers will need.
 template void PrepareForUTF16Or32Output(const char*, size_t, std::wstring*);
-#ifdef WCHAR_T_IS_UTF32
+#if defined(WCHAR_T_IS_UTF32)
 template void PrepareForUTF16Or32Output(const char*, size_t, string16*);
 #endif
 

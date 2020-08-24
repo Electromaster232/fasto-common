@@ -192,7 +192,7 @@ LogMessage::~LogMessage() {
   *kLogger << stream_.str();
   kLogger->flush();
   if (level_ <= logging::LOG_LEVEL_CRIT) {
-#ifdef NDEBUG
+#if defined(NDEBUG)
     immediate_exit();
 #else
     immediate_assert();

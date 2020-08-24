@@ -37,7 +37,7 @@ CompressZlibEDcoder::CompressZlibEDcoder(bool sized, ZlibDeflates def)
     : IEDcoder(ED_ZLIB), sized_(sized), deflate_(def) {}
 
 Error CompressZlibEDcoder::DoEncode(const StringPiece& data, char_buffer_t* out) {
-#ifdef HAVE_ZLIB
+#if defined(HAVE_ZLIB)
   return compress::EncodeZlib(data, sized_, deflate_, out);
 #else
   UNUSED(data);
@@ -47,7 +47,7 @@ Error CompressZlibEDcoder::DoEncode(const StringPiece& data, char_buffer_t* out)
 }
 
 Error CompressZlibEDcoder::DoDecode(const StringPiece& data, char_buffer_t* out) {
-#ifdef HAVE_ZLIB
+#if defined(HAVE_ZLIB)
   return compress::DecodeZlib(data, sized_, out);
 #else
   UNUSED(data);
@@ -57,7 +57,7 @@ Error CompressZlibEDcoder::DoDecode(const StringPiece& data, char_buffer_t* out)
 }
 
 Error CompressZlibEDcoder::DoEncode(const char_buffer_t& data, char_buffer_t* out) {
-#ifdef HAVE_ZLIB
+#if defined(HAVE_ZLIB)
   return compress::EncodeZlib(data, sized_, deflate_, out);
 #else
   UNUSED(data);
@@ -67,7 +67,7 @@ Error CompressZlibEDcoder::DoEncode(const char_buffer_t& data, char_buffer_t* ou
 }
 
 Error CompressZlibEDcoder::DoDecode(const char_buffer_t& data, char_buffer_t* out) {
-#ifdef HAVE_ZLIB
+#if defined(HAVE_ZLIB)
   return compress::DecodeZlib(data, sized_, out);
 #else
   UNUSED(data);

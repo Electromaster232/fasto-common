@@ -34,7 +34,7 @@
 #include <common/convert2string.h>
 #include <common/string_util.h>
 
-#ifdef OS_WIN
+#if defined(OS_WIN)
 #include <common/file_system/string_path_utils.h>
 #endif
 
@@ -79,7 +79,7 @@ void DoScanFolder(const DirectoryStringPath<CharT, Traits>& folder,
       continue;
     }
 
-#ifdef OS_WIN
+#if defined(OS_WIN)
     const std::string dir_str = make_path(folder_str, dent->d_name);
     tribool is_dir_tr = is_directory(dir_str);
     if (is_dir_tr == INDETERMINATE) {

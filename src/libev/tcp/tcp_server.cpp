@@ -40,7 +40,7 @@
 
 namespace {
 
-#ifdef OS_WIN
+#if defined(OS_WIN)
 struct WinsockInit {
   WinsockInit() {
     WSADATA d;

@@ -34,7 +34,7 @@ namespace uri {
 
 namespace {
 
-#ifdef WIN32
+#if defined(WIN32)
 
 // Given a pointer into the spec, this copies and canonicalizes the drive
 // letter and colon to the output, if one is found. If there is not a drive
@@ -76,7 +76,7 @@ bool DoDevCanonicalizePath(const CHAR* spec, const Component& path, CanonOutput*
   // Copies and normalizes the "c:" at the beginning, if present.
   out_path->begin = output->length();
   int after_drive;
-#ifdef WIN32
+#if defined(WIN32)
   after_drive = DevDoDriveSpec(spec, path.begin, path.end(), output);
 #else
   after_drive = path.begin;

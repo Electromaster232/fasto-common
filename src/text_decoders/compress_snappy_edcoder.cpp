@@ -36,7 +36,7 @@ namespace common {
 CompressSnappyEDcoder::CompressSnappyEDcoder() : IEDcoder(ED_SNAPPY) {}
 
 Error CompressSnappyEDcoder::DoEncode(const StringPiece& data, char_buffer_t* out) {
-#ifdef HAVE_SNAPPY
+#if defined(HAVE_SNAPPY)
   return compress::EncodeSnappy(data, out);
 #else
   UNUSED(data);
@@ -46,7 +46,7 @@ Error CompressSnappyEDcoder::DoEncode(const StringPiece& data, char_buffer_t* ou
 }
 
 Error CompressSnappyEDcoder::DoDecode(const StringPiece& data, char_buffer_t* out) {
-#ifdef HAVE_SNAPPY
+#if defined(HAVE_SNAPPY)
   return compress::DecodeSnappy(data, out);
 #else
   UNUSED(data);
@@ -56,7 +56,7 @@ Error CompressSnappyEDcoder::DoDecode(const StringPiece& data, char_buffer_t* ou
 }
 
 Error CompressSnappyEDcoder::DoEncode(const char_buffer_t& data, char_buffer_t* out) {
-#ifdef HAVE_SNAPPY
+#if defined(HAVE_SNAPPY)
   return compress::EncodeSnappy(data, out);
 #else
   UNUSED(data);
@@ -66,7 +66,7 @@ Error CompressSnappyEDcoder::DoEncode(const char_buffer_t& data, char_buffer_t* 
 }
 
 Error CompressSnappyEDcoder::DoDecode(const char_buffer_t& data, char_buffer_t* out) {
-#ifdef HAVE_SNAPPY
+#if defined(HAVE_SNAPPY)
   return compress::DecodeSnappy(data, out);
 #else
   UNUSED(data);

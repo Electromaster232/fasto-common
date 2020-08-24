@@ -112,7 +112,7 @@ void* threadFunc(void* params) {
   *(thread_params->tid_) = tid;
   void* result = thread_params->cl(thread_params->args);
   delete thread_params;
-#ifdef OS_WIN
+#if defined(OS_WIN)
   return result;
 #else
   pthread_exit(result);

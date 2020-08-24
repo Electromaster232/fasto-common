@@ -67,7 +67,7 @@ bool realpath_without_exist(const std::basic_string<CharT>& path, std::basic_str
     valid_parts.push_back(part);
   }
 
-#ifdef OS_WIN
+#if defined(OS_WIN)
   *realpath = JoinString(valid_parts, get_separator_string<CharT>());
 #else
   *realpath = get_separator_string<CharT>() + JoinString(valid_parts, get_separator_string<CharT>());

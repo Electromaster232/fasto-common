@@ -27,7 +27,7 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifdef OS_WIN
+#if defined(OS_WIN)
 #include <winsock2.h>
 #else
 #include <netinet/in.h>
@@ -40,7 +40,7 @@
 #include <errno.h>
 #include <string.h>
 
-#ifdef COMPILER_MSVC
+#if defined(COMPILER_MSVC)
 #include <io.h>
 #endif
 

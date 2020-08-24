@@ -53,7 +53,7 @@
 #include <sys/sendfile.h>
 #endif
 
-#ifdef COMPILER_MSVC
+#if defined(COMPILER_MSVC)
 #include <io.h>
 #endif
 
@@ -150,7 +150,7 @@ ErrnoError do_sendto(socket_descr_t fd,
     return make_error_perror("sendto", EINVAL);
   }
 
-#ifdef OS_WIN
+#if defined(OS_WIN)
   ssize_t res = ::sendto(fd, reinterpret_cast<const char*>(data), len, 0, addr, addr_len);
 #else
   ssize_t res = ::sendto(fd, data, len, 0, addr, addr_len);
@@ -184,7 +184,7 @@ ErrnoError do_recvfrom(socket_descr_t fd,
     return make_error_perror("recvfrom", EINVAL);
   }
 
-#ifdef OS_WIN
+#if defined(OS_WIN)
   ssize_t res = ::recvfrom(fd, reinterpret_cast<char*>(out_data), max_size, 0, addr, addr_len);
 #else
   ssize_t res = ::recvfrom(fd, out_data, max_size, 0, addr, addr_len);
@@ -241,7 +241,7 @@ ErrnoError do_connect(socket_descr_t sock, const struct sockaddr* addr, socklen_
   int res = ::connect(sock, addr, len);
   if (res < 0) {
     if (errno == EINPROGRESS) {
-#ifdef OS_POSIX
+#if defined(OS_POSIX)
       struct pollfd fds[1];
       fds[0].fd = sock;
       fds[0].events = POLLOUT;
@@ -540,7 +540,7 @@ ErrnoError accept(const socket_info& info, socket_info* out_info) {
 
   *out_info = info;
   struct addrinfo* ainf = out_info->addr_info();
-#ifdef OS_POSIX
+#if defined(OS_POSIX)
   socklen_t* addr_len = &ainf->ai_addrlen;
 #else
   int* addr_len = reinterpret_cast<int*>(&ainf->ai_addrlen);
@@ -612,7 +612,7 @@ ErrnoError close(socket_descr_t fd) {
     return ErrnoError();
   }
 
-#ifdef OS_WIN
+#if defined(OS_WIN)
   int res = ::closesocket(fd);
 #else
   int res = ::close(fd);
@@ -625,7 +625,7 @@ ErrnoError close(socket_descr_t fd) {
 }
 
 ErrnoError set_blocking_socket(socket_descr_t sock, bool blocking) {
-#ifdef OS_POSIX
+#if defined(OS_POSIX)
   int opts = fcntl(sock, F_GETFL);
   if (opts < 0) {
     return make_error_perror("fcntl(F_GETFL)", errno);
@@ -653,7 +653,7 @@ ErrnoError set_blocking_socket(socket_descr_t sock, bool blocking) {
 #endif
 }
 
-#ifdef OS_POSIX
+#if defined(OS_POSIX)
 ErrnoError write_ev_to_socket(socket_descr_t fd, const struct iovec* iovec, int count, size_t* nwritten_out) {
   if (fd == INVALID_SOCKET_VALUE || !iovec || count <= 0 || !nwritten_out) {
     return make_error_perror("write_ev_to_socket", EINVAL);
@@ -726,7 +726,7 @@ ErrnoError write_to_tcp_socket(socket_descr_t fd, const void* data, size_t size,
     return make_error_perror("write_to_socket", EINVAL);
   }
 
-#ifdef OS_WIN
+#if defined(OS_WIN)
   ssize_t lnwritten = send(fd, reinterpret_cast<const char*>(data), size, 0);
 #else
 #if defined(OS_LINUX) || defined(OS_ANDROID)
@@ -749,7 +749,7 @@ ErrnoError read_from_tcp_socket(socket_descr_t fd, void* buf, size_t size, size_
     return make_error_perror("read_from_socket", EINVAL);
   }
 
-#ifdef OS_WIN
+#if defined(OS_WIN)
   ssize_t lnread = recv(fd, reinterpret_cast<char*>(buf), size, 0);
 #else
   ssize_t lnread = HANDLE_EINTR(read(fd, buf, size));

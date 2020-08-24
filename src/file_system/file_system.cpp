@@ -246,7 +246,7 @@ ErrnoError touch(const std::string& path) {
 }
 
 ErrnoError set_blocking_descriptor(descriptor_t descr, bool blocking) {
-#ifdef OS_POSIX
+#if defined(OS_POSIX)
   int opts = fcntl(descr, F_GETFL);
   if (opts < 0) {
     return make_error_perror("fcntl(F_GETFL)", errno);
@@ -360,7 +360,7 @@ ErrnoError move_file(const std::string& pathFrom, const std::string& pathTo) {
 
   std::string pr_from = prepare_path(pathFrom);
   std::string pr_to = prepare_path(pathTo);
-#ifdef OS_WIN
+#if defined(OS_WIN)
   WINBOOL res = MoveFileExA(pr_from.c_str(), pr_to.c_str(), MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING);
   bool result = res != 0;
 #else
@@ -425,7 +425,7 @@ ErrnoError create_directory(const std::string& path, bool is_recursive) {
   const char* pr_path_ptr = pr_path.c_str();
   if (is_recursive) {
     char* p = nullptr;
-#ifdef OS_WIN
+#if defined(OS_WIN)
     uint8_t shift = 3;
 #else
     uint8_t shift = 1;
@@ -613,7 +613,7 @@ bool find_file_in_path(const std::string& file_name, std::string* out_path) {
   while (!path.eof()) {
     std::string test;
     struct stat info;
-#ifdef OS_WIN
+#if defined(OS_WIN)
     getline(path, test, ';');
 #else
     getline(path, test, ':');

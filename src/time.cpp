@@ -102,7 +102,7 @@ utctime_t tm2utctime(struct tm* timestruct, bool is_local) {
     return mktime(timestruct);
   }
 
-#ifdef OS_WIN
+#if defined(OS_WIN)
   return _mkgmtime(timestruct);
 #else
   return timegm(timestruct);
@@ -112,13 +112,13 @@ utctime_t tm2utctime(struct tm* timestruct, bool is_local) {
 struct tm utctime2tm(utctime_t time_sec, bool is_local) {
   struct tm info;  // representing a calendar time
   if (is_local) {
-#ifdef OS_WIN
+#if defined(OS_WIN)
     localtime_s(&info, &time_sec);  // time to calendar_time
 #else
     localtime_r(&time_sec, &info);  // time to calendar_time
 #endif
   } else {
-#ifdef OS_WIN
+#if defined(OS_WIN)
     gmtime_s(&info, &time_sec);  // time to calendar_time
 #else
     gmtime_r(&time_sec, &info);     // time to calendar_time

@@ -36,7 +36,7 @@ namespace common {
 CompressBZip2EDcoder::CompressBZip2EDcoder(bool sized) : IEDcoder(ED_ZLIB), sized_(sized) {}
 
 Error CompressBZip2EDcoder::DoEncode(const StringPiece& data, char_buffer_t* out) {
-#ifdef HAVE_BZIP2
+#if defined(HAVE_BZIP2)
   return compress::EncodeBZip2(data, sized_, out);
 #else
   UNUSED(data);
@@ -46,7 +46,7 @@ Error CompressBZip2EDcoder::DoEncode(const StringPiece& data, char_buffer_t* out
 }
 
 Error CompressBZip2EDcoder::DoDecode(const StringPiece& data, char_buffer_t* out) {
-#ifdef HAVE_BZIP2
+#if defined(HAVE_BZIP2)
   return compress::DecodeBZip2(data, sized_, out);
 #else
   UNUSED(data);
@@ -56,7 +56,7 @@ Error CompressBZip2EDcoder::DoDecode(const StringPiece& data, char_buffer_t* out
 }
 
 Error CompressBZip2EDcoder::DoEncode(const char_buffer_t& data, char_buffer_t* out) {
-#ifdef HAVE_BZIP2
+#if defined(HAVE_BZIP2)
   return compress::EncodeBZip2(data, sized_, out);
 #else
   UNUSED(data);
@@ -66,7 +66,7 @@ Error CompressBZip2EDcoder::DoEncode(const char_buffer_t& data, char_buffer_t* o
 }
 
 Error CompressBZip2EDcoder::DoDecode(const char_buffer_t& data, char_buffer_t* out) {
-#ifdef HAVE_BZIP2
+#if defined(HAVE_BZIP2)
   return compress::DecodeBZip2(data, sized_, out);
 #else
   UNUSED(data);
