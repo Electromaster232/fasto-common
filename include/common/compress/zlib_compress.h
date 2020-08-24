@@ -29,7 +29,7 @@
 
 #pragma once
 
-#ifdef HAVE_ZLIB
+#if defined(HAVE_ZLIB)
 #include <common/error.h>
 #include <common/string_piece.h>
 #include <common/types.h>

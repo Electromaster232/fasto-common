@@ -34,7 +34,7 @@
 namespace common {
 namespace uri {
 
-#ifdef WIN32
+#if defined(OS_WIN)
 
 // We allow both "c:" and "c|" as drive identifiers.
 inline bool IsWindowsDriveSeparator(common::char16 ch) {
@@ -53,7 +53,7 @@ inline int FindNextSlash(const CHAR* spec, int begin_index, int spec_len) {
   return idx;
 }
 
-#ifdef WIN32
+#if defined(OS_WIN)
 
 // Returns true if the start_offset in the given spec looks like it begins a
 // drive spec, for example "c:". This function explicitly handles start_offset

@@ -44,7 +44,7 @@ inline int strncmp16(const char16* s1, const char16* s2, size_t count) {
 }
 
 inline int vsnprintf(char* buffer, size_t size, const char* format, va_list arguments) {
-#ifdef __MINGW32__
+#if defined(COMPILER_MINGW)
   return ::vsnprintf(buffer, size, format, arguments);
 #else
   int length = _vsprintf_p(buffer, size, format, arguments);
@@ -92,4 +92,4 @@ inline int vswprintf(wchar_t* buffer, size_t size, const wchar_t* format, va_lis
   return length;
 }
 
-}  // namespace base
+}  // namespace common

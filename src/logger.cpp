@@ -40,7 +40,7 @@
 #include <common/patterns/singleton_pattern.h>
 #include <common/sprintf.h>
 
-#ifdef OS_MACOSX
+#if defined(OS_MACOSX)
 #include <mach/clock.h>
 #include <mach/mach.h>
 #endif

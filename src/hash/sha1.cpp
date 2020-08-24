@@ -86,7 +86,7 @@ void sha1_hashBlock(SHA1_CTX* s) {
 
 void sha1_addUncounted(SHA1_CTX* s, uint8_t data) {
   uint8_t* const b = reinterpret_cast<uint8_t*>(s->buffer);
-#ifdef ARCH_CPU_BIG_ENDIAN
+#if defined(ARCH_CPU_BIG_ENDIAN)
   b[s->buffer_offset] = data;
 #else
   b[s->buffer_offset ^ 3] = data;

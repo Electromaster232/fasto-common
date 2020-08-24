@@ -29,7 +29,7 @@
 
 #pragma once
 
-#ifdef HAVE_SNAPPY
+#if defined(HAVE_SNAPPY)
 #include <common/error.h>
 #include <common/string_piece.h>
 #include <common/types.h>

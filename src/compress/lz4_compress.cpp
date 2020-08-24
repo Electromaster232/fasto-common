@@ -29,7 +29,7 @@
 
 #include <common/compress/lz4_compress.h>
 
-#ifdef HAVE_LZ4
+#if defined(HAVE_LZ4)
 
 #include <lz4.h>
 

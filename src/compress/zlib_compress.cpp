@@ -29,7 +29,7 @@
 
 #include <common/compress/zlib_compress.h>
 
-#ifdef HAVE_ZLIB
+#if defined(HAVE_ZLIB)
 
 #include <string.h>
 

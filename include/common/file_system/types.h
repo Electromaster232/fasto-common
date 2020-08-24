@@ -148,7 +148,7 @@ inline std::basic_string<CharT, Traits> prepare_path(std::basic_string<CharT, Tr
   }
 
   if (path[0] == get_home_separator<CharT>()) {
-#ifdef OS_POSIX
+#if defined(OS_POSIX)
     std::basic_string<CharT, Traits> home = getenv<CharT, Traits>("HOME");
 #else
     std::basic_string<CharT, Traits> home = getenv<CharT, Traits>("USERPROFILE");

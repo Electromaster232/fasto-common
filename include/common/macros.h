@@ -132,7 +132,7 @@ typedef int descriptor_t;
 #error Please add support for your architecture
 #endif
 
-#ifdef ARCH_CPU_64_BITS
+#if defined(ARCH_CPU_64_BITS)
 #define WORDSIZE 64
 #elif defined(ARCH_CPU_32_BITS)
 #define WORDSIZE 32

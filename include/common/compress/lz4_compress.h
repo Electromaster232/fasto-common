@@ -29,7 +29,7 @@
 
 #pragma once
 
-#ifdef HAVE_LZ4
+#if defined(HAVE_LZ4)
 #include <common/error.h>
 #include <common/string_piece.h>
 #include <common/types.h>

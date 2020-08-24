@@ -42,7 +42,7 @@ class ISocketFd : public ISocket {
 
   ErrnoError SetBlocking(bool block) WARN_UNUSED_RESULT;
 
-#ifdef OS_POSIX
+#if defined(OS_POSIX)
   ErrnoError WriteEv(const struct iovec* iovec, int count, size_t* nwrite_out) WARN_UNUSED_RESULT;
   ErrnoError ReadEv(const struct iovec* iovec, int count, size_t* nwrite_out) WARN_UNUSED_RESULT;
 #endif

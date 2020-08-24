@@ -29,7 +29,7 @@
 
 #include <common/compress/snappy_compress.h>
 
-#ifdef HAVE_SNAPPY
+#if defined(HAVE_SNAPPY)
 #include <limits>
 
 #include <snappy.h>

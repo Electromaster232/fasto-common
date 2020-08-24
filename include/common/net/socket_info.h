@@ -29,7 +29,7 @@
 
 #pragma once
 
-#ifdef OS_POSIX
+#if defined(OS_POSIX)
 #include <netinet/in.h>
 #include <sys/socket.h>
 #else
@@ -43,7 +43,7 @@ struct addrinfo;
 
 #define RANDOM_PORT 0
 
-#ifdef OS_WIN
+#if defined(OS_WIN)
 #define INVALID_SOCKET_VALUE INVALID_SOCKET
 #else
 #define INVALID_SOCKET_VALUE INVALID_DESCRIPTOR
@@ -52,7 +52,7 @@ struct addrinfo;
 namespace common {
 namespace net {
 
-#ifdef OS_WIN
+#if defined(OS_WIN)
 typedef SOCKET socket_descr_t;
 #else
 typedef int socket_descr_t;
@@ -60,7 +60,7 @@ typedef int socket_descr_t;
 
 /* Types of sockets.  */
 
-#ifdef COMPILER_MINGW
+#if defined(COMPILER_MINGW)
 enum socket_t {
   ST_SOCK_STREAM = 1,   /* Sequenced, reliable, connection-based
                            byte streams.  */

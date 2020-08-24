@@ -128,7 +128,7 @@ ErrnoError call_fcntl_flock(descriptor_t fd_desc, bool do_lock) {
   if (fd_desc == INVALID_DESCRIPTOR) {
     return make_error_perror("call_fcntl_flock", EINVAL);
   }
-#ifdef OS_POSIX
+#if defined(OS_POSIX)
   struct flock lock;
   lock.l_type = do_lock ? F_WRLCK : F_UNLCK;
   lock.l_whence = SEEK_SET;
@@ -161,7 +161,7 @@ ErrnoError do_rmdir_directory(const char* path) {
 }
 
 ErrnoError do_create_directory(const char* path) {
-#ifdef OS_WIN
+#if defined(OS_WIN)
   bool result = mkdir(path) != ERROR_RESULT_VALUE;
 #else
   bool result = mkdir(path, S_IRWXU | S_IRWXG | S_IRWXO) != ERROR_RESULT_VALUE;

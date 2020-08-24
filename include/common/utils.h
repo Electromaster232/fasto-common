@@ -113,7 +113,7 @@ char* strdupornull(const char* src);
 void freeifnotnull(void* ptr);
 }  // namespace utils
 
-#ifdef OS_POSIX
+#if defined(OS_POSIX)
 bool create_as_daemon();
 #endif
 long get_current_process_pid();

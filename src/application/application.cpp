@@ -41,7 +41,7 @@ std::string IApplication::GetAppPath() const {
 }
 
 std::string IApplication::GetAppDir() const {
-#ifdef OS_MACOSX
+#if defined(OS_MACOSX)
   const std::string app_path = file_system::pwd();
 #else
   const std::string app_path = GetAppPath();

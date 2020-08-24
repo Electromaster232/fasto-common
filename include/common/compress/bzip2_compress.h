@@ -29,7 +29,7 @@
 
 #pragma once
 
-#ifdef HAVE_BZIP2
+#if defined(HAVE_BZIP2)
 #include <common/error.h>
 #include <common/string_piece.h>
 #include <common/types.h>

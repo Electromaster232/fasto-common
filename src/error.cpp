@@ -36,7 +36,7 @@
 
 namespace common {
 
-#ifdef OS_WIN
+#if defined(OS_WIN)
 std::string common_strerror(int err) {
   if (err == ECONNRESET) {
     return "Connection reset by peer";

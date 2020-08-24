@@ -29,7 +29,7 @@
 
 #include <common/compress/bzip2_compress.h>
 
-#ifdef HAVE_BZIP2
+#if defined(HAVE_BZIP2)
 #include <string.h>
 
 #include <limits>
