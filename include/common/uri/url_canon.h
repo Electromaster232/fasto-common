@@ -611,6 +611,21 @@ bool CanonicalizeUdpURL(const char16* spec,
                         CanonOutput* output,
                         Parsed* new_parsed);
 
+// Use for rtp URLs.
+bool CanonicalizeRtpURL(const char* spec,
+                        int spec_len,
+                        const Parsed& parsed,
+                        CharsetConverter* query_converter,
+                        CanonOutput* output,
+                        Parsed* new_parsed);
+
+bool CanonicalizeRtpURL(const char16* spec,
+                        int spec_len,
+                        const Parsed& parsed,
+                        CharsetConverter* query_converter,
+                        CanonOutput* output,
+                        Parsed* new_parsed);
+
 // Use for srt URLs.
 bool CanonicalizeSrtURL(const char* spec,
                         int spec_len,

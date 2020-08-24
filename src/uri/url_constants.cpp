@@ -36,6 +36,7 @@ const char kDataScheme[] = "data";
 const char kFileScheme[] = "file";
 const char kDevScheme[] = "dev";
 const char kUdpScheme[] = "udp";
+const char kRtpScheme[] = "rtp";
 const char kSrtScheme[] = "srt";
 const char kTcpScheme[] = "tcp";
 const char kRtmpScheme[] = "rtmp";

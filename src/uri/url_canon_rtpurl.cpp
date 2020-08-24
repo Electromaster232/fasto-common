@@ -35,14 +35,13 @@ namespace uri {
 namespace {
 
 template <typename CHAR, typename UCHAR>
-bool DoCanonicalizeRtmpURL(const URLComponentSource<CHAR>& source,
-                           const Parsed& parsed,
-                           CharsetConverter* query_converter,
-                           CanonOutput* output,
-                           Parsed* new_parsed) {
+bool DoCanonicalizeRtpURL(const URLComponentSource<CHAR>& source,
+                          const Parsed& parsed,
+                          CharsetConverter* query_converter,
+                          CanonOutput* output,
+                          Parsed* new_parsed) {
   UNUSED(query_converter);
-
-  // Things we don't set in rtmp: URLs.
+  // Things we don't set in rtp: URLs.
   new_parsed->username = Component();
   new_parsed->password = Component();
   new_parsed->query = Component();
@@ -50,50 +49,37 @@ bool DoCanonicalizeRtmpURL(const URLComponentSource<CHAR>& source,
   // Scheme (known, so we don't bother running it through the more
   // complicated scheme canonicalizer).
   new_parsed->scheme.begin = output->length();
-  output->Append("rtmp://", 7);
-  new_parsed->scheme.len = 4;
+  output->Append("rtp://", 6);
+  new_parsed->scheme.len = 3;
 
   bool success = CanonicalizeHost(source.host, parsed.host, output, &new_parsed->host);
   int default_port = DefaultPortForScheme(&output->data()[new_parsed->scheme.begin], new_parsed->scheme.len);
   success &= CanonicalizePort(source.port, parsed.port, default_port, output, &new_parsed->port);
-  // Path
-  if (parsed.path.is_valid()) {
-    success &= CanonicalizePath(source.path, parsed.path, output, &new_parsed->path);
-  } else if (parsed.query.is_valid() || parsed.ref.is_valid()) {
-    // When we have an empty path, make up a path when we have an authority
-    // or something following the path. The only time we allow an empty
-    // output path is when there is nothing else.
-    new_parsed->path = Component(output->length(), 1);
-    output->push_back('/');
-  } else {
-    // No path at all
-    new_parsed->path.reset();
-  }
   return success;
 }
 
 }  // namespace
 
-bool CanonicalizeRtmpURL(const char* spec,
-                         int spec_len,
-                         const Parsed& parsed,
-                         CharsetConverter* query_converter,
-                         CanonOutput* output,
-                         Parsed* new_parsed) {
+bool CanonicalizeRtpURL(const char* spec,
+                        int spec_len,
+                        const Parsed& parsed,
+                        CharsetConverter* query_converter,
+                        CanonOutput* output,
+                        Parsed* new_parsed) {
   UNUSED(spec_len);
-  return DoCanonicalizeRtmpURL<char, unsigned char>(URLComponentSource<char>(spec), parsed, query_converter, output,
-                                                    new_parsed);
+  return DoCanonicalizeRtpURL<char, unsigned char>(URLComponentSource<char>(spec), parsed, query_converter, output,
+                                                   new_parsed);
 }
 
-bool CanonicalizeRtmpURL(const char16* spec,
-                         int spec_len,
-                         const Parsed& parsed,
-                         CharsetConverter* query_converter,
-                         CanonOutput* output,
-                         Parsed* new_parsed) {
+bool CanonicalizeRtpURL(const char16* spec,
+                        int spec_len,
+                        const Parsed& parsed,
+                        CharsetConverter* query_converter,
+                        CanonOutput* output,
+                        Parsed* new_parsed) {
   UNUSED(spec_len);
-  return DoCanonicalizeRtmpURL<char16, char16>(URLComponentSource<char16>(spec), parsed, query_converter, output,
-                                               new_parsed);
+  return DoCanonicalizeRtpURL<char16, char16>(URLComponentSource<char16>(spec), parsed, query_converter, output,
+                                              new_parsed);
 }
 
 }  // namespace uri

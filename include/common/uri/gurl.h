@@ -220,6 +220,8 @@ class GURL {
 
   bool SchemeIsUdp() const { return SchemeIs(uri::kUdpScheme); }
 
+  bool SchemeIsRtp() const { return SchemeIs(uri::kRtpScheme); }
+
   bool SchemeIsSrt() const { return SchemeIs(uri::kSrtScheme); }
 
   bool SchemeIsTcp() const { return SchemeIs(uri::kTcpScheme); }
