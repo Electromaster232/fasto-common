@@ -67,6 +67,7 @@ struct SchemeRegistry {
       {kSrtScheme, SCHEME_WITH_HOST_AND_PORT},
       {kTcpScheme, SCHEME_WITH_HOST_AND_PORT},
       {kRtmpScheme, SCHEME_WITH_HOST_AND_PORT},
+      {kRtmpsScheme, SCHEME_WITH_HOST_AND_PORT},
       {kRtspScheme, SCHEME_WITH_HOST_PORT_AND_USER_INFORMATION},
       {kFtpScheme, SCHEME_WITH_HOST_PORT_AND_USER_INFORMATION},
       {kWssScheme, SCHEME_WITH_HOST_PORT_AND_USER_INFORMATION},  // WebSocket secure.
@@ -271,8 +272,9 @@ bool DoCanonicalize(const CHAR* spec,
     // Tcp URLs are special.
     ParseTcpURL(spec, spec_len, &parsed_input);
     success = CanonicalizeTcpURL(spec, spec_len, parsed_input, charset_converter, output, output_parsed);
-  } else if (DoCompareSchemeComponent(spec, scheme, uri::kRtmpScheme)) {
-    // Rtmp URLs are special.
+  } else if (DoCompareSchemeComponent(spec, scheme, uri::kRtmpScheme) ||
+             DoCompareSchemeComponent(spec, scheme, uri::kRtmpsScheme)) {
+    // Rtmp/rtmps URLs are special.
     ParseRtmpURL(spec, spec_len, &parsed_input);
     success = CanonicalizeRtmpURL(spec, spec_len, parsed_input, charset_converter, output, output_parsed);
   } else if (DoCompareSchemeComponent(spec, scheme, uri::kRtspScheme)) {

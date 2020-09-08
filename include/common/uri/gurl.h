@@ -228,6 +228,8 @@ class GURL {
 
   bool SchemeIsRtmp() const { return SchemeIs(uri::kRtmpScheme); }
 
+  bool SchemeIsRtmps() const { return SchemeIs(uri::kRtmpsScheme); }
+
   bool SchemeIsRtsp() const { return SchemeIs(uri::kRtspScheme); }
 
   // Returns true if the scheme indicates a network connection that uses TLS or

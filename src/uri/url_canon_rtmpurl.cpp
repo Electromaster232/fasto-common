@@ -50,10 +50,17 @@ bool DoCanonicalizeRtmpURL(const URLComponentSource<CHAR>& source,
   // Scheme (known, so we don't bother running it through the more
   // complicated scheme canonicalizer).
   new_parsed->scheme.begin = output->length();
-  output->Append("rtmp://", 7);
-  new_parsed->scheme.len = 4;
+  // Scheme: this will append the colon.
+  bool success = CanonicalizeScheme(source.scheme, parsed.scheme, output, &new_parsed->scheme);
+  if (success && parsed.scheme.is_valid()) {
+    output->push_back('/');
+    output->push_back('/');
+  }
 
-  bool success = CanonicalizeHost(source.host, parsed.host, output, &new_parsed->host);
+  // output->Append("rtmp://", 7);
+  // new_parsed->scheme.len = 4;
+
+  success = CanonicalizeHost(source.host, parsed.host, output, &new_parsed->host);
   int default_port = DefaultPortForScheme(&output->data()[new_parsed->scheme.begin], new_parsed->scheme.len);
   success &= CanonicalizePort(source.port, parsed.port, default_port, output, &new_parsed->port);
   // Path

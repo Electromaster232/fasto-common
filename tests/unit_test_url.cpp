@@ -41,6 +41,7 @@
 #define TCP_LINK "tcp://google.com:2121"
 #define RTMP_LINK "rtmp://192.168.1.105:5423/live"
 #define RTMP_LINK_DEFAULT "rtmp://a.rtmp.youtube.com/live2"
+#define RTMPS_LINK "rtmps://192.168.1.105:5423/live"
 #define RTSP_LINK "rtsp://192.168.1.210:555/Streaming/Channels/101"
 #define RTSP_LINK_USER "rtsp://root:password@192.168.1.111/axis-media/media.amp?videocodec=h264&audiocodec=aac"
 
@@ -151,6 +152,14 @@ TEST(Url, IsValid) {
   ASSERT_EQ(rtmp_default.EffectiveIntPort(), 1935);
   ASSERT_EQ(rtmp_default.path(), "/live2");
   ASSERT_EQ(rtmp_default.spec(), RTMP_LINK_DEFAULT);
+
+  common::uri::GURL rtmps(RTMPS_LINK);
+  ASSERT_TRUE(rtmps.is_valid());
+  ASSERT_TRUE(rtmps.SchemeIsRtmps());
+  ASSERT_EQ(rtmps.host(), "192.168.1.105");
+  ASSERT_EQ(rtmps.port(), "5423");
+  ASSERT_EQ(rtmps.path(), "/live");
+  ASSERT_EQ(rtmps.spec(), RTMPS_LINK);
 
   common::uri::GURL rtsp(RTSP_LINK);
   ASSERT_TRUE(rtsp.is_valid());

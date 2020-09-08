@@ -40,6 +40,7 @@ const char kRtpScheme[] = "rtp";
 const char kSrtScheme[] = "srt";
 const char kTcpScheme[] = "tcp";
 const char kRtmpScheme[] = "rtmp";
+const char kRtmpsScheme[] = "rtmps";
 const char kRtspScheme[] = "rtsp";
 const char kFtpScheme[] = "ftp";
 const char kHttpScheme[] = "http";
