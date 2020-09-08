@@ -268,6 +268,10 @@ bool GURL::SchemeIsHTTPOrHTTPS() const {
   return SchemeIs(kHttpScheme) || SchemeIs(kHttpsScheme);
 }
 
+bool GURL::SchemeIsRtmpBased() const {
+  return SchemeIs(kRtmpScheme) || SchemeIs(kRtmpsScheme);
+}
+
 bool GURL::SchemeIsValidForReferrer() const {
   return is_valid_ && IsReferrerScheme(spec_.data(), parsed_.scheme);
 }
