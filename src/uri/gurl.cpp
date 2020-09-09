@@ -269,7 +269,8 @@ bool GURL::SchemeIsHTTPOrHTTPS() const {
 }
 
 bool GURL::SchemeIsRtmpBased() const {
-  return SchemeIs(kRtmpScheme) || SchemeIs(kRtmpsScheme);
+  return SchemeIs(kRtmpScheme) || SchemeIs(kRtmpsScheme) || SchemeIs(kRtmpeScheme) || SchemeIs(kRtmptScheme) ||
+         SchemeIs(kRtmfpScheme);
 }
 
 bool GURL::SchemeIsValidForReferrer() const {

@@ -42,6 +42,9 @@
 #define RTMP_LINK "rtmp://192.168.1.105:5423/live"
 #define RTMP_LINK_DEFAULT "rtmp://a.rtmp.youtube.com/live2"
 #define RTMPS_LINK "rtmps://192.168.1.105:5423/live"
+#define RTMPT_LINK "rtmpt://192.168.1.105:5423/live"
+#define RTMPE_LINK "rtmpe://192.168.1.105:5423/live"
+#define RTMFP_LINK "rtmfp://192.168.1.105:5423/live"
 #define RTSP_LINK "rtsp://192.168.1.210:555/Streaming/Channels/101"
 #define RTSP_LINK_USER "rtsp://root:password@192.168.1.111/axis-media/media.amp?videocodec=h264&audiocodec=aac"
 
@@ -155,11 +158,35 @@ TEST(Url, IsValid) {
 
   common::uri::GURL rtmps(RTMPS_LINK);
   ASSERT_TRUE(rtmps.is_valid());
-  ASSERT_TRUE(rtmps.SchemeIsRtmps());
+  ASSERT_TRUE(rtmps.SchemeIsRtmpBased());
   ASSERT_EQ(rtmps.host(), "192.168.1.105");
   ASSERT_EQ(rtmps.port(), "5423");
   ASSERT_EQ(rtmps.path(), "/live");
   ASSERT_EQ(rtmps.spec(), RTMPS_LINK);
+
+  common::uri::GURL rtmpt(RTMPT_LINK);
+  ASSERT_TRUE(rtmpt.is_valid());
+  ASSERT_TRUE(rtmpt.SchemeIsRtmpBased());
+  ASSERT_EQ(rtmpt.host(), "192.168.1.105");
+  ASSERT_EQ(rtmpt.port(), "5423");
+  ASSERT_EQ(rtmpt.path(), "/live");
+  ASSERT_EQ(rtmpt.spec(), RTMPT_LINK);
+
+  common::uri::GURL rtmpe(RTMPE_LINK);
+  ASSERT_TRUE(rtmpe.is_valid());
+  ASSERT_TRUE(rtmpe.SchemeIsRtmpBased());
+  ASSERT_EQ(rtmpe.host(), "192.168.1.105");
+  ASSERT_EQ(rtmpe.port(), "5423");
+  ASSERT_EQ(rtmpe.path(), "/live");
+  ASSERT_EQ(rtmpe.spec(), RTMPE_LINK);
+
+  common::uri::GURL rtmfp(RTMFP_LINK);
+  ASSERT_TRUE(rtmfp.is_valid());
+  ASSERT_TRUE(rtmfp.SchemeIsRtmpBased());
+  ASSERT_EQ(rtmfp.host(), "192.168.1.105");
+  ASSERT_EQ(rtmfp.port(), "5423");
+  ASSERT_EQ(rtmfp.path(), "/live");
+  ASSERT_EQ(rtmfp.spec(), RTMFP_LINK);
 
   common::uri::GURL rtsp(RTSP_LINK);
   ASSERT_TRUE(rtsp.is_valid());
