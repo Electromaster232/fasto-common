@@ -266,7 +266,7 @@ bool DoCanonicalize(const CHAR* spec,
   } else if (DoCompareSchemeComponent(spec, scheme, uri::kRtpScheme)) {
     // Rtp URLs are special.
     ParseRtpURL(spec, spec_len, &parsed_input);
-    success = CanonicalizeUdpURL(spec, spec_len, parsed_input, charset_converter, output, output_parsed);
+    success = CanonicalizeRtpURL(spec, spec_len, parsed_input, charset_converter, output, output_parsed);
   } else if (DoCompareSchemeComponent(spec, scheme, uri::kSrtScheme)) {
     // Srt URLs are special.
     ParseSrtURL(spec, spec_len, &parsed_input);

@@ -36,6 +36,7 @@
 #define FILE_PATH "/home/sasha/1.mp4"
 #define DEV_VIDEO_PATH "/dev/video3"
 #define UDP_LINK "udp://239.0.3.3:3003"
+#define RTP_LINK "rtp://0.0.0.0:5555"
 #define SRT_LINK "srt://239.0.3.3:3003"
 #define SRT_LINK2 "srt://:7001"
 #define TCP_LINK "tcp://google.com:2121"
@@ -118,6 +119,13 @@ TEST(Url, IsValid) {
   ASSERT_EQ(udp.host(), "239.0.3.3");
   ASSERT_EQ(udp.port(), "3003");
   ASSERT_EQ(udp.spec(), UDP_LINK);
+
+  common::uri::GURL rtp(RTP_LINK);
+  ASSERT_TRUE(rtp.is_valid());
+  ASSERT_TRUE(rtp.SchemeIsRtp());
+  ASSERT_EQ(rtp.host(), "0.0.0.0");
+  ASSERT_EQ(rtp.port(), "5555");
+  ASSERT_EQ(rtp.spec(), RTP_LINK);
 
   common::uri::GURL srt(SRT_LINK);
   ASSERT_TRUE(srt.is_valid());
