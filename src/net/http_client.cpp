@@ -50,6 +50,7 @@
 
 #define BUF_SIZE 8192
 
+#if defined(HAVE_OPENSSL)
 namespace {
 
 common::ErrnoError SSLWrite(SSL* ssl, const void* data, size_t size, size_t* nwrite_out) {
@@ -122,10 +123,12 @@ ssize_t sendfilessl(SSL* ssl, descriptor_t in_fd, off_t* offset, size_t count) {
 }
 
 }  // namespace
+#endif
 
 namespace common {
 namespace net {
 
+#if defined(HAVE_OPENSSL)
 namespace {
 class SocketTls : public common::net::ISocketFd {
  public:
@@ -251,6 +254,7 @@ class SocketTls : public common::net::ISocketFd {
   SSL* ssl_;
 };
 }  // namespace
+#endif
 
 Error IHttpClient::PostFile(const url_t& path, const file_system::ascii_file_string_path& file_path) {
   file_system::File file;
