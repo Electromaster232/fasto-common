@@ -49,6 +49,7 @@ enum EDType : unsigned {
   ED_UNICODE,
   ED_UUNICODE,
   ED_HTML_ESC,
+  ED_NONE,
   ENCODER_DECODER_NUM_TYPES
 };
 extern const std::array<const char*, ENCODER_DECODER_NUM_TYPES> edecoder_types;

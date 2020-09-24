@@ -38,6 +38,7 @@
 #include <common/text_decoders/html_edcoder.h>
 #include <common/text_decoders/iedcoder.h>
 #include <common/text_decoders/iedcoder_factory.h>
+#include <common/text_decoders/none_edcoder.h>
 #include <common/text_decoders/unicode_edcoder.h>
 
 TEST(html, enc_dec) {
@@ -164,6 +165,20 @@ TEST(snappy, enc_dec) {
   ASSERT_EQ(raw_data, dec_data);
 }
 #endif
+
+TEST(none, enc_dec) {
+  const common::char_buffer_t raw_data = MAKE_CHAR_BUFFER("alex aalex talex balex");
+  common::NoneEDcoder zl;
+  common::char_buffer_t enc_data;
+  common::Error err = zl.Encode(raw_data, &enc_data);
+  ASSERT_FALSE(err);
+  ASSERT_EQ(raw_data, enc_data);
+
+  common::char_buffer_t dec_data;
+  err = zl.Decode(enc_data, &dec_data);
+  ASSERT_FALSE(err);
+  ASSERT_EQ(raw_data, dec_data);
+}
 
 TEST(iedcoder, factory) {
   for (size_t i = 0; i < common::ENCODER_DECODER_NUM_TYPES; ++i) {

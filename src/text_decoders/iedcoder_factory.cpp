@@ -36,6 +36,7 @@
 #include <common/text_decoders/compress_zlib_edcoder.h>
 #include <common/text_decoders/hex_edcoder.h>
 #include <common/text_decoders/html_edcoder.h>
+#include <common/text_decoders/none_edcoder.h>
 #include <common/text_decoders/unicode_edcoder.h>
 #include <common/text_decoders/uunicode_edcoder.h>
 #include <common/text_decoders/xhex_edcoder.h>
@@ -63,6 +64,8 @@ IEDcoder* CreateEDCoder(EDType type) {
     return new UUnicodeEDcoder;
   } else if (type == ED_HTML_ESC) {
     return new HtmlEscEDcoder;
+  } else if (type == ED_NONE) {
+    return new NoneEDcoder;
   }
 
   DNOTREACHED() << "Unknown EDCoder type:" << type;

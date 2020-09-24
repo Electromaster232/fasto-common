@@ -354,6 +354,7 @@ SET(TEXT_DECODERS_HEADERS
   ${CMAKE_SOURCE_DIR}/include/common/text_decoders/compress_bzip2_edcoder.h
   ${CMAKE_SOURCE_DIR}/include/common/text_decoders/compress_lz4_edcoder.h
   ${CMAKE_SOURCE_DIR}/include/common/text_decoders/compress_snappy_edcoder.h
+  ${CMAKE_SOURCE_DIR}/include/common/text_decoders/none_edcoder.h
 )
 
 SET(TEXT_DECODERS_SOURCES
@@ -369,6 +370,7 @@ SET(TEXT_DECODERS_SOURCES
   ${CMAKE_SOURCE_DIR}/src/text_decoders/compress_bzip2_edcoder.cpp
   ${CMAKE_SOURCE_DIR}/src/text_decoders/compress_lz4_edcoder.cpp
   ${CMAKE_SOURCE_DIR}/src/text_decoders/compress_snappy_edcoder.cpp
+  ${CMAKE_SOURCE_DIR}/src/text_decoders/none_edcoder.cpp
 )
 
 SET(HASH_HEADERS

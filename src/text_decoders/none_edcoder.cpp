@@ -27,74 +27,30 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <common/text_decoders/iedcoder.h>
+#include <common/text_decoders/none_edcoder.h>
 
 namespace common {
 
-const std::array<const char*, ENCODER_DECODER_NUM_TYPES> edecoder_types = {
-    {"Base64", "Zlib", "BZip2", "LZ4", "Snappy", "Hex", "XHex", "Unicode", "UUnicode", "HtmlEscape", "None"}};
+NoneEDcoder::NoneEDcoder() : IEDcoder(ED_NONE) {}
 
-std::string ConvertToString(EDType ed_type) {
-  if (ed_type >= 0 && ed_type < edecoder_types.size()) {
-    return edecoder_types[ed_type];
-  }
-
-  DNOTREACHED();
-  return "UNKNOWN";
+Error NoneEDcoder::DoEncode(const StringPiece& data, char_buffer_t* out) {
+  *out = MAKE_CHAR_BUFFER_SIZE(data.data(), data.size());
+  return Error();
 }
 
-bool ConvertFromString(const std::string& from, EDType* out) {
-  if (!out) {
-    return false;
-  }
-
-  for (size_t i = 0; i < edecoder_types.size(); ++i) {
-    if (from == edecoder_types[i]) {
-      *out = static_cast<EDType>(i);
-      return true;
-    }
-  }
-
-  return false;
+Error NoneEDcoder::DoDecode(const StringPiece& data, char_buffer_t* out) {
+  *out = MAKE_CHAR_BUFFER_SIZE(data.data(), data.size());
+  return Error();
 }
 
-IEDcoder::~IEDcoder() {}
-
-IEDcoder::IEDcoder(EDType type) : type_(type) {}
-
-Error IEDcoder::Encode(const StringPiece& data, char_buffer_t* out) {
-  if (!out || data.empty()) {
-    return make_error_inval();
-  }
-
-  return DoEncode(data, out);
+Error NoneEDcoder::DoEncode(const char_buffer_t& data, char_buffer_t* out) {
+  *out = data;
+  return Error();
 }
 
-Error IEDcoder::Decode(const StringPiece& data, char_buffer_t* out) {
-  if (!out || data.empty()) {
-    return make_error_inval();
-  }
-
-  return DoDecode(data, out);
-}
-
-Error IEDcoder::Encode(const char_buffer_t& data, char_buffer_t* out) {
-  if (!out || data.empty()) {
-    return make_error_inval();
-  }
-
-  return DoEncode(data, out);
-}
-Error IEDcoder::Decode(const char_buffer_t& data, char_buffer_t* out) {
-  if (!out || data.empty()) {
-    return make_error_inval();
-  }
-
-  return DoDecode(data, out);
-}
-
-EDType IEDcoder::GetType() const {
-  return type_;
+Error NoneEDcoder::DoDecode(const char_buffer_t& data, char_buffer_t* out) {
+  *out = data;
+  return Error();
 }
 
 }  // namespace common
