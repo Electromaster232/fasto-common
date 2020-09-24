@@ -43,20 +43,20 @@ ErrnoError WriteResponse(libev::IoClient* client,
 ErrnoError ReadCommand(libev::IoClient* client, IEDcoder* compressor, std::string* out) WARN_UNUSED_RESULT;
 }  // namespace detail
 
-template <typename Client, typename Compression>
+template <typename Client>
 class ProtocolClient : public Client {
  public:
   typedef Client base_class;
   typedef std::function<void(const JsonRPCResponse* response)> callback_t;
   typedef std::pair<JsonRPCRequest, callback_t> request_save_entry_t;
+  typedef std::shared_ptr<IEDcoder> compressor_t;
 
   template <typename... Args>
-  explicit ProtocolClient(Args... args) : base_class(args...), compressor_(new Compression), id_(0) {}
-
-  ~ProtocolClient() override { destroy(&compressor_); }
+  explicit ProtocolClient(compressor_t compressor, Args... args)
+      : base_class(args...), compressor_(compressor), id_(0) {}
 
   ErrnoError WriteRequest(const JsonRPCRequest& request, callback_t cb = callback_t()) WARN_UNUSED_RESULT {
-    ErrnoError err = detail::WriteRequest(this, compressor_, request);
+    ErrnoError err = detail::WriteRequest(this, compressor_.get(), request);
     if (!err && !request.IsNotification()) {
       requests_queue_[request.id] = std::make_pair(request, cb);
     }
@@ -64,10 +64,12 @@ class ProtocolClient : public Client {
   }
 
   ErrnoError WriteResponse(const JsonRPCResponse& response) WARN_UNUSED_RESULT {
-    return detail::WriteResponse(this, compressor_, response);
+    return detail::WriteResponse(this, compressor_.get(), response);
   }
 
-  ErrnoError ReadCommand(std::string* out) WARN_UNUSED_RESULT { return detail::ReadCommand(this, compressor_, out); }
+  ErrnoError ReadCommand(std::string* out) WARN_UNUSED_RESULT {
+    return detail::ReadCommand(this, compressor_.get(), out);
+  }
 
   bool PopRequestByID(json_rpc_id sid, JsonRPCRequest* req, callback_t* cb = nullptr) {
     if (!req || !sid) {
@@ -95,7 +97,7 @@ class ProtocolClient : public Client {
   }
 
  private:
-  IEDcoder* compressor_;
+  const compressor_t compressor_;
   std::map<json_rpc_id, request_save_entry_t> requests_queue_;
   std::atomic<seq_id_t> id_;
   using Client::Read;
