@@ -44,7 +44,9 @@
 namespace common {
 
 IEDcoder* CreateEDCoder(EDType type) {
-  if (type == ED_BASE64) {
+  if (type == ED_NONE) {
+    return new NoneEDcoder;
+  } else if (type == ED_BASE64) {
     return new Base64EDcoder;
   } else if (type == ED_ZLIB) {
     return new CompressZlibEDcoder;
@@ -64,8 +66,6 @@ IEDcoder* CreateEDCoder(EDType type) {
     return new UUnicodeEDcoder;
   } else if (type == ED_HTML_ESC) {
     return new HtmlEscEDcoder;
-  } else if (type == ED_NONE) {
-    return new NoneEDcoder;
   }
 
   DNOTREACHED() << "Unknown EDCoder type:" << type;

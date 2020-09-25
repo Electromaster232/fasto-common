@@ -45,6 +45,8 @@ ErrnoError ReadCommand(libev::IoClient* client, IEDcoder* compressor, std::strin
 
 template <typename Client>
 class ProtocolClient : public Client {
+  COMPILE_ASSERT((std::is_base_of<libev::IoClient, Client>::value), "Client must derive from libev::IoClient");
+
  public:
   typedef Client base_class;
   typedef std::function<void(const JsonRPCResponse* response)> callback_t;
@@ -99,7 +101,7 @@ class ProtocolClient : public Client {
  private:
   const compressor_t compressor_;
   std::map<json_rpc_id, request_save_entry_t> requests_queue_;
-  std::atomic<seq_id_t> id_;
+  seq_id_t id_;
   using Client::Read;
   using Client::Write;
 };

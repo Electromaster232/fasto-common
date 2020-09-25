@@ -32,15 +32,15 @@
 namespace common {
 
 const std::array<const char*, ENCODER_DECODER_NUM_TYPES> edecoder_types = {
-    {"Base64", "Zlib", "BZip2", "LZ4", "Snappy", "Hex", "XHex", "Unicode", "UUnicode", "HtmlEscape", "None"}};
+    {"NoComression", "Base64", "Zlib", "BZip2", "LZ4", "Snappy", "Hex", "XHex", "Unicode", "UUnicode", "HtmlEscape"}};
 
-std::string ConvertToString(EDType ed_type) {
-  if (ed_type >= 0 && ed_type < edecoder_types.size()) {
-    return edecoder_types[ed_type];
+std::string ConvertToString(EDType type) {
+  if (type >= 0 && type < edecoder_types.size()) {
+    return edecoder_types[type];
   }
 
-  DNOTREACHED();
-  return "UNKNOWN";
+  DNOTREACHED() << "Unknown EDCoder type:" << type;
+  return "Unknown";
 }
 
 bool ConvertFromString(const std::string& from, EDType* out) {

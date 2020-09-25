@@ -39,7 +39,8 @@
 namespace common {
 
 enum EDType : unsigned {
-  ED_BASE64 = 0,
+  ED_NONE = 0,
+  ED_BASE64,
   ED_ZLIB,
   ED_BZIP2,
   ED_LZ4,
@@ -49,7 +50,6 @@ enum EDType : unsigned {
   ED_UNICODE,
   ED_UUNICODE,
   ED_HTML_ESC,
-  ED_NONE,
   ENCODER_DECODER_NUM_TYPES
 };
 extern const std::array<const char*, ENCODER_DECODER_NUM_TYPES> edecoder_types;
@@ -77,7 +77,7 @@ class IEDcoder {
   const EDType type_;
 };
 
-std::string ConvertToString(EDType ed_type);
+std::string ConvertToString(EDType type);
 bool ConvertFromString(const std::string& from, EDType* out) WARN_UNUSED_RESULT;
 
 }  // namespace common
