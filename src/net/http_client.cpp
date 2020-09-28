@@ -44,8 +44,6 @@
 #include <common/file_system/file_system.h>
 #include <common/http/http_chunked_decoder.h>
 
-#define USER_AGENT_VALUE PROJECT_COMPANYNAME "/" PROJECT_NAME "/" PROJECT_VERSION
-
 #undef SetPort
 
 #define BUF_SIZE 8192

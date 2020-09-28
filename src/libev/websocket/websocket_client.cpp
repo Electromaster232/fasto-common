@@ -29,11 +29,13 @@
 
 #include <common/libev/websocket/websocket_client.h>
 
+#include <common/http/http.h>
+
 namespace common {
 namespace libev {
 namespace websocket {
 
-WebSocketClient::WebSocketClient(libev::IoLoop* server, const net::socket_info& info) : Http2Client(server, info) {}
+WebSocketClient::WebSocketClient(libev::IoLoop* server, const net::socket_info& info) : HttpClient(server, info) {}
 
 WebSocketClient::~WebSocketClient() {}
 
@@ -52,17 +54,22 @@ ErrnoError WebSocketClient::StartHandshake(const uri::GURL& url) {
 
   std::string host = url.HostNoBrackets();
   std::string path = url.PathForRequest();
-  const std::string request = MemSPrintf(
-      "GET %s HTTP/1.1\r\n"
-      "Host: %s\r\n"
-      "Upgrade: websocket\r\n"
-      "Connection: Upgrade\r\n"
-      "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n"
-      "Sec-WebSocket-Version: 13\r\n"
-      "\r\n",
-      path, host);
+
+  common::http::HttpHeader header("Host", host);
+  common::http::HttpHeader upgrade("Upgrade", "websocket");
+  common::http::HttpHeader user("User-Agent", USER_AGENT_VALUE);
+  common::http::HttpHeader connection("Connection", "Upgrade");
+  common::http::HttpHeader sec_key("Sec-WebSocket-Key", "dGhlIHNhbXBsZSBub25jZQ==");
+  common::http::HttpHeader sec_version("Sec-WebSocket-Version", "13");
+  auto req = common::http::MakeGetRequest(path, common::http::HP_1_1,
+                                          {header, upgrade, user, connection, sec_key, sec_version});
+  if (!req) {
+    return common::make_errno_error(EINVAL);
+  }
+
+  std::string request_str = ConvertToString(*req);
   size_t nout;
-  return Write(request.c_str(), request.size(), &nout);
+  return Write(request_str.data(), request_str.size(), &nout);
 }
 
 }  // namespace websocket

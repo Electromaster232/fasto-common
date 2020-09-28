@@ -46,6 +46,8 @@
 #define HTTP_2_0_PROTOCOL_NAME "HTTP/2.0"
 #define HTTP_2_0_PROTOCOL_NAME_LEN (sizeof(HTTP_2_0_PROTOCOL_NAME) - 1)
 
+#define USER_AGENT_VALUE PROJECT_COMPANYNAME "/" PROJECT_NAME "/" PROJECT_VERSION
+
 namespace common {
 namespace http {
 

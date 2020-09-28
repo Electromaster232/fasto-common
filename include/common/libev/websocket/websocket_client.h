@@ -36,7 +36,7 @@ namespace common {
 namespace libev {
 namespace websocket {
 
-class WebSocketClient : public http::Http2Client {
+class WebSocketClient : public http::HttpClient {
  public:
   WebSocketClient(libev::IoLoop* server, const net::socket_info& info);
   virtual ~WebSocketClient();
