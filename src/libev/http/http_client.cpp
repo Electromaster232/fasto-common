@@ -41,6 +41,7 @@
 #include <common/sprintf.h>
 
 #define RFC1123FMT "%a, %d %b %Y %H:%M:%S GMT"
+#define CARET_MARKER "\r\n"
 
 namespace {
 
@@ -172,16 +173,55 @@ ErrnoError HttpClient::SendHeaders(common::http::http_protocol protocol,
   }
 
   if (!is_keep_alive) {
-#define CONNECTION_CLOSE "Connection: close\r\n\r\n"
+#define CONNECTION_CLOSE "Connection: close\r\n" CARET_MARKER
     const int last_len = sizeof(CONNECTION_CLOSE) - 1;
     memcpy(header_data + cur_pos, CONNECTION_CLOSE, last_len);
     cur_pos += last_len;
   } else {
-#define CONNECTION_KEEP_ALIVE "Keep-Alive: timeout=15, max=100\r\n\r\n"
+#define CONNECTION_KEEP_ALIVE "Keep-Alive: timeout=15, max=100\r\n" CARET_MARKER
     const int last_len = sizeof(CONNECTION_KEEP_ALIVE) - 1;
     memcpy(header_data + cur_pos, CONNECTION_KEEP_ALIVE, last_len);
     cur_pos += last_len;
   }
+
+  DCHECK(strlen(header_data) == static_cast<size_t>(cur_pos));
+  size_t nwrite = 0;
+  return Write(header_data, cur_pos, &nwrite);
+}
+
+ErrnoError HttpClient::SendResponse(common::http::http_protocol protocol,
+                                    common::http::http_status status,
+                                    const common::http::headers_t& extra_headers,
+                                    const HttpServerInfo& info) {
+  CHECK(protocol <= common::http::HP_1_1);
+  const std::string title = ConvertToString(status);
+
+  time_t now = time(nullptr);
+  char timebuf[100];
+  strftime(timebuf, sizeof(timebuf), RFC1123FMT, gmtime(&now));
+
+  char header_data[2048] = {0};
+  int cur_pos = SNPrintf(header_data, sizeof(header_data),
+                         protocol == common::http::HP_2_0 ? HTTP_2_0_PROTOCOL_NAME
+                             " %d %s\r\n"
+                             "Server: %s\r\n"
+                             "Date: %s\r\n"
+                                                          : HTTP_1_1_PROTOCOL_NAME
+                             " %d %s\r\n"
+                             "Server: %s\r\n"
+                             "Date: %s\r\n",
+                         status, title, info.server_name, timebuf);
+
+  for (size_t i = 0; i < extra_headers.size(); ++i) {
+    const auto header = extra_headers[i];
+    const std::string header_str = header.as_string();
+    int exlen = SNPrintf(header_data + cur_pos, sizeof(header_data) - cur_pos, "%s\r\n", header_str);
+    cur_pos += exlen;
+  }
+
+  const int last_len = sizeof(CARET_MARKER) - 1;
+  memcpy(header_data + cur_pos, CARET_MARKER, last_len);
+  cur_pos += last_len;
 
   DCHECK(strlen(header_data) == static_cast<size_t>(cur_pos));
   size_t nwrite = 0;
@@ -230,12 +270,12 @@ ErrnoError HttpClient::SendRequest(common::http::http_method method,
   }
 
   if (!is_keep_alive) {
-#define CONNECTION_CLOSE "Connection: close\r\n\r\n"
+#define CONNECTION_CLOSE "Connection: close\r\n" CARET_MARKER
     const int last_len = sizeof(CONNECTION_CLOSE) - 1;
     memcpy(header_data + cur_pos, CONNECTION_CLOSE, last_len);
     cur_pos += last_len;
   } else {
-#define CONNECTION_KEEP_ALIVE "Keep-Alive: timeout=15, max=100\r\n\r\n"
+#define CONNECTION_KEEP_ALIVE "Keep-Alive: timeout=15, max=100\r\n" CARET_MARKER
     const int last_len = sizeof(CONNECTION_KEEP_ALIVE) - 1;
     memcpy(header_data + cur_pos, CONNECTION_KEEP_ALIVE, last_len);
     cur_pos += last_len;

@@ -29,54 +29,17 @@
 
 #include <common/libev/websocket/websocket_server.h>
 
-#include <common/convert2string.h>
-#include <common/hash/sha1.h>
 #include <common/libev/websocket/websocket_client.h>
-#include <common/utils.h>
 
 namespace common {
 namespace libev {
 namespace websocket {
 
-WebSocketServer::WebSocketServer(const net::HostAndPort& host, IoLoopObserver* observer) : TcpServer(host, observer) {}
+WebSocketServer::WebSocketServer(const net::HostAndPort& host, bool is_default, IoLoopObserver* observer)
+    : TcpServer(host, is_default, observer) {}
 
 const char* WebSocketServer::ClassName() const {
   return "WebSocketServer";
-}
-
-Error WebSocketServer::MakeSwitchProtocolsResponse(const std::string& key,
-                                                   const std::vector<std::string>& protocols,
-                                                   common::http::HttpResponse* resp) {
-  if (key.empty() || protocols.empty() || !resp) {
-    return make_error_inval();
-  }
-
-  common::http::HttpHeader upgrade("Upgrade", "websocket");
-  common::http::HttpHeader user("User-Agent", USER_AGENT_VALUE);
-  common::http::HttpHeader connection("Connection", "Upgrade");
-  std::string raw_key = key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
-
-  common::hash::SHA1_CTX ctx;
-  const common::buffer_t bytes_key = ConvertToBytes(raw_key);
-  common::hash::SHA1_Init(&ctx);
-  common::hash::SHA1_Update(&ctx, bytes_key.data(), bytes_key.size());
-  unsigned char sha1_result[SHA1_HASH_LENGTH];
-  common::hash::SHA1_Final(&ctx, sha1_result);
-  std::string hexed;
-  if (!common::utils::base64::encode64(MAKE_CHAR_BUFFER_SIZE(sha1_result, SHA1_HASH_LENGTH), &hexed)) {
-    return make_error("can't encode key to base64");
-  }
-
-  common::http::HttpHeader sec_accept("Sec-WebSocket-Accept", hexed);
-  std::string protocol_line = protocols[0];
-  for (size_t i = 1; i < protocols.size(); ++i) {
-    protocol_line += ", ";
-    protocol_line += protocols[i];
-  }
-  common::http::HttpHeader sec_protocol("Sec-WebSocket-Protocol", protocol_line);
-  *resp = common::http::HttpResponse(common::http::http_protocol::HP_1_1, common::http::http_status::HS_SWITCH_PROTOCOL,
-                                     {upgrade, user, connection, sec_accept, sec_protocol}, char_buffer_t());
-  return Error();
 }
 
 tcp::TcpClient* WebSocketServer::CreateClient(const net::socket_info& info) {

@@ -28,7 +28,7 @@
 */
 #pragma once
 
-#include <common/libev/http/http2_client.h>
+#include <common/libev/http/http_client.h>
 
 #include <common/uri/gurl.h>
 
@@ -43,7 +43,10 @@ class WebSocketClient : public http::HttpClient {
 
   const char* ClassName() const override;
 
-  ErrnoError StartHandshake(const uri::GURL& url) WARN_UNUSED_RESULT;
+  ErrnoError SendSwitchProtocolsResponse(const std::string& key,
+                                         const std::string& protocol,
+                                         const http::HttpServerInfo& info) WARN_UNUSED_RESULT;
+  ErrnoError StartHandshake(const uri::GURL& url, const http::HttpServerInfo& info) WARN_UNUSED_RESULT;
 };
 
 }  // namespace websocket

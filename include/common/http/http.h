@@ -188,6 +188,8 @@ class HttpResponse {
   body_t GetBody() const;
 
   http_status GetStatus() const;
+  http_protocol GetProtocol() const;
+  headers_t GetHeaders() const;
 
  private:
   http_protocol protocol_;

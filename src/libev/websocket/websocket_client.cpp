@@ -29,7 +29,9 @@
 
 #include <common/libev/websocket/websocket_client.h>
 
-#include <common/http/http.h>
+#include <common/convert2string.h>
+#include <common/hash/sha1.h>
+#include <common/utils.h>
 
 namespace common {
 namespace libev {
@@ -43,7 +45,8 @@ const char* WebSocketClient::ClassName() const {
   return "WebSocketClient";
 }
 
-ErrnoError WebSocketClient::StartHandshake(const uri::GURL& url) {
+ErrnoError WebSocketClient::StartHandshake(const uri::GURL& url, const http::HttpServerInfo& info) {
+  UNUSED(info);
   if (!url.is_valid()) {
     return make_errno_error_inval();
   }
@@ -70,6 +73,34 @@ ErrnoError WebSocketClient::StartHandshake(const uri::GURL& url) {
   std::string request_str = ConvertToString(*req);
   size_t nout;
   return Write(request_str.data(), request_str.size(), &nout);
+}
+
+ErrnoError WebSocketClient::SendSwitchProtocolsResponse(const std::string& key,
+                                                        const std::string& protocol,
+                                                        const http::HttpServerInfo& info) {
+  if (key.empty()) {
+    return make_errno_error_inval();
+  }
+
+  common::hash::SHA1_CTX ctx;
+  const common::buffer_t bytes_key = ConvertToBytes(key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
+  common::hash::SHA1_Init(&ctx);
+  common::hash::SHA1_Update(&ctx, bytes_key.data(), bytes_key.size());
+  unsigned char sha1_result[SHA1_HASH_LENGTH];
+  common::hash::SHA1_Final(&ctx, sha1_result);
+  std::string hexed;
+  if (!common::utils::base64::encode64(MAKE_CHAR_BUFFER_SIZE(sha1_result, SHA1_HASH_LENGTH), &hexed)) {
+    return make_errno_error("can't encode key to base64", EAGAIN);
+  }
+
+  common::http::headers_t headers = {
+      common::http::HttpHeader("Upgrade", "websocket"), common::http::HttpHeader("User-Agent", USER_AGENT_VALUE),
+      common::http::HttpHeader("Connection", "Upgrade"), common::http::HttpHeader("Sec-WebSocket-Accept", hexed)};
+  if (!protocol.empty()) {
+    headers.push_back(common::http::HttpHeader("Sec-WebSocket-Protocol", protocol));
+  }
+  return SendResponse(common::http::http_protocol::HP_1_1, common::http::http_status::HS_SWITCH_PROTOCOL, headers,
+                      info);
 }
 
 }  // namespace websocket

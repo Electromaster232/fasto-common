@@ -839,6 +839,14 @@ http_status HttpResponse::GetStatus() const {
   return status_;
 }
 
+http_protocol HttpResponse::GetProtocol() const {
+  return protocol_;
+}
+
+headers_t HttpResponse::GetHeaders() const {
+  return headers_;
+}
+
 Error parse_http_response(const std::string& response, HttpResponse* res_out, size_t* not_parsed) {
   if (response.empty() || !res_out || !not_parsed) {
     return make_error_inval();

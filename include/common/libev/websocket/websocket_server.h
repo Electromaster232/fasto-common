@@ -31,20 +31,14 @@
 
 #include <common/libev/tcp/tcp_server.h>
 
-#include <common/http/http.h>
-
 namespace common {
 namespace libev {
 namespace websocket {
 
 class WebSocketServer : public libev::tcp::TcpServer {
  public:
-  explicit WebSocketServer(const net::HostAndPort& host, libev::IoLoopObserver* observer = nullptr);
+  explicit WebSocketServer(const net::HostAndPort& host, bool is_default, libev::IoLoopObserver* observer = nullptr);
   const char* ClassName() const override;
-
-  Error MakeSwitchProtocolsResponse(const std::string& key,
-                                    const std::vector<std::string>& protocols,
-                                    common::http::HttpResponse* resp) WARN_UNUSED_RESULT;
 
  protected:
   virtual libev::tcp::TcpClient* CreateClient(const net::socket_info& info) override;

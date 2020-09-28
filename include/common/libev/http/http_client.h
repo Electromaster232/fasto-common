@@ -77,6 +77,11 @@ class HttpClient : public libev::tcp::TcpClient {
                                  const common::http::headers_t& extra_headers,
                                  bool is_keep_alive) WARN_UNUSED_RESULT;
 
+  ErrnoError SendResponse(common::http::http_protocol protocol,
+                          common::http::http_status status,
+                          const common::http::headers_t& extra_headers,
+                          const HttpServerInfo& info) WARN_UNUSED_RESULT;
+
   const char* ClassName() const override;
 
   void SetIsAuthenticated(bool auth);
