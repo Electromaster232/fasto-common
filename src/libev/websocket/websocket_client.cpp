@@ -55,24 +55,12 @@ ErrnoError WebSocketClient::StartHandshake(const uri::GURL& url, const http::Htt
     return make_errno_error_inval();
   }
 
-  std::string host = url.HostNoBrackets();
-  std::string path = url.PathForRequest();
-
-  common::http::HttpHeader header("Host", host);
-  common::http::HttpHeader upgrade("Upgrade", "websocket");
-  common::http::HttpHeader user("User-Agent", USER_AGENT_VALUE);
-  common::http::HttpHeader connection("Connection", "Upgrade");
-  common::http::HttpHeader sec_key("Sec-WebSocket-Key", "dGhlIHNhbXBsZSBub25jZQ==");
-  common::http::HttpHeader sec_version("Sec-WebSocket-Version", "13");
-  auto req = common::http::MakeGetRequest(path, common::http::HP_1_1,
-                                          {header, upgrade, user, connection, sec_key, sec_version});
-  if (!req) {
-    return common::make_errno_error(EINVAL);
-  }
-
-  std::string request_str = ConvertToString(*req);
-  size_t nout;
-  return Write(request_str.data(), request_str.size(), &nout);
+  common::http::headers_t headers = {common::http::HttpHeader("Upgrade", "websocket"),
+                                     common::http::HttpHeader("User-Agent", USER_AGENT_VALUE),
+                                     common::http::HttpHeader("Connection", "Upgrade"),
+                                     common::http::HttpHeader("Sec-WebSocket-Key", "dGhlIHNhbXBsZSBub25jZQ=="),
+                                     common::http::HttpHeader("Sec-WebSocket-Version", "13")};
+  return SendRequest(common::http::HM_GET, url, common::http::HP_1_1, headers);
 }
 
 ErrnoError WebSocketClient::SendSwitchProtocolsResponse(const std::string& key,
@@ -88,14 +76,14 @@ ErrnoError WebSocketClient::SendSwitchProtocolsResponse(const std::string& key,
   common::hash::SHA1_Update(&ctx, bytes_key.data(), bytes_key.size());
   unsigned char sha1_result[SHA1_HASH_LENGTH];
   common::hash::SHA1_Final(&ctx, sha1_result);
-  std::string hexed;
-  if (!common::utils::base64::encode64(MAKE_CHAR_BUFFER_SIZE(sha1_result, SHA1_HASH_LENGTH), &hexed)) {
+  std::string base64;
+  if (!common::utils::base64::encode64(MAKE_CHAR_BUFFER_SIZE(sha1_result, SHA1_HASH_LENGTH), &base64)) {
     return make_errno_error("can't encode key to base64", EAGAIN);
   }
 
   common::http::headers_t headers = {
       common::http::HttpHeader("Upgrade", "websocket"), common::http::HttpHeader("User-Agent", USER_AGENT_VALUE),
-      common::http::HttpHeader("Connection", "Upgrade"), common::http::HttpHeader("Sec-WebSocket-Accept", hexed)};
+      common::http::HttpHeader("Connection", "Upgrade"), common::http::HttpHeader("Sec-WebSocket-Accept", base64)};
   if (!protocol.empty()) {
     headers.push_back(common::http::HttpHeader("Sec-WebSocket-Protocol", protocol));
   }

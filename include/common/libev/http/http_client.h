@@ -77,6 +77,11 @@ class HttpClient : public libev::tcp::TcpClient {
                                  const common::http::headers_t& extra_headers,
                                  bool is_keep_alive) WARN_UNUSED_RESULT;
 
+  virtual ErrnoError SendRequest(common::http::http_method method,
+                                 const uri::GURL& url,
+                                 common::http::http_protocol protocol,
+                                 const common::http::headers_t& extra_headers) WARN_UNUSED_RESULT;
+
   ErrnoError SendResponse(common::http::http_protocol protocol,
                           common::http::http_status status,
                           const common::http::headers_t& extra_headers,

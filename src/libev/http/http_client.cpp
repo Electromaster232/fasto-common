@@ -233,6 +233,20 @@ ErrnoError HttpClient::SendRequest(common::http::http_method method,
                                    common::http::http_protocol protocol,
                                    const common::http::headers_t& extra_headers,
                                    bool is_keep_alive) {
+  common::http::headers_t copy = extra_headers;
+  if (!is_keep_alive) {
+    copy.push_back(common::http::HttpHeader("Connection", "close"));
+  } else {
+    copy.push_back(common::http::HttpHeader("Keep-Alive", "timeout=15, max=100"));
+  }
+
+  return SendRequest(method, url, protocol, copy);
+}
+
+ErrnoError HttpClient::SendRequest(common::http::http_method method,
+                                   const uri::GURL& url,
+                                   common::http::http_protocol protocol,
+                                   const common::http::headers_t& extra_headers) {
   CHECK(protocol <= common::http::HP_1_1);
 
   if (!url.is_valid()) {
@@ -269,17 +283,9 @@ ErrnoError HttpClient::SendRequest(common::http::http_method method,
     cur_pos += exlen;
   }
 
-  if (!is_keep_alive) {
-#define CONNECTION_CLOSE "Connection: close\r\n" CARET_MARKER
-    const int last_len = sizeof(CONNECTION_CLOSE) - 1;
-    memcpy(header_data + cur_pos, CONNECTION_CLOSE, last_len);
-    cur_pos += last_len;
-  } else {
-#define CONNECTION_KEEP_ALIVE "Keep-Alive: timeout=15, max=100\r\n" CARET_MARKER
-    const int last_len = sizeof(CONNECTION_KEEP_ALIVE) - 1;
-    memcpy(header_data + cur_pos, CONNECTION_KEEP_ALIVE, last_len);
-    cur_pos += last_len;
-  }
+  const int last_len = sizeof(CARET_MARKER) - 1;
+  memcpy(header_data + cur_pos, CARET_MARKER, last_len);
+  cur_pos += last_len;
 
   DCHECK(strlen(header_data) == static_cast<size_t>(cur_pos));
   size_t nwrite = 0;
