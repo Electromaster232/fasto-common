@@ -471,8 +471,8 @@ template <typename CHAR>
 void DoParseRtmpURL(const CHAR* spec, int spec_len, Parsed* parsed) {
   parsed->username.reset();
   parsed->password.reset();
-  parsed->query.reset();
-  parsed->ref.reset();
+  // parsed->query.reset();
+  // parsed->ref.reset();
 
   // Strip leading & trailing spaces and control characters.
   // Strip leading & trailing spaces and control characters.
@@ -510,9 +510,9 @@ void DoParseRtmpURL(const CHAR* spec, int spec_len, Parsed* parsed) {
     Component username;
     Component password;
     DoParseAuthority(spec, authority, &username, &password, &parsed->host, &parsed->port);
-    Component query;
-    Component ref;
-    ParsePath(spec, full_path, &parsed->path, &query, &ref);
+    // Component query;
+    // Component ref;
+    ParsePath(spec, full_path, &parsed->path, &parsed->query, &parsed->ref);
   }
 }
 

@@ -45,7 +45,7 @@ bool DoCanonicalizeRtmpURL(const URLComponentSource<CHAR>& source,
   // Things we don't set in rtmp: URLs.
   new_parsed->username = Component();
   new_parsed->password = Component();
-  new_parsed->query = Component();
+  // new_parsed->query = Component();
 
   // Scheme (known, so we don't bother running it through the more
   // complicated scheme canonicalizer).
@@ -76,6 +76,10 @@ bool DoCanonicalizeRtmpURL(const URLComponentSource<CHAR>& source,
     // No path at all
     new_parsed->path.reset();
   }
+
+  CanonicalizeQuery(source.query, parsed.query, query_converter, output, &new_parsed->query);
+  // Ignore failure for refs since the URL can probably still be loaded.
+  CanonicalizeRef(source.ref, parsed.ref, output, &new_parsed->ref);
   return success;
 }
 
