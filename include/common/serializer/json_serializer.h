@@ -25,6 +25,14 @@
 namespace common {
 namespace serializer {
 
+Error json_get_string(json_object* json, const char* field, std::string* out);
+Error json_get_int(json_object* json, const char* field, int* out);
+Error json_get_int64(json_object* json, const char* field, int64_t* out);
+Error json_get_double(json_object* json, const char* field, double* out);
+Error json_get_bool(json_object* json, const char* field, bool* out);
+Error json_get_array(json_object* json, const char* field, struct array_list** out);
+Error json_get_object(json_object* json, const char* field, struct lh_table** out);
+
 template <typename T>
 class JsonSerializerBase : public ISerializer<struct json_object*> {
  public:

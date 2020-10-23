@@ -15,5 +15,144 @@
 #include <common/serializer/json_serializer.h>
 
 namespace common {
-namespace serializer {}
+namespace {
+const Error kInvalidType = Error("Invalid type");
+const Error kNotExist = Error("Not exists field");
+}  // namespace
+namespace serializer {
+
+Error json_get_string(json_object* json, const char* field, std::string* out) {
+  if (!json || !field || !out) {
+    return make_error_inval();
+  }
+
+  json_object* jstring = nullptr;
+  json_bool jstring_exists = json_object_object_get_ex(json, field, &jstring);
+  if (!jstring_exists) {
+    return kNotExist;
+  }
+
+  if (!json_object_is_type(jstring, json_type_string)) {
+    return kInvalidType;
+  }
+
+  *out = json_object_get_string(jstring);
+  return Error();
+}
+
+Error json_get_int(json_object* json, const char* field, int* out) {
+  if (!json || !field || !out) {
+    return make_error_inval();
+  }
+
+  json_object* jint = nullptr;
+  json_bool jint_exists = json_object_object_get_ex(json, field, &jint);
+  if (!jint_exists) {
+    return kNotExist;
+  }
+
+  if (!json_object_is_type(jint, json_type_int)) {
+    return kInvalidType;
+  }
+
+  *out = json_object_get_int(jint);
+  return Error();
+}
+
+Error json_get_int64(json_object* json, const char* field, int64_t* out) {
+  if (!json || !field || !out) {
+    return make_error_inval();
+  }
+
+  json_object* jint = nullptr;
+  json_bool jint_exists = json_object_object_get_ex(json, field, &jint);
+  if (!jint_exists) {
+    return kNotExist;
+  }
+
+  if (!json_object_is_type(jint, json_type_int)) {
+    return kInvalidType;
+  }
+
+  *out = json_object_get_int64(jint);
+  return Error();
+}
+
+Error json_get_double(json_object* json, const char* field, double* out) {
+  if (!json || !field || !out) {
+    return make_error_inval();
+  }
+
+  json_object* jint = nullptr;
+  json_bool jint_exists = json_object_object_get_ex(json, field, &jint);
+  if (!jint_exists) {
+    return kNotExist;
+  }
+
+  if (!json_object_is_type(jint, json_type_double)) {
+    return kInvalidType;
+  }
+
+  *out = json_object_get_double(jint);
+  return Error();
+}
+
+Error json_get_bool(json_object* json, const char* field, bool* out) {
+  if (!json || !field || !out) {
+    return make_error_inval();
+  }
+
+  json_object* jint = nullptr;
+  json_bool jint_exists = json_object_object_get_ex(json, field, &jint);
+  if (!jint_exists) {
+    return kNotExist;
+  }
+
+  if (!json_object_is_type(jint, json_type_boolean)) {
+    return kInvalidType;
+  }
+
+  *out = json_object_get_boolean(jint);
+  return Error();
+}
+
+Error json_get_array(json_object* json, const char* field, struct array_list** out) {
+  if (!json || !field || !out) {
+    return make_error_inval();
+  }
+
+  json_object* jarray = nullptr;
+  json_bool jarray_exists = json_object_object_get_ex(json, field, &jarray);
+  if (!jarray_exists) {
+    return kNotExist;
+  }
+
+  if (!json_object_is_type(jarray, json_type_array)) {
+    return kInvalidType;
+  }
+
+  *out = json_object_get_array(jarray);
+  return Error();
+}
+
+Error json_get_object(json_object* json, const char* field, struct lh_table** out) {
+  if (!json || !field || !out) {
+    return make_error_inval();
+  }
+
+  json_object* jobj = nullptr;
+  json_bool jobj_exists = json_object_object_get_ex(json, field, &jobj);
+  if (!jobj_exists) {
+    return kNotExist;
+  }
+
+  if (!json_object_is_type(jobj, json_type_array)) {
+    return kInvalidType;
+  }
+
+  *out = json_object_get_object(jobj);
+  return Error();
+}
+
+}  // namespace serializer
 }  // namespace common
