@@ -39,6 +39,26 @@ class JsonSerializerBase : public ISerializer<struct json_object*> {
   typedef ISerializer<struct json_object*> base_class;
   typedef typename base_class::serialize_type serialize_type;
 
+  static Error GetStringField(serialize_type json, const char* field, std::string* out) WARN_UNUSED_RESULT {
+    return json_get_string(json, field, out);
+  }
+
+  static Error GetIntField(serialize_type json, const char* field, int* out) WARN_UNUSED_RESULT {
+    return json_get_int(json, field, out);
+  }
+
+  static Error GetInt64Field(serialize_type json, const char* field, int64_t* out) WARN_UNUSED_RESULT {
+    return json_get_int64(json, field, out);
+  }
+
+  static Error GetDoubleField(serialize_type json, const char* field, double* out) WARN_UNUSED_RESULT {
+    return json_get_double(json, field, out);
+  }
+
+  static Error GetBoolField(serialize_type json, const char* field, bool* out) WARN_UNUSED_RESULT {
+    return json_get_bool(json, field, out);
+  }
+
   Error SerializeToString(std::string* out) const override final WARN_UNUSED_RESULT {
     serialize_type des = nullptr;
     Error err = base_class::Serialize(&des);
