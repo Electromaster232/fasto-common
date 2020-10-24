@@ -43,6 +43,9 @@ class JsonSerializerBase : public ISerializer<struct json_object*> {
     return json_get_string(json, field, out);
   }
 
+  template <typename U>
+  static Error GetEnumField(serialize_type json, const char* field, U* out) WARN_UNUSED_RESULT;
+
   static Error GetIntField(serialize_type json, const char* field, int* out) WARN_UNUSED_RESULT {
     return json_get_int(json, field, out);
   }
@@ -201,6 +204,19 @@ inline bool operator==(const JsonSerializerArray<T>& lhs, const JsonSerializerAr
 template <typename T>
 inline bool operator!=(const JsonSerializerArray<T>& x, const JsonSerializerArray<T>& y) {
   return !(x == y);
+}
+
+template <typename T>
+template <typename U>
+inline Error JsonSerializerBase<T>::GetEnumField(serialize_type json, const char* field, U* out) {
+  int res;
+  Error err = json_get_int(json, field, &res);
+  if (err) {
+    return err;
+  }
+
+  *out = static_cast<U>(res);
+  return Error();
 }
 
 }  // namespace serializer
