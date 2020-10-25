@@ -30,8 +30,8 @@ Error json_get_int(json_object* json, const char* field, int* out);
 Error json_get_int64(json_object* json, const char* field, int64_t* out);
 Error json_get_double(json_object* json, const char* field, double* out);
 Error json_get_bool(json_object* json, const char* field, bool* out);
-Error json_get_array(json_object* json, const char* field, struct array_list** out);
-Error json_get_object(json_object* json, const char* field, struct lh_table** out);
+Error json_get_array(json_object* json, const char* field, json_object** out, size_t* len);
+Error json_get_object(json_object* json, const char* field, json_object** out);
 
 template <typename T>
 class JsonSerializerBase : public ISerializer<struct json_object*> {
@@ -60,6 +60,15 @@ class JsonSerializerBase : public ISerializer<struct json_object*> {
 
   static Error GetBoolField(serialize_type json, const char* field, bool* out) WARN_UNUSED_RESULT {
     return json_get_bool(json, field, out);
+  }
+
+  static Error GetArrayField(serialize_type json, const char* field, serialize_type* out, size_t* len)
+      WARN_UNUSED_RESULT {
+    return json_get_array(json, field, out, len);
+  }
+
+  static Error GetObjectField(serialize_type json, const char* field, serialize_type* out) WARN_UNUSED_RESULT {
+    return json_get_object(json, field, out);
   }
 
   Error SerializeToString(std::string* out) const override final WARN_UNUSED_RESULT {

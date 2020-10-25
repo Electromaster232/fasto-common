@@ -116,8 +116,8 @@ Error json_get_bool(json_object* json, const char* field, bool* out) {
   return Error();
 }
 
-Error json_get_array(json_object* json, const char* field, struct array_list** out) {
-  if (!json || !field || !out) {
+Error json_get_array(json_object* json, const char* field, json_object** out, size_t* len) {
+  if (!json || !field || !out || !len) {
     return make_error_inval();
   }
 
@@ -131,11 +131,12 @@ Error json_get_array(json_object* json, const char* field, struct array_list** o
     return kInvalidType;
   }
 
-  *out = json_object_get_array(jarray);
+  *out = jarray;
+  *len = json_object_array_length(jarray);
   return Error();
 }
 
-Error json_get_object(json_object* json, const char* field, struct lh_table** out) {
+Error json_get_object(json_object* json, const char* field, json_object** out) {
   if (!json || !field || !out) {
     return make_error_inval();
   }
@@ -146,11 +147,11 @@ Error json_get_object(json_object* json, const char* field, struct lh_table** ou
     return kNotExist;
   }
 
-  if (!json_object_is_type(jobj, json_type_array)) {
+  if (!json_object_is_type(jobj, json_type_object)) {
     return kInvalidType;
   }
 
-  *out = json_object_get_object(jobj);
+  *out = jobj;
   return Error();
 }
 
