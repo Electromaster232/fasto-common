@@ -78,6 +78,25 @@ Error json_get_int64(json_object* json, const char* field, int64_t* out) {
   return Error();
 }
 
+Error json_get_uint64(json_object* json, const char* field, uint64_t* out) {
+  if (!json || !field || !out) {
+    return make_error_inval();
+  }
+
+  json_object* jint = nullptr;
+  json_bool jint_exists = json_object_object_get_ex(json, field, &jint);
+  if (!jint_exists) {
+    return kNotExist;
+  }
+
+  if (!json_object_is_type(jint, json_type_int)) {
+    return kInvalidType;
+  }
+
+  *out = json_object_get_uint64(jint);
+  return Error();
+}
+
 Error json_get_double(json_object* json, const char* field, double* out) {
   if (!json || !field || !out) {
     return make_error_inval();

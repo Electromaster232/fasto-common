@@ -28,6 +28,7 @@ namespace serializer {
 Error json_get_string(json_object* json, const char* field, std::string* out);
 Error json_get_int(json_object* json, const char* field, int* out);
 Error json_get_int64(json_object* json, const char* field, int64_t* out);
+Error json_get_uint64(json_object* json, const char* field, uint64_t* out);
 Error json_get_double(json_object* json, const char* field, double* out);
 Error json_get_bool(json_object* json, const char* field, bool* out);
 Error json_get_array(json_object* json, const char* field, json_object** out, size_t* len);
@@ -52,6 +53,10 @@ class JsonSerializerBase : public ISerializer<struct json_object*> {
 
   static Error GetInt64Field(serialize_type json, const char* field, int64_t* out) WARN_UNUSED_RESULT {
     return json_get_int64(json, field, out);
+  }
+
+  static Error GetUint64Field(serialize_type json, const char* field, uint64_t* out) WARN_UNUSED_RESULT {
+    return json_get_uint64(json, field, out);
   }
 
   static Error GetDoubleField(serialize_type json, const char* field, double* out) WARN_UNUSED_RESULT {
