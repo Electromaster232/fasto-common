@@ -14,10 +14,16 @@
 
 #include <common/serializer/json_serializer.h>
 
+#include <common/sprintf.h>
+
 namespace common {
 namespace {
-const Error kInvalidType = Error("Invalid type");
-const Error kNotExist = Error("Not exists field");
+Error make_invalid_type(const char* field) {
+  return Error(MemSPrintf("Invalid type field: %s", field));
+}
+Error make_not_exists_field(const char* field) {
+  return Error(MemSPrintf("Not exists field: %s", field));
+}
 }  // namespace
 namespace serializer {
 
@@ -29,11 +35,11 @@ Error json_get_string(json_object* json, const char* field, std::string* out) {
   json_object* jstring = nullptr;
   json_bool jstring_exists = json_object_object_get_ex(json, field, &jstring);
   if (!jstring_exists) {
-    return kNotExist;
+    return make_not_exists_field(field);
   }
 
   if (!json_object_is_type(jstring, json_type_string)) {
-    return kInvalidType;
+    return make_invalid_type(field);
   }
 
   *out = json_object_get_string(jstring);
@@ -48,11 +54,11 @@ Error json_get_int(json_object* json, const char* field, int* out) {
   json_object* jint = nullptr;
   json_bool jint_exists = json_object_object_get_ex(json, field, &jint);
   if (!jint_exists) {
-    return kNotExist;
+    return make_not_exists_field(field);
   }
 
   if (!json_object_is_type(jint, json_type_int)) {
-    return kInvalidType;
+    return make_invalid_type(field);
   }
 
   *out = json_object_get_int(jint);
@@ -67,11 +73,11 @@ Error json_get_int64(json_object* json, const char* field, int64_t* out) {
   json_object* jint = nullptr;
   json_bool jint_exists = json_object_object_get_ex(json, field, &jint);
   if (!jint_exists) {
-    return kNotExist;
+    return make_not_exists_field(field);
   }
 
   if (!json_object_is_type(jint, json_type_int)) {
-    return kInvalidType;
+    return make_invalid_type(field);
   }
 
   *out = json_object_get_int64(jint);
@@ -86,11 +92,11 @@ Error json_get_uint64(json_object* json, const char* field, uint64_t* out) {
   json_object* jint = nullptr;
   json_bool jint_exists = json_object_object_get_ex(json, field, &jint);
   if (!jint_exists) {
-    return kNotExist;
+    return make_not_exists_field(field);
   }
 
   if (!json_object_is_type(jint, json_type_int)) {
-    return kInvalidType;
+    return make_invalid_type(field);
   }
 
   *out = json_object_get_uint64(jint);
@@ -105,11 +111,11 @@ Error json_get_double(json_object* json, const char* field, double* out) {
   json_object* jint = nullptr;
   json_bool jint_exists = json_object_object_get_ex(json, field, &jint);
   if (!jint_exists) {
-    return kNotExist;
+    return make_not_exists_field(field);
   }
 
   if (!json_object_is_type(jint, json_type_double)) {
-    return kInvalidType;
+    return make_invalid_type(field);
   }
 
   *out = json_object_get_double(jint);
@@ -124,11 +130,11 @@ Error json_get_bool(json_object* json, const char* field, bool* out) {
   json_object* jint = nullptr;
   json_bool jint_exists = json_object_object_get_ex(json, field, &jint);
   if (!jint_exists) {
-    return kNotExist;
+    return make_not_exists_field(field);
   }
 
   if (!json_object_is_type(jint, json_type_boolean)) {
-    return kInvalidType;
+    return make_invalid_type(field);
   }
 
   *out = json_object_get_boolean(jint);
@@ -143,11 +149,11 @@ Error json_get_array(json_object* json, const char* field, json_object** out, si
   json_object* jarray = nullptr;
   json_bool jarray_exists = json_object_object_get_ex(json, field, &jarray);
   if (!jarray_exists) {
-    return kNotExist;
+    return make_not_exists_field(field);
   }
 
   if (!json_object_is_type(jarray, json_type_array)) {
-    return kInvalidType;
+    return make_invalid_type(field);
   }
 
   *out = jarray;
@@ -163,11 +169,11 @@ Error json_get_object(json_object* json, const char* field, json_object** out) {
   json_object* jobj = nullptr;
   json_bool jobj_exists = json_object_object_get_ex(json, field, &jobj);
   if (!jobj_exists) {
-    return kNotExist;
+    return make_not_exists_field(field);
   }
 
   if (!json_object_is_type(jobj, json_type_object)) {
-    return kInvalidType;
+    return make_invalid_type(field);
   }
 
   *out = jobj;
