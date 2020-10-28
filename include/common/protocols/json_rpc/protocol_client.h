@@ -92,6 +92,8 @@ class ProtocolClient : public Client {
     return true;
   }
 
+  size_t GetRequstSizeQueue() const { return requests_queue_.size(); }
+
  protected:
   json_rpc_id NextRequestID() {
     const seq_id_t next_id = id_++;
