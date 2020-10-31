@@ -30,6 +30,7 @@ Error json_get_int(json_object* json, const char* field, int* out);
 Error json_get_int64(json_object* json, const char* field, int64_t* out);
 Error json_get_uint64(json_object* json, const char* field, uint64_t* out);
 Error json_get_double(json_object* json, const char* field, double* out);
+Error json_get_float(json_object* json, const char* field, float* out);
 Error json_get_bool(json_object* json, const char* field, bool* out);
 Error json_get_array(json_object* json, const char* field, json_object** out, size_t* len);
 Error json_get_object(json_object* json, const char* field, json_object** out);
@@ -61,6 +62,10 @@ class JsonSerializerBase : public ISerializer<struct json_object*> {
 
   static Error GetDoubleField(serialize_type json, const char* field, double* out) WARN_UNUSED_RESULT {
     return json_get_double(json, field, out);
+  }
+
+  static Error GetFloatField(serialize_type json, const char* field, float* out) WARN_UNUSED_RESULT {
+    return json_get_float(json, field, out);
   }
 
   static Error GetBoolField(serialize_type json, const char* field, bool* out) WARN_UNUSED_RESULT {

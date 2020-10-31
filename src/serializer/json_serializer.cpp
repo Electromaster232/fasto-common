@@ -122,6 +122,25 @@ Error json_get_double(json_object* json, const char* field, double* out) {
   return Error();
 }
 
+Error json_get_float(json_object* json, const char* field, float* out) {
+  if (!json || !field || !out) {
+    return make_error_inval();
+  }
+
+  json_object* jint = nullptr;
+  json_bool jint_exists = json_object_object_get_ex(json, field, &jint);
+  if (!jint_exists) {
+    return make_not_exists_field(field);
+  }
+
+  if (!json_object_is_type(jint, json_type_double)) {
+    return make_invalid_type(field);
+  }
+
+  *out = json_object_get_double(jint);
+  return Error();
+}
+
 Error json_get_bool(json_object* json, const char* field, bool* out) {
   if (!json || !field || !out) {
     return make_error_inval();
