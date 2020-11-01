@@ -18,6 +18,9 @@
 
 namespace common {
 namespace {
+Error make_failed_to_add(const char* field, int err) {
+  return Error(MemSPrintf("Failed to add field: %s, errno: %d", field, err));
+}
 Error make_invalid_type(const char* field) {
   return Error(MemSPrintf("Invalid type field: %s", field));
 }
@@ -26,6 +29,102 @@ Error make_not_exists_field(const char* field) {
 }
 }  // namespace
 namespace serializer {
+
+Error json_set_string(json_object* json, const char* field, const std::string& data) {
+  if (!json || !field) {
+    return make_error_inval();
+  }
+
+  return json_set_string(json, field, data.c_str());
+}
+
+Error json_set_string(json_object* json, const char* field, const char* data) {
+  if (!json || !field) {
+    return make_error_inval();
+  }
+
+  json_object* obj = json_object_new_string(data);
+  return json_set_object(json, field, obj);
+}
+
+Error json_set_int(json_object* json, const char* field, int data) {
+  if (!json || !field) {
+    return make_error_inval();
+  }
+
+  json_object* obj = json_object_new_int(data);
+  return json_set_object(json, field, obj);
+}
+
+Error json_set_int64(json_object* json, const char* field, int64_t data) {
+  if (!json || !field) {
+    return make_error_inval();
+  }
+
+  json_object* obj = json_object_new_int64(data);
+  return json_set_object(json, field, obj);
+}
+
+Error json_set_uint64(json_object* json, const char* field, uint64_t data) {
+  if (!json || !field) {
+    return make_error_inval();
+  }
+
+  json_object* obj = json_object_new_uint64(data);
+  return json_set_object(json, field, obj);
+}
+
+Error json_set_double(json_object* json, const char* field, double data) {
+  if (!json || !field) {
+    return make_error_inval();
+  }
+
+  json_object* obj = json_object_new_double(data);
+  return json_set_object(json, field, obj);
+}
+
+Error json_set_float(json_object* json, const char* field, float data) {
+  if (!json || !field) {
+    return make_error_inval();
+  }
+
+  json_object* obj = json_object_new_double(data);
+  return json_set_object(json, field, obj);
+}
+
+Error json_set_bool(json_object* json, const char* field, bool data) {
+  if (!json || !field) {
+    return make_error_inval();
+  }
+
+  json_object* obj = json_object_new_boolean(data);
+  return json_set_object(json, field, obj);
+}
+
+Error json_set_array(json_object* json, const char* field, json_object* data) {
+  if (!json || !field) {
+    return make_error_inval();
+  }
+
+  if (!json_object_is_type(data, json_type_array)) {
+    return make_invalid_type(field);
+  }
+
+  return json_set_object(json, field, data);
+}
+
+Error json_set_object(json_object* json, const char* field, json_object* data) {
+  if (!json || !field) {
+    return make_error_inval();
+  }
+
+  int result = json_object_object_add(json, field, data);
+  if (result != 0) {
+    return make_failed_to_add(field, result);
+  }
+
+  return common::Error();
+}
 
 Error json_get_string(json_object* json, const char* field, std::string* out) {
   if (!json || !field || !out) {

@@ -25,6 +25,17 @@
 namespace common {
 namespace serializer {
 
+Error json_set_string(json_object* json, const char* field, const std::string& data);
+Error json_set_string(json_object* json, const char* field, const char* data);
+Error json_set_int(json_object* json, const char* field, int data);
+Error json_set_int64(json_object* json, const char* field, int64_t data);
+Error json_set_uint64(json_object* json, const char* field, uint64_t data);
+Error json_set_double(json_object* json, const char* field, double data);
+Error json_set_float(json_object* json, const char* field, float data);
+Error json_set_bool(json_object* json, const char* field, bool data);
+Error json_set_array(json_object* json, const char* field, json_object* data);
+Error json_set_object(json_object* json, const char* field, json_object* data);
+
 Error json_get_string(json_object* json, const char* field, std::string* out);
 Error json_get_int(json_object* json, const char* field, int* out);
 Error json_get_int64(json_object* json, const char* field, int64_t* out);
@@ -40,6 +51,49 @@ class JsonSerializerBase : public ISerializer<struct json_object*> {
  public:
   typedef ISerializer<struct json_object*> base_class;
   typedef typename base_class::serialize_type serialize_type;
+
+  static Error SetStringField(serialize_type json, const char* field, const std::string& data) WARN_UNUSED_RESULT {
+    return json_set_string(json, field, data);
+  }
+
+  static Error SetStringField(serialize_type json, const char* field, const char* data) WARN_UNUSED_RESULT {
+    return json_set_string(json, field, data);
+  }
+
+  template <typename U>
+  static Error SetEnumField(serialize_type json, const char* field, U data) WARN_UNUSED_RESULT;
+
+  static Error SetIntField(serialize_type json, const char* field, int data) WARN_UNUSED_RESULT {
+    return json_set_int(json, field, data);
+  }
+
+  static Error SetInt64Field(serialize_type json, const char* field, int64_t data) WARN_UNUSED_RESULT {
+    return json_set_int64(json, field, data);
+  }
+
+  static Error SetUInt64Field(serialize_type json, const char* field, uint64_t data) WARN_UNUSED_RESULT {
+    return json_set_uint64(json, field, data);
+  }
+
+  static Error SetDoubleField(serialize_type json, const char* field, double data) WARN_UNUSED_RESULT {
+    return json_set_double(json, field, data);
+  }
+
+  static Error SetFloatField(serialize_type json, const char* field, float data) WARN_UNUSED_RESULT {
+    return json_set_float(json, field, data);
+  }
+
+  static Error SetBoolField(serialize_type json, const char* field, bool data) WARN_UNUSED_RESULT {
+    return json_set_bool(json, field, data);
+  }
+
+  static Error SetArrayField(serialize_type json, const char* field, serialize_type data) WARN_UNUSED_RESULT {
+    return json_set_array(json, field, data);
+  }
+
+  static Error SetObjectField(serialize_type json, const char* field, serialize_type data) WARN_UNUSED_RESULT {
+    return json_set_object(json, field, data);
+  }
 
   static Error GetStringField(serialize_type json, const char* field, std::string* out) WARN_UNUSED_RESULT {
     return json_get_string(json, field, out);
@@ -223,6 +277,12 @@ inline bool operator==(const JsonSerializerArray<T>& lhs, const JsonSerializerAr
 template <typename T>
 inline bool operator!=(const JsonSerializerArray<T>& x, const JsonSerializerArray<T>& y) {
   return !(x == y);
+}
+
+template <typename T>
+template <typename U>
+inline Error JsonSerializerBase<T>::SetEnumField(serialize_type json, const char* field, U data) {
+  return SetIntField(json, field, data);
 }
 
 template <typename T>
