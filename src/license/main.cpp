@@ -18,12 +18,12 @@
 
 #include <common/license/hardware_hash.h>
 
-#define HELP_TEXT                              \
-  "Usage: " LICENSE_GEN_NAME                   \
-  " [options]\n"                               \
-  "  License generation for " LICENSE_GEN_NAME \
-  " project.\n\n"                              \
-  "    --hdd [default] hash algorithm\n"       \
+#define HELP_TEXT                        \
+  "Usage: license_gen"                   \
+  " [options]\n"                         \
+  "  License generation for license_gen" \
+  " project.\n\n"                        \
+  "    --hdd [default] hash algorithm\n" \
   "    --machine-id hash algorithm\n"
 
 int main(int argc, char** argv) {
