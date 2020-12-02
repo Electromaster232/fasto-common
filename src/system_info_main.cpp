@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
   size_t hdd_bytes_total = 0;
   const auto hdd_total = common::system_info::AmountOfTotalDiskSpace("/");
   if (hdd_total) {
-    hdd_bytes_total = *total;
+    hdd_bytes_total = *hdd_total;
   }
 
   size_t hdd_bytes_free = 0;
