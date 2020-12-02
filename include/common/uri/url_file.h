@@ -30,6 +30,7 @@
 #pragma once
 
 #include <common/uri/url_parse_internal.h>
+#include <common/string_util.h>
 
 namespace common {
 namespace uri {
