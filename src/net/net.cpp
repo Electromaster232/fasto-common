@@ -126,6 +126,25 @@ ssize_t sendfile(common::net::socket_descr_t out_fd, descriptor_t in_fd, off_t* 
 }  // namespace
 #endif
 
+namespace {
+int compare_addr(const struct addrinfo* a, const struct addrinfo* b) {
+  if (a->ai_family != b->ai_family) {
+    return 1;
+  }
+
+  if (a->ai_family == AF_INET) {
+    return (((const struct sockaddr_in*)a)->sin_addr.s_addr != ((const struct sockaddr_in*)b)->sin_addr.s_addr);
+  }
+
+  if (a->ai_family == AF_INET6) {
+    const uint8_t* s6_addr_a = ((const struct sockaddr_in6*)a)->sin6_addr.s6_addr;
+    const uint8_t* s6_addr_b = ((const struct sockaddr_in6*)b)->sin6_addr.s6_addr;
+    return memcmp(s6_addr_a, s6_addr_b, 16);
+  }
+  return 1;
+}
+}  // namespace
+
 namespace common {
 namespace net {
 
@@ -277,7 +296,7 @@ ErrnoError do_connect(socket_descr_t sock, const struct sockaddr* addr, socklen_
   return ErrnoError();
 }
 
-ErrnoError resolve_raw(const char* host, uint16_t port, socket_t socktype, socket_info* out_info) {
+ErrnoError resolve_raw(const char* host, uint16_t port, int socktype, socket_info* out_info, int family = AF_UNSPEC) {
   if (!host || !out_info) {
     return make_error_perror("connect", EINVAL);
   }
@@ -289,8 +308,8 @@ ErrnoError resolve_raw(const char* host, uint16_t port, socket_t socktype, socke
   char _port[6];
   snprintf(_port, sizeof(_port), "%u", port);
   memset(&hints, 0, sizeof(hints));
-  hints.ai_family = AF_UNSPEC;
-  hints.ai_socktype = socket_type_to_native(socktype);
+  hints.ai_family = family;
+  hints.ai_socktype = socktype;
   hints.ai_flags = AI_PASSIVE; /* For wildcard IP address */
   hints.ai_protocol = 0;       /* Any protocol */
   hints.ai_canonname = nullptr;
@@ -572,7 +591,7 @@ ErrnoError resolve(const HostAndPort& to, socket_t socktype, socket_info* out_in
   const auto host = to.GetHostNoBrackets();
   const auto port = to.GetPort();
 
-  return resolve_raw(host.c_str(), port, socktype, out_info);
+  return resolve_raw(host.c_str(), port, socket_type_to_native(socktype), out_info);
 }
 
 ErrnoError connect(const HostAndPort& to, socket_t socktype, struct timeval* timeout, socket_info* out_info) {
@@ -860,20 +879,33 @@ bool HostAndPort::IsSameHost(const host_t& host) const {
     return IsDefaultRoute();
   }
 
-  socket_t all = static_cast<socket_t>(0);
   socket_info src;
-  ErrnoError err = resolve(*this, all, &src);
+  ErrnoError err = resolve_raw(host_.c_str(), port_, 1, &src);
   if (err) {
     return false;
   }
 
   socket_info dst;
-  err = resolve(HostAndPort(host, port_), all, &dst);
+  err = resolve_raw(host.c_str(), port_, 1, &dst);
   if (err) {
     return false;
   }
 
-  return strcmp(src.host(), dst.host()) == 0;
+  if (src.addr_info()->ai_family != dst.addr_info()->ai_family) {
+    if (src.addr_info()->ai_family == AF_INET) {
+      err = resolve_raw(host_.c_str(), port_, 1, &src, AF_INET6);
+      if (err) {
+        return false;
+      }
+    } else if (dst.addr_info()->ai_family == AF_INET) {
+      err = resolve_raw(host.c_str(), port_, 1, &dst, AF_INET6);
+      if (err) {
+        return false;
+      }
+    }
+  }
+
+  return compare_addr(src.addr_info(), dst.addr_info()) == 0;
 }
 
 }  // namespace net

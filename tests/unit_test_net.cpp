@@ -37,6 +37,9 @@ TEST(HostAndPort, methods) {
   ASSERT_TRUE(valid_host.IsValid());
   ASSERT_FALSE(valid_host.IsLocalHost());
   ASSERT_EQ(valid_host.GetPort(), valid_port);
+
+  const common::net::HostAndPort fastotv("fastotv.com", 5999);
+  ASSERT_TRUE(fastotv.IsSameHost("2a03:b0c0:2:d0::383:2001"));
 }
 
 TEST(HostAndPort, ConvertToString) {
