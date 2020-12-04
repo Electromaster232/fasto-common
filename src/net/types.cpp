@@ -117,6 +117,22 @@ bool HostAndPort::Equals(const HostAndPort& other) const {
   return host_ == other.host_ && port_ == other.port_;
 }
 
+bool HostAndPort::IsSameHost(const host_t& host) const {
+  if (host == host_) {
+    return true;
+  }
+
+  if (net::IsLocalHost(host)) {
+    return IsLocalHost();
+  }
+
+  if (net::IsDefaultRoute(host)) {
+    return IsDefaultRoute();
+  }
+
+  return false;
+}
+
 HostAndPort::host_t HostAndPort::GetHost() const {
   return host_;
 }
