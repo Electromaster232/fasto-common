@@ -846,6 +846,36 @@ ErrnoError send_file(const std::string& path, const HostAndPort& to) {
   return err;
 }
 
+// external
+bool HostAndPort::IsSameHost(const HostAndPort& host) const {
+  if (host.GetHost() == host_) {
+    return true;
+  }
+
+  if (host.IsLocalHost()) {
+    return IsLocalHost();
+  }
+
+  if (host.IsDefaultRoute()) {
+    return IsDefaultRoute();
+  }
+
+  socket_t all = static_cast<socket_t>(0);
+  socket_info src;
+  ErrnoError err = resolve(host, all, &src);
+  if (err) {
+    return false;
+  }
+
+  socket_info dst;
+  err = resolve(host, all, &dst);
+  if (err) {
+    return false;
+  }
+
+  return strcmp(src.host(), dst.host()) == 0;
+}
+
 }  // namespace net
 std::string common_gai_strerror(int err) {
   const char* error_str = gai_strerror(err);
