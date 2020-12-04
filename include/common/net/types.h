@@ -29,6 +29,8 @@
 
 #pragma once
 
+#include <string>
+
 #include <common/macros.h>
 
 namespace common {
@@ -51,7 +53,7 @@ class HostAndPort {
   static HostAndPort CreateDefaultRouteIPV6(uint16_t port);
 
   bool Equals(const HostAndPort& other) const;
-  bool IsSameHost(const HostAndPort& host) const;
+  bool IsSameHost(const host_t& host) const;
 
   host_t GetHost() const;
   void SetHost(host_t host);

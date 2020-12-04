@@ -847,28 +847,28 @@ ErrnoError send_file(const std::string& path, const HostAndPort& to) {
 }
 
 // external
-bool HostAndPort::IsSameHost(const HostAndPort& host) const {
-  if (host.GetHost() == host_) {
+bool HostAndPort::IsSameHost(const host_t& host) const {
+  if (host == host_) {
     return true;
   }
 
-  if (host.IsLocalHost()) {
+  if (net::IsLocalHost(host)) {
     return IsLocalHost();
   }
 
-  if (host.IsDefaultRoute()) {
+  if (net::IsDefaultRoute(host)) {
     return IsDefaultRoute();
   }
 
   socket_t all = static_cast<socket_t>(0);
   socket_info src;
-  ErrnoError err = resolve(host, all, &src);
+  ErrnoError err = resolve(*this, all, &src);
   if (err) {
     return false;
   }
 
   socket_info dst;
-  err = resolve(host, all, &dst);
+  err = resolve(HostAndPort(host, port_), all, &dst);
   if (err) {
     return false;
   }
