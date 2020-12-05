@@ -64,7 +64,8 @@ int main(int argc, char** argv) {
   std::cout << "Operation system: " << name << std::endl;
   std::cout << "Version: " << version << std::endl;
   std::cout << "Architecture: " << arch << std::endl;
-  std::cout << "Cpu brand: " << cpu.vendor_name() << std::endl;
+  std::cout << "Vendor: " << cpu.vendor_name() << std::endl;
+  std::cout << "Cpu brand: " << cpu.cpu_brand() << std::endl;
   std::cout << "RAM bytes total: " << ram_bytes_total << std::endl;
   std::cout << "RAM bytes available: " << ram_bytes_free << std::endl;
   std::cout << "HDD bytes total: " << hdd_bytes_total << std::endl;
