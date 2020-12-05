@@ -89,20 +89,6 @@ IF(JSONC_FOUND)
   SET(COMMON_LIBS ${COMMON_LIBS} ${JSONC_LIBRARIES})
 ENDIF(JSONC_FOUND)
 
-FIND_PACKAGE(Cpuid QUIET)
-IF(CPUID_FOUND)
-  SET(SYSTEM_INFO_HEADERS
-    ${CMAKE_SOURCE_DIR}/include/common/system_info/cpu_info.h
-  )
-
-  SET(SYSTEM_INFO_SOURCES
-    ${CMAKE_SOURCE_DIR}/src/system_info/cpu_info.cpp
-  )
-
-  SET(COMMON_INCLUDE_DIRS ${COMMON_INCLUDE_DIRS} ${CPUID_INCLUDE_DIRS})
-  SET(COMMON_LIBS ${COMMON_LIBS} ${CPUID_LIBRARIES})
-ENDIF(CPUID_FOUND)
-
 SET(URI_HEADERS
   ${CMAKE_SOURCE_DIR}/include/common/uri/gurl.h
   ${CMAKE_SOURCE_DIR}/include/common/uri/url_canon_stdstring.h
@@ -394,11 +380,13 @@ SET(MODP_B64_SOURCES
 SET(SYSTEM_INFO_HEADERS ${SYSTEM_INFO_HEADERS}
   ${CMAKE_SOURCE_DIR}/include/common/system_info/system_info.h
   ${CMAKE_SOURCE_DIR}/include/common/system_info/types.h
+  ${CMAKE_SOURCE_DIR}/include/common/system_info/cpu_info.h
 )
 
 SET(SYSTEM_INFO_SOURCES ${SYSTEM_INFO_SOURCES}
   ${CMAKE_SOURCE_DIR}/src/system_info/system_info.cpp
   ${CMAKE_SOURCE_DIR}/src/system_info/types.cpp
+  ${CMAKE_SOURCE_DIR}/src/system_info/cpu_info.cpp
 )
 
 SET(LICENSE_HW_HEADERS
@@ -1002,9 +990,7 @@ IF(DEVELOPER_ENABLE_TESTS)
     ${CMAKE_SOURCE_DIR}/tests/unit_test_license.cpp
   )
 
-  IF(CPUID_FOUND)
-    SET(UNIT_TESTS_SOURCES ${UNIT_TESTS_SOURCES} ${CMAKE_SOURCE_DIR}/tests/unit_test_cpu.cpp)
-  ENDIF(CPUID_FOUND)
+  SET(UNIT_TESTS_SOURCES ${UNIT_TESTS_SOURCES} ${CMAKE_SOURCE_DIR}/tests/unit_test_cpu.cpp)
 
   IF(JSON_ENABLED)
     SET(UNIT_TESTS_SOURCES ${UNIT_TESTS_SOURCES} ${CMAKE_SOURCE_DIR}/tests/unit_test_json_rpc.cpp)

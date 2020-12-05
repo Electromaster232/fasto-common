@@ -59,12 +59,12 @@ int main(int argc, char** argv) {
   static const std::string name = common::system_info::OperatingSystemName();
   static const std::string version = common::system_info::OperatingSystemVersion();
   static const std::string arch = common::system_info::OperatingSystemArchitecture();
-  static const auto cpu = common::system_info::CpuInfo::MakeCpuInfo();
+  static const auto cpu = common::system_info::CPU();
 
   std::cout << "Operation system: " << name << std::endl;
   std::cout << "Version: " << version << std::endl;
   std::cout << "Architecture: " << arch << std::endl;
-  std::cout << "Cpu brand: " << cpu.GetBrandName() << std::endl;
+  std::cout << "Cpu brand: " << cpu.vendor_name() << std::endl;
   std::cout << "RAM bytes total: " << ram_bytes_total << std::endl;
   std::cout << "RAM bytes available: " << ram_bytes_free << std::endl;
   std::cout << "HDD bytes total: " << hdd_bytes_total << std::endl;

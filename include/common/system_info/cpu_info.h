@@ -32,36 +32,99 @@
 #include <memory>
 #include <string>  // for string
 
+#include <common/macros.h>
 #include <common/system_info/types.h>  // for lcpu_count_t, core_count_t
 
 namespace common {
 namespace system_info {
 
-class CpuInfo {
+#if defined(ARCH_CPU_X86_FAMILY)
+namespace internal {
+
+// Compute the CPU family and model based on the vendor and CPUID signature.
+// Returns in order: family, model, extended family, extended model.
+std::tuple<int, int, int, int> ComputeX86FamilyAndModel(const std::string& vendor, int signature);
+
+}  // namespace internal
+#endif  // defined(ARCH_CPU_X86_FAMILY)
+
+// Query information about the processor.
+class CPU final {
  public:
-  static CpuInfo MakeCpuInfo();
+  explicit CPU();
 
-  std::string GetBrandName() const;
+  enum IntelMicroArchitecture {
+    PENTIUM,
+    SSE,
+    SSE2,
+    SSE3,
+    SSSE3,
+    SSE41,
+    SSE42,
+    AVX,
+    AVX2,
+    MAX_INTEL_MICRO_ARCHITECTURE
+  };
 
-  bool IsValid() const;
-  bool Equals(const CpuInfo& other) const;
+  // Accessors for CPU information.
+  const std::string& vendor_name() const { return cpu_vendor_; }
+  int signature() const { return signature_; }
+  int stepping() const { return stepping_; }
+  int model() const { return model_; }
+  int family() const { return family_; }
+  int type() const { return type_; }
+  int extended_model() const { return ext_model_; }
+  int extended_family() const { return ext_family_; }
+  bool has_mmx() const { return has_mmx_; }
+  bool has_sse() const { return has_sse_; }
+  bool has_sse2() const { return has_sse2_; }
+  bool has_sse3() const { return has_sse3_; }
+  bool has_ssse3() const { return has_ssse3_; }
+  bool has_sse41() const { return has_sse41_; }
+  bool has_sse42() const { return has_sse42_; }
+  bool has_popcnt() const { return has_popcnt_; }
+  bool has_avx() const { return has_avx_; }
+  bool has_avx2() const { return has_avx2_; }
+  bool has_aesni() const { return has_aesni_; }
+  bool has_non_stop_time_stamp_counter() const { return has_non_stop_time_stamp_counter_; }
+  bool is_running_in_vm() const { return is_running_in_vm_; }
+
+  // Armv8.5-A extensions for control flow and memory safety.
+  bool has_mte() const { return has_mte_; }
+  bool has_bti() const { return has_bti_; }
+
+  IntelMicroArchitecture GetIntelMicroArchitecture() const;
+  const std::string& cpu_brand() const { return cpu_brand_; }
 
  private:
-  CpuInfo();
+  // Query the processor for CPUID information.
+  void Initialize();
 
-  struct CpuInfoImpl;
-  std::shared_ptr<CpuInfoImpl> impl_;
+  int signature_ = 0;  // raw form of type, family, model, and stepping
+  int type_ = 0;       // process type
+  int family_ = 0;     // family of the processor
+  int model_ = 0;      // model of processor
+  int stepping_ = 0;   // processor revision number
+  int ext_model_ = 0;
+  int ext_family_ = 0;
+  bool has_mmx_ = false;
+  bool has_sse_ = false;
+  bool has_sse2_ = false;
+  bool has_sse3_ = false;
+  bool has_ssse3_ = false;
+  bool has_sse41_ = false;
+  bool has_sse42_ = false;
+  bool has_popcnt_ = false;
+  bool has_avx_ = false;
+  bool has_avx2_ = false;
+  bool has_aesni_ = false;
+  bool has_mte_ = false;  // Armv8.5-A MTE (Memory Taggging Extension)
+  bool has_bti_ = false;  // Armv8.5-A BTI (Branch Target Identification)
+  bool has_non_stop_time_stamp_counter_ = false;
+  bool is_running_in_vm_ = false;
+  std::string cpu_vendor_ = "unknown";
+  std::string cpu_brand_;
 };
-
-inline bool operator==(const CpuInfo& left, const CpuInfo& right) {
-  return left.Equals(right);
-}
-
-inline bool operator!=(const CpuInfo& left, const CpuInfo& right) {
-  return !(left == right);
-}
-
-const CpuInfo& CurrentCpuInfo();
 
 }  // namespace system_info
 }  // namespace common
