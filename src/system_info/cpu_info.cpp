@@ -146,7 +146,7 @@ std::string* CpuInfoBrand() {
     const char kProcessorPrefix[] = "Processor\t: ";
 
     std::string contents;
-    read_file_to_string("/proc/cpuinfo", &contents);
+    file_system::read_file_to_string("/proc/cpuinfo", &contents);
     DCHECK(!contents.empty());
 
     std::istringstream iss(contents);
