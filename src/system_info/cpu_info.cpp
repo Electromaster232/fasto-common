@@ -31,6 +31,7 @@
 
 #include <common/patterns/singleton_pattern.h>
 
+#include <common/license/utils.h>
 #include <common/sprintf.h>
 
 #include <libcpuid/libcpuid.h>
@@ -50,9 +51,8 @@ struct CurrentCpuInfo {
 namespace system_info {
 
 struct CpuInfo::CpuInfoImpl {
-  CpuInfoImpl() : raw_cpuid_(), cpuid_(), is_valid_(false) {}
+  CpuInfoImpl() : cpuid_(), is_valid_(false) {}
 
-  cpu_raw_data_t raw_cpuid_;
   cpu_id_t cpuid_;  // contains recognized CPU features data
   bool is_valid_;
 };
@@ -60,32 +60,7 @@ struct CpuInfo::CpuInfoImpl {
 CpuInfo::CpuInfo() : impl_(new CpuInfoImpl) {}
 
 std::string CpuInfo::GetBrandName() const {
-  return impl_->cpuid_.brand_str;
-}
-
-core_count_t CpuInfo::GetCoreCount() const {
-  if (impl_->cpuid_.num_cores <= 0) {
-    impl_->cpuid_.num_cores = 1;
-  }
-
-  return impl_->cpuid_.num_cores;
-}
-
-lcpu_count_t CpuInfo::GetLogicalCpusCount() const {
-  if (impl_->cpuid_.num_logical_cpus <= 0) {
-    impl_->cpuid_.num_logical_cpus = 1;
-  }
-
-  return impl_->cpuid_.num_logical_cpus;
-}
-
-lcpu_count_t CpuInfo::GetThreadsOnCore() const {
-  return GetLogicalCpusCount() / GetCoreCount();
-}
-
-std::string CpuInfo::GetNativeCpuID() const {
-  return MemSPrintf("%08X %08X %08X %08X", impl_->raw_cpuid_.basic_cpuid[0][0], impl_->raw_cpuid_.basic_cpuid[0][1],
-                    impl_->raw_cpuid_.basic_cpuid[0][2], impl_->raw_cpuid_.basic_cpuid[0][3]);
+  return impl_->cpuid_.vendor_str;
 }
 
 bool CpuInfo::IsValid() const {
@@ -93,9 +68,7 @@ bool CpuInfo::IsValid() const {
 }
 
 bool CpuInfo::Equals(const CpuInfo& other) const {
-  return IsValid() == other.IsValid() && GetBrandName() == other.GetBrandName() &&
-         GetCoreCount() == other.GetCoreCount() && GetLogicalCpusCount() == other.GetLogicalCpusCount() &&
-         GetNativeCpuID() == other.GetNativeCpuID();
+  return IsValid() == other.IsValid() && GetBrandName() == other.GetBrandName();
 }
 
 const CpuInfo& CurrentCpuInfo() {
@@ -118,7 +91,6 @@ CpuInfo CpuInfo::MakeCpuInfo() {
   }
 
   CpuInfo inf;
-  inf.impl_->raw_cpuid_ = raw;
   inf.impl_->cpuid_ = data;
   inf.impl_->is_valid_ = true;
   return inf;

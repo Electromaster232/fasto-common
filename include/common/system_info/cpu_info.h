@@ -42,10 +42,6 @@ class CpuInfo {
   static CpuInfo MakeCpuInfo();
 
   std::string GetBrandName() const;
-  core_count_t GetCoreCount() const;
-  lcpu_count_t GetLogicalCpusCount() const;
-  lcpu_count_t GetThreadsOnCore() const;
-  std::string GetNativeCpuID() const;
 
   bool IsValid() const;
   bool Equals(const CpuInfo& other) const;
