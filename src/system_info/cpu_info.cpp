@@ -33,6 +33,21 @@
 
 #include <common/types.h>
 
+#if defined(ARCH_CPU_ARM_FAMILY) && (defined(OS_ANDROID) || defined(OS_LINUX) || defined(OS_CHROMEOS))
+#include <asm/hwcap.h>
+#include <sys/auxv.h>
+// Temporary definitions until a new hwcap.h is pulled in.
+#define HWCAP2_MTE (1 << 18)
+#define HWCAP2_BTI (1 << 17)
+#endif
+
+#if defined(ARCH_CPU_X86_FAMILY)
+#if defined(COMPILER_MSVC)
+#include <immintrin.h>  // For _xgetbv()
+#include <intrin.h>
+#endif
+#endif
+
 namespace common {
 namespace system_info {
 
