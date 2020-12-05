@@ -35,6 +35,7 @@
 
 #if defined(ARCH_CPU_ARM_FAMILY) && (defined(OS_ANDROID) || defined(OS_LINUX) || defined(OS_CHROMEOS))
 #include <asm/hwcap.h>
+#include <common/file_system/file_system.h>
 #include <sys/auxv.h>
 // Temporary definitions until a new hwcap.h is pulled in.
 #define HWCAP2_MTE (1 << 18)
@@ -145,7 +146,7 @@ std::string* CpuInfoBrand() {
     const char kProcessorPrefix[] = "Processor\t: ";
 
     std::string contents;
-    ReadFileToString(FilePath("/proc/cpuinfo"), &contents);
+    read_file_to_string("/proc/cpuinfo", &contents);
     DCHECK(!contents.empty());
 
     std::istringstream iss(contents);
