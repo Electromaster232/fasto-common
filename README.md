@@ -21,7 +21,6 @@ Dependencies (Optional)
   * Snappy
   * LZ4
   * Json-c
-  * Cpuid
   * LibEv
   * Qt
 
