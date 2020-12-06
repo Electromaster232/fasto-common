@@ -122,7 +122,7 @@ class CPU final {
   bool has_bti_ = false;  // Armv8.5-A BTI (Branch Target Identification)
   bool has_non_stop_time_stamp_counter_ = false;
   bool is_running_in_vm_ = false;
-  std::string cpu_vendor_ = "unknown";
+  std::string cpu_vendor_ = "Unknown";
   std::string cpu_brand_;
 };
 
