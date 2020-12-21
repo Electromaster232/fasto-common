@@ -164,7 +164,7 @@ class SocketTls : public common::net::ISocketFd {
 
     SSL_CTX* ctx = SSL_CTX_new(method);
     if (!ctx) {
-      hs.Disconnect();
+      ignore_result(hs.Disconnect());
       return common::make_errno_error_inval();
     }
 
@@ -173,7 +173,7 @@ class SocketTls : public common::net::ISocketFd {
     ctx = nullptr;
     if (!ssl) {
       SSL_free(ssl);
-      hs.Disconnect();
+      ignore_result(hs.Disconnect());
       return common::make_errno_error_inval();
     }
 
@@ -183,8 +183,15 @@ class SocketTls : public common::net::ISocketFd {
       int err = SSL_get_error(ssl, e);
       char* str = ERR_error_string(err, nullptr);
       SSL_free(ssl);
-      hs.Disconnect();
+      ignore_result(hs.Disconnect());
       return common::make_errno_error(str, EINTR);
+    }
+
+    X509* cert = SSL_get_peer_certificate(ssl);
+    if (cert == NULL) {
+      SSL_free(ssl);
+      ignore_result(hs.Disconnect());
+      return common::make_errno_error("Could not get a certificate", EINTR);
     }
 
     hs_.SetInfo(hs.GetInfo());
