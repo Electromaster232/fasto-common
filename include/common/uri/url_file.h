@@ -1,4 +1,4 @@
-/*  Copyright (C) 2014-2020 FastoGT. All right reserved.
+/*  Copyright (C) 2014-2021 FastoGT. All right reserved.
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are
@@ -29,8 +29,8 @@
 
 #pragma once
 
-#include <common/uri/url_parse_internal.h>
 #include <common/string_util.h>
+#include <common/uri/url_parse_internal.h>
 
 namespace common {
 namespace uri {

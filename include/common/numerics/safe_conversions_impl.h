@@ -1,4 +1,4 @@
-/*  Copyright (C) 2014-2020 FastoGT. All right reserved.
+/*  Copyright (C) 2014-2021 FastoGT. All right reserved.
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are
@@ -265,7 +265,8 @@ struct NarrowingRange {
 
 template <typename Dst,
           typename Src,
-          template <typename> class Bounds,
+          template <typename>
+          class Bounds,
           IntegerRepresentation DstSign =
               std::is_signed<Dst>::value ? INTEGER_REPRESENTATION_SIGNED : INTEGER_REPRESENTATION_UNSIGNED,
           IntegerRepresentation SrcSign =
@@ -280,7 +281,8 @@ struct DstRangeRelationToSrcRangeImpl;
 // Same sign narrowing: The range is contained for normal limits.
 template <typename Dst,
           typename Src,
-          template <typename> class Bounds,
+          template <typename>
+          class Bounds,
           IntegerRepresentation DstSign,
           IntegerRepresentation SrcSign>
 struct DstRangeRelationToSrcRangeImpl<Dst, Src, Bounds, DstSign, SrcSign, NUMERIC_RANGE_CONTAINED> {
