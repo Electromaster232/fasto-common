@@ -75,6 +75,11 @@ ErrnoError ISocketFd::WriteImpl(const void* data, size_t size, size_t* nwrite_ou
 ErrnoError ISocketFd::ReadImpl(void* out_data, size_t max_size, size_t* nread_out) {
   return read_from_tcp_socket(GetFd(), out_data, max_size, nread_out);
 }
+
+ErrnoError ISocketFd::SendFileImpl(descriptor_t file_fd, size_t file_size) {
+  const socket_descr_t fd = GetFd();
+  return send_file_to_fd(fd, file_fd, 0, file_size);
+}
 #endif
 
 ErrnoError ISocketFd::SendFile(descriptor_t file_fd, size_t file_size) {
