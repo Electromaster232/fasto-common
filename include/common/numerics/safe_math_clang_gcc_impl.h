@@ -88,7 +88,6 @@ struct ClampedMulFastAsmOp {
   }
 };
 #endif  // BASE_HAS_ASSEMBLER_SAFE_MATH
-#undef BASE_HAS_ASSEMBLER_SAFE_MATH
 
 template <typename T, typename U>
 struct CheckedAddFastOp {
