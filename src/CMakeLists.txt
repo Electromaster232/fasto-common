@@ -639,8 +639,8 @@ SET(COMMON_HEADERS
   ${CMAKE_SOURCE_DIR}/include/common/numerics/checked_math.h
   ${CMAKE_SOURCE_DIR}/include/common/numerics/checked_math_impl.h
   ${CMAKE_SOURCE_DIR}/include/common/numerics/safe_conversions.h
-  #${CMAKE_SOURCE_DIR}/include/common/numerics/safe_conversions_impl.h
-  #${CMAKE_SOURCE_DIR}/include/common/numerics/safe_conversions_arm_impl.h
+  ${CMAKE_SOURCE_DIR}/include/common/numerics/safe_conversions_impl.h
+  ${CMAKE_SOURCE_DIR}/include/common/numerics/safe_conversions_arm_impl.h
   ${CMAKE_SOURCE_DIR}/include/common/numerics/safe_math_shared_impl.h
   ${CMAKE_SOURCE_DIR}/include/common/numerics/safe_math_clang_gcc_impl.h
 
