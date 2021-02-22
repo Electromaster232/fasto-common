@@ -53,6 +53,8 @@ struct JsonRPCRequest {
   bool IsNotification() const;
   bool Equals(const JsonRPCRequest& req) const;
 
+  std::string ToString() const;
+
   json_rpc_id id;
   json_rpc_method method;
   json_rpc_request_params params;

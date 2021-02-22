@@ -102,6 +102,8 @@ struct JsonRPCResponse {
   bool IsValid() const;
   bool Equals(const JsonRPCResponse& resp) const;
 
+  std::string ToString() const;
+
   json_rpc_id id;
   json_rpc_message message;
   json_rpc_error error;

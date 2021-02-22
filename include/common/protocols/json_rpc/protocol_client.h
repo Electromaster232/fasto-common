@@ -18,6 +18,7 @@
 #include <map>
 #include <string>
 #include <utility>
+#include <memory>
 
 #include <common/libev/io_client.h>
 #include <common/text_decoders/iedcoder.h>
@@ -58,6 +59,7 @@ class ProtocolClient : public Client {
       : base_class(args...), compressor_(compressor), id_(0) {}
 
   ErrnoError WriteRequest(const JsonRPCRequest& request, callback_t cb = callback_t()) WARN_UNUSED_RESULT {
+    // INFO_LOG() << "WriteRequest: " << request.ToString();
     ErrnoError err = detail::WriteRequest(this, compressor_.get(), request);
     if (!err && !request.IsNotification()) {
       requests_queue_[request.id] = std::make_pair(request, cb);
@@ -66,6 +68,7 @@ class ProtocolClient : public Client {
   }
 
   ErrnoError WriteResponse(const JsonRPCResponse& response) WARN_UNUSED_RESULT {
+    // INFO_LOG() << "WriteResponse: " << response.ToString();
     return detail::WriteResponse(this, compressor_.get(), response);
   }
 

@@ -332,6 +332,18 @@ Error ParseJsonRPC(const std::string& data, JsonRPCRequest** result_req, JsonRPC
   return err;
 }
 
+std::string JsonRPCRequest::ToString() const {
+  std::string result;
+  ignore_result(MakeJsonRPCRequest(*this, &result));
+  return result;
+}
+
+std::string JsonRPCResponse::ToString() const {
+  std::string result;
+  ignore_result(MakeJsonRPCResponse(*this, &result));
+  return result;
+}
+
 }  // namespace json_rpc
 }  // namespace protocols
 }  // namespace common
